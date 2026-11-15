@@ -1,8 +1,8 @@
-# LoG Hub self-service pipeline
+# Legacy of Goku Hub
 
 LOG-HUB-003 provides signed durable recovery in the private backup repository, immutable releases, and protected public hash receipts. The public source is [legacy-of-goku-hub](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub). See [operations](docs/OPERATIONS.md) for setup, monitoring, recovery and off-platform export, and [verification](VERIFICATION.md) for measured hosted results. All configured features use GitHub Free.
 
-Static catalog infrastructure for Legacy of Goku, Legacy of Goku II and Buu's Fury. Developers submit through a repository manifest or guided GitHub form. GitHub Actions validates, normalizes and publishes eligible listings as artifacts. No frontend, CMS, dashboard, database, AI service, monetization or production server is needed.
+Static catalog infrastructure for Legacy of Goku, Legacy of Goku II and Buu's Fury. Developers submit through a repository manifest or guided GitHub form. GitHub Actions validates, normalizes and publishes eligible listings as artifacts. An Astro static frontend is implemented for review; it is not publicly deployed. No CMS, dashboard, database, runtime AI service, monetization or production server is needed.
 
 The existing Node 24, JSON Schema, GitHub release, Sharp image and deterministic catalog components remain in use. Legacy CLI tools and their regression tests are retained for migration, not the routine publishing path. Production has no community-approved records. Policy explicitly delists the isolated integration fixture; test data never becomes a community listing.
 
@@ -148,3 +148,7 @@ LOG-HUB-003 hosted publication and recovery have passed. See VERIFICATION.md for
 Actual issue-event processing and feedback passed in production with the isolated fixture excluded.
 
 With the owner as sole CODEOWNER, independently authored policy PRs can be owner-reviewed; owner-authored PRs need a second designated CODEOWNER.
+
+## Approved website design (LOG-HUB-004)
+
+The Astro implementation, honest empty state, stable project pages, responsive directory and accurate seven-Dragon-Ball preview are ready for normal PR review. Persistent voting and public deployment remain disabled. See [the frontend report and Windows guide](docs/frontend/README.md), [rendered screenshots](docs/frontend/evidence/empty-desktop.png), [skill investigation](docs/frontend/SKILLS.md) and [independent review](docs/frontend/REVIEW.md). The site consumes signed recovery exports and never substitutes synthetic fixtures for approved projects.

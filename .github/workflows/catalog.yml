@@ -239,3 +239,70 @@ jobs:
       group: loghub-operations-alert
       cancel-in-progress: false
 
+  website:
+    needs: publish
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - *a2
+      - *a3
+      - *a4
+      - *a5
+      - id: app
+        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349
+        with:
+          app-id: ${{ vars.BACKUP_APP_ID }}
+          private-key: ${{ secrets.BACKUP_APP_PRIVATE_KEY }}
+          owner: ${{ steps.config.outputs.owner }}
+          repositories: ${{ steps.config.outputs.repository }}
+          permission-contents: read
+      - run: node src/backup-cli.js export .previous
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BACKUP_TOKEN: ${{ steps.app.outputs.token }}
+      - run: npm run site:build -- --snapshot .previous
+        env:
+          SITE_BASE: /legacy-of-goku-hub/
+      - run: node src/backup-cli.js config
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: website
+          path: .site/production/
+          retention-days: 30
+          if-no-files-found: error
+      - if: vars.SITE_DEPLOYMENT_ENABLED == 'true'
+        run: node tools/site/check-deployment.js
+      - if: vars.SITE_DEPLOYMENT_ENABLED == 'true'
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
+        with:
+          path: .site/production/
+  deploy-website:
+    needs: website
+    if: vars.SITE_DEPLOYMENT_ENABLED == 'true' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Reject a stale source revision before deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+          SOURCE_BRANCH: ${{ github.event.repository.default_branch }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          current=$(gh api "repos/$SOURCE_REPOSITORY/git/ref/heads/$SOURCE_BRANCH" --jq '.object.sha')
+          test "$current" = "$EXPECTED_SHA"
+      - id: deploy
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e

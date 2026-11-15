@@ -1,0 +1,31 @@
+:root {
+  --ink: #000000;
+  --navy: #202040;
+  --charcoal: #282828;
+  --paper: #f8f8f8;
+  --muted: #b8b8b8;
+  --gold: #f8d040;
+  --orange: #f89018;
+  --orange-soft: #f8a858;
+  --blue: #0068f8;
+  --blue-deep: #2060a8;
+  --ice: #90c8f8;
+  --teal: #00c8c8;
+  --green: #58f870;
+  --violet: #9880f8;
+  --red: #d01028;
+  --background: color-mix(in srgb, var(--navy) 36%, var(--ink));
+  --surface: color-mix(in srgb, var(--navy) 64%, var(--charcoal));
+  --surface-low: color-mix(in srgb, var(--navy) 40%, var(--ink));
+  --border: color-mix(in srgb, var(--ice) 46%, var(--navy));
+  --line: color-mix(in srgb, var(--ice) 23%, var(--navy));
+  --radius-card: 16px;
+  --radius-control: 10px;
+  --gutter: 36px;
+  --content-width: 1448px;
+  --shadow: 0 6px 18px #00000038;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--paper);
+  background: var(--background);
+  color-scheme: dark;
+}

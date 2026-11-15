@@ -36,3 +36,11 @@
 - Record successful issue-event production and feedback verification.
 
 - Clarify the sole-CODEOWNER review boundary for future owner-authored changes.
+
+## LOG-HUB-004
+
+- Implement the approved Astro static homepage, stable project details, responsive layouts and honest empty state.
+- Add canonical SVG Dragon Ball star arrangements and accessible, unsaved rating previews; no voting backend.
+- Consume signed recovery exports with current delisting, preserve existing catalog/backup stages, and prepare default-off Pages deployment with isolated permissions.
+- Add isolated fixtures, 20 browser checks, axe/performance evidence, palette mappings and bounded independent review; retain all existing regressions.
+- Keep reference artwork, installed development skills and local previews out of production. No auto merge or public deployment.

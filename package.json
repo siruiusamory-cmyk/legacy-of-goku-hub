@@ -14,13 +14,21 @@
     "publish:local": "node src/service-cli.js publish",
     "backup": "node src/backup-cli.js backup",
     "restore": "node src/backup-cli.js restore",
-    "backup:health": "node src/backup-cli.js health"
+    "backup:health": "node src/backup-cli.js health",
+    "site:fixture": "node tools/site/build.js --fixture",
+    "site:build": "node tools/site/build.js",
+    "site:serve": "node tools/site/serve.js",
+    "test:browser": "playwright test",
+    "test:site": "node --test tests/site/*.test.js"
   },
   "dependencies": {
     "ajv": "8.20.0",
     "sharp": "0.35.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.65.1",
+    "astro": "7.4.12",
     "yaml": "2.9.1"
   }
 }

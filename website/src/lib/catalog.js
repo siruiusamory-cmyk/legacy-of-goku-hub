@@ -1,0 +1,15 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+const input = process.env.SITE_INPUT;
+export const catalog = JSON.parse(await fs.readFile(path.join(input, 'catalog.json'), 'utf8'));
+export const provenance = JSON.parse(await fs.readFile(path.join(input, 'provenance.json'), 'utf8'));
+export const base = import.meta.env.BASE_URL;
+export const href = relative => base + relative;
+export const names = {'legacy-of-goku': 'LoG 1', 'legacy-of-goku-2': 'LoG II', 'buus-fury': "Buu’s Fury", multiple: 'LoG series', 'rom-hack': 'ROM Hack', 'fan-project': 'Fan Project', tool: 'Tools', resource: 'Resource', released: 'Released', 'in-development': 'In Development', 'on-hold': 'On Hold', discontinued: 'Discontinued'};
+export const fullGame = {'legacy-of-goku': 'Legacy of Goku', 'legacy-of-goku-2': 'Legacy of Goku II', 'buus-fury': "Buu’s Fury", multiple: 'Multiple games'};
+export const projectURL = project => href('projects/' + project.id + '/');
+export const submitURL = 'https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/issues/new/choose';
+export const sourceURL = 'https://github.com/siruiusamory-cmyk/legacy-of-goku-hub';
+export const rating = project => provenance.purpose === 'fixture' && project.id !== 'fixture-1' ? {average: [6, 5.6, 6.2, 5.8, 6.1, 5.3, 6.4][catalog.projects.indexOf(project)] ?? 6, count: 412} : {};
+export const formatDate = value => new Intl.DateTimeFormat('en-US', {month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC'}).format(new Date(value));
+export const formatSize = size => size < 1048576 ? `${(size / 1024).toFixed(1)} KB` : `${(size / 1048576).toFixed(1)} MB`;
