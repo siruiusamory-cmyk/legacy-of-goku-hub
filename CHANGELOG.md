@@ -1,5 +1,13 @@
 # Changelog
 
+## LOG-HUB-004B (typography review candidate)
+
+- Refined heading tracking and mobile title/panel sizes; modestly enlarged branding with narrow-header regression checks and matching polish screenshots.
+
+- Self-hosted four optimized Latin Barlow Condensed and Inter styles, preserving OFL notices and source hashes.
+- Added shared typography tokens, upright section/card headings, selective italic display titles and readable Inter body/control text.
+- Captured matching real-preview before/after views and added font loading, integrity and long-title checks.
+
 ## LOG-HUB-004A (isolated review candidate)
 
 - Added read-only ingestion and a clearly separated preview for four real owner repositories.
