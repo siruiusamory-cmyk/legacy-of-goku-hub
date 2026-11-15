@@ -1,5 +1,11 @@
 # Changelog
 
+## LOG-HUB-008: public launch preparation
+
+- Refresh four real candidate repositories and prepare unapproved submission drafts; DragonByte Z still needs current owner-approved cover art.
+- Document launch blockers, no-persistent-voting recommendation, maintainer moderation, deployment and emergency rollback procedures, with independent Zeroshot findings.
+- Reconcile operational documentation with observed branch protection. Pages, production policy and listing approvals remain unchanged; rating disclosure is isolated in PR #29.
+
 ## LOG-HUB-006 (content moderation review candidate)
 
 - Require protected first-content approval and ordered raw/normalized artwork hash approvals for every owner.
@@ -102,6 +108,7 @@
 LOG-HUB-006 independent review correction: last-artwork removal may create an empty protected snapshot only under explicit identity-bound suspension/delisting policy; accidental empty resets remain blocked.
 
 Use the Report project content Issue Form for inappropriate artwork or misleading information. Reports notify maintainers, carry no publication authority and do not automatically hide projects. Supply URLs and text only, not image attachments.
+
 # LOG-HUB-008: rating disclosure
 
 - Label the existing seven-ball selector as an unsaved preview; no public votes or ratings service are implied.

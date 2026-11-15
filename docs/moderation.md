@@ -1,5 +1,7 @@
 # Content moderation (LOG-HUB-006)
 
+For routine operation use the concise [maintainer checklist](launch/MODERATION-CHECKLIST.md), exercised in LOG-HUB-007 and prepared for launch in LOG-HUB-008. See [emergency removal/rollback](launch/DEPLOYMENT.md). Current protection requires strict `test` and PRs but zero human approvals/no enforced CODEOWNER review (owner change during LOG-HUB-005); actual human content inspection remains required by this procedure, not inferred from GitHub approval enforcement.
+
 ## Policy and publication authority
 
 Every first listing needs a human content decision in `policy/publishing.json`, through a normal protected source PR. There is no trusted-owner exception. Repository ownership, team representation, content approval and technical validation are different decisions. A label, submitter checkbox, issue author, manifest or bot cannot grant approval. CODEOWNERS remains the ownership map; this change does not alter GitHub protection settings or add paid features. Only authorized maintainers should merge policy changes; automated checks cannot decide whether an image is appropriate.

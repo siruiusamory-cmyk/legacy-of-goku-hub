@@ -10,9 +10,11 @@ Static catalog infrastructure for Legacy of Goku, Legacy of Goku II and Buu's Fu
 
 The existing Node 24, JSON Schema, GitHub release, Sharp image and deterministic catalog components remain in use. Legacy CLI tools and their regression tests are retained for migration, not the routine publishing path. Production has no community-approved records. Policy explicitly delists the isolated integration fixture; test data never becomes a community listing.
 
+Current launch status: [LOG-HUB-008 readiness report](docs/launch/README.md), [candidate inventory](docs/launch/INVENTORY.md), [moderation checklist](docs/launch/MODERATION-CHECKLIST.md) and [deployment/rollback checklist](docs/launch/DEPLOYMENT.md). The launch plan is prepared; public launch remains blocked on the listed owner decisions. No deployment or real listing approval is authorized here. Historical milestone reports below describe their state at the time.
+
 ## Legacy of Goku visual identity
 
-LOG-HUB-004C adds shared gold-edged menu framing, an authentic LoG II canyon backdrop at crisp native/mobile and 2x/desktop scale, compact featured-project presentation, and a reusable unavailable-artwork state. [Visual identity report and matching before/after evidence](docs/frontend/visual-identity/README.md) cover art credits, scaling, tokens, accessibility, performance and review boundaries. The final refinement confines game-specific Kame House, Goku's House and Snake Way scenery to the hero, uses Buu's Fury portrait framing for featured content, quiets secondary borders, preserves complete-sentence summaries and fixes narrow filters. See the [refinement report](docs/frontend/visual-identity/REFINEMENT.md) for provenance limits and independent review. The candidate is not deployed or approved for merging.
+LOG-HUB-004C adds shared gold-edged menu framing, an authentic LoG II canyon backdrop at crisp native/mobile and 2x/desktop scale, compact featured-project presentation, and a reusable unavailable-artwork state. [Visual identity report and matching before/after evidence](docs/frontend/visual-identity/README.md) cover art credits, scaling, tokens, accessibility, performance and review boundaries. The final refinement confines game-specific Kame House, Goku's House and Snake Way scenery to the hero, uses Buu's Fury portrait framing for featured content, quiets secondary borders, preserves complete-sentence summaries and fixes narrow filters. See the [refinement report](docs/frontend/visual-identity/REFINEMENT.md) for provenance limits and independent review. The frontend PRs are integrated into main; the website is not deployed.
 
 ## Typography review
 
@@ -138,7 +140,7 @@ LOG-HUB-003 hosted publication and recovery have passed. See VERIFICATION.md for
 
 Actual issue-event processing and feedback passed in production with the isolated fixture excluded.
 
-With the owner as sole CODEOWNER, independently authored policy PRs can be owner-reviewed; owner-authored PRs need a second designated CODEOWNER.
+CODEOWNERS routes responsibility to the owner. Live protection requires PRs and strict test checks; human approval count is zero and CODEOWNER review is not enforced. Human content review remains mandatory procedure.
 
 ## Approved website design (LOG-HUB-004)
 
@@ -146,7 +148,7 @@ The Astro implementation, honest empty state, stable project pages, responsive d
 
 Frontend CI uses the hosted runner's installed Chrome with sandboxing enabled; local Windows checks use project-local Chromium. Visual captures explicitly load and decode lazy images before inspecting them.
 
-[PR #24](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/pull/24) has passing hosted Node and browser checks. Owner review and deployment authorization remain pending.
+[PR #24](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/pull/24) has passing hosted Node and browser checks. PRs #24–#27 and moderation #28 are merged; public deployment and real listing approvals remain pending.
 
 Detail artwork uses a padding-trimmed display derivative scaled proportionally to cover the original fixed portrait frame. Catalog covers and cards remain unchanged.
 

@@ -1,6 +1,6 @@
 # LOG-HUB-004: approved design implementation
 
-This Astro static frontend is awaiting controlled integration through stacked PRs #24 through #27. It has not been merged or publicly deployed. Existing submission, ownership, moderation, release synchronization, signed backup and recovery modules are unchanged. Current visual details are recorded in the [typography](typography/README.md) and [visual refinement](visual-identity/REFINEMENT.md) reports.
+The Astro frontend PRs #24–#27 and moderation #28 are integrated into main; the website is not deployed. Follow the current [launch report](../launch/README.md) and [deployment checklist](../launch/DEPLOYMENT.md). Historical verification below records the frontend milestone; its former merge/review status is superseded by LOG-HUB-008. Current visual details are recorded in the [typography](typography/README.md) and [visual refinement](visual-identity/REFINEMENT.md) reports.
 
 ## Architecture and data boundary
 
@@ -67,7 +67,7 @@ Gold gradient buttons are primary; dark bordered buttons are secondary. Blue ide
 
 ## Rating boundary and accurate stars
 
-Production has no rating aggregate source: it shows **Not rated yet**, never fixture scores. The selector displays only **Rate this project** and seven Dragon Balls. Native radio inputs retain numeric `aria-label` names, a group named by the visible heading, and arrows/Space, pointer and touch support. The heading and balls share the desktop panel centerline. There is no instruction/status paragraph or live preview announcement. Choices remain local and unsaved: there is no submit endpoint, cookie, localStorage or aggregation, and `pageshow` resets the preview.
+Production has no rating aggregate source: it shows **Not rated yet**, never fixture scores. The selector displays only **Preview only · not saved** and seven Dragon Balls. Native radio inputs retain numeric `aria-label` names, a group named by the visible heading, and arrows/Space, pointer and touch support. The heading and balls share the desktop panel centerline. There is no instruction/status paragraph or live preview announcement. Choices remain local and unsaved: there is no submit endpoint, cookie, localStorage or aggregation, and `pageshow` resets the preview.
 
 Star patterns were checked against the [official Banpresto seven-ball image](https://en.dragon-ball-official.com/news/01_2525.html). The source photo is local review evidence only; the website uses original SVG geometry. Two stars run upper-left to lower-right; three form a triangle; four form a square. Five uses 1-2-2 rows, six 2-3-1 with a center star, and seven a hexagonal ring plus center, 2-3-2. Every star is an upright five-point polygon. Native font glyph differences cannot change them. Unit tests check positions, count and orientation; browser tests check rendered polygon counts.
 
@@ -109,7 +109,7 @@ A separate Pages job has source read plus `pages:write` and `id-token:write`, no
 
 Before first public deployment, the owner must:
 
-1. Inspect these screenshots and the PR; obtain the normal approving CODEOWNER review and passing checks. Do not bypass protection.
+1. Use the current [deployment checklist](../launch/DEPLOYMENT.md), review the exact launch revision and passing checks, and obtain owner authorization. Observed protection requires PRs/strict `test` but zero human approving reviews and no enforced CODEOWNER review; this does not replace required human content inspection. Do not bypass or alter protection.
 2. Configure repository Settings -> Pages -> Source: GitHub Actions.
 3. Configure the `github-pages` environment's deployment branch restriction to protected main and any desired initial human approval. Permanent per-run approvals would intentionally prevent fully automatic updates, so choose that policy explicitly.
 4. After frontend approval/merge, set repository variable `SITE_DEPLOYMENT_ENABLED=true` and dispatch the catalog workflow. Inspect the deployed result and Actions receipt. No paid plan is required for the public repository.
