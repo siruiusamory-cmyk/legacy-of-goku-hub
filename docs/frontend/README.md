@@ -125,3 +125,7 @@ Skill versions, compatibility, reviewed install behavior and scoped use are reco
 Hosted browser setup: the first Ubuntu run stopped before page tests because AppArmor denied the downloaded Chromium sandbox. CI now selects the runner's preinstalled Chrome through Playwright's supported channel setting; chromiumSandbox remains true. This follows Chromium's documented installed-Chrome profile and does not change kernel policy or disable sandboxing. Windows continues using the project-local pinned Chromium download.
 
 The next hosted run passed 19 functional/accessibility cases with sandboxed Chrome 157 but exposed a screenshot-only wait on offscreen lazy gallery images. The capture helper now explicitly requests every image before awaiting successful decoding. Production keeps lazy loading; broken images fail the test instead of being silently ignored. No test was skipped or weakened.
+
+## Hosted GitHub verification
+
+PR #24 passed both hosted checks on candidate 68ac1c0: [73 Node tests](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/actions/runs/43673022005) and [20 browser tests](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/actions/runs/43673022067). The browser run used the preinstalled Linux Chrome 157 channel with chromiumSandbox enabled, including the complete screenshot stage. Earlier sandbox-startup and lazy-image-capture failures are retained as failed attempts, not counted as successful verification. Pages deployment remains off and the PR remains unmerged.
