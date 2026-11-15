@@ -78,3 +78,5 @@
 - Verify all 73 Node and 20 browser tests on hosted Linux with sandboxing enabled; retain normal PR approval and default-off deployment.
 
 - Restored original detail frame dimensions; remove normalization padding from a detail-only derivative and scale the complete banner to fill the frame interior.
+
+- Preserve banner proportions inside the unchanged detail frame using a logo-focused cover crop, replacing stretched fill sizing.
