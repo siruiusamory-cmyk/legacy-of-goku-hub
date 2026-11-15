@@ -18,7 +18,7 @@ test('visual identity matching real-page evidence',async({page},info)=>{
 });
 
 test('missing artwork has a neutral fallback and preserves navigation and metadata',async({page})=>{
-  await page.route('**/assets/gh-1429374563/cover.webp',r=>r.fulfill({status:404,body:'unavailable'}));
+  await page.route('**/assets/gh-1429374563/{cover,detail}.webp',r=>r.fulfill({status:404,body:'unavailable'}));
   for(const route of ['/','/projects/gh-1429374563/']){
     await page.goto(route);
     const fallback=page.locator(route==='/'?'.project-card[data-id="gh-1429374563"] .artwork-unavailable':'.detail-art .artwork-unavailable');
@@ -84,8 +84,8 @@ test('portrait frames have transparent corner surfaces and one complete centered
     await page.setViewportSize({width,height:844});await page.goto(route);
     const frame=page.locator(route==='/'?'.spotlight-inner':'.detail-art');
     if(route!=='/'){
-      const fit=await frame.evaluate(e=>{const f=e.getBoundingClientRect(),i=e.querySelector('img').getBoundingClientRect(),s=getComputedStyle(e);return {width:f.width-parseFloat(s.borderLeftWidth)-parseFloat(s.borderRightWidth)-i.width,height:f.height-parseFloat(s.borderTopWidth)-parseFloat(s.borderBottomWidth)-i.height,ratio:i.width/i.height};});
-      expect(Math.abs(fit.width)).toBeLessThan(.02);expect(Math.abs(fit.height)).toBeLessThan(.02);expect(fit.ratio).toBeCloseTo(16/9,3);
+      const fit=await frame.evaluate(e=>{const f=e.getBoundingClientRect(),image=e.querySelector('img'),i=image.getBoundingClientRect(),s=getComputedStyle(e);return {width:f.width-parseFloat(s.borderLeftWidth)-parseFloat(s.borderRightWidth)-i.width,height:f.height-parseFloat(s.borderTopWidth)-parseFloat(s.borderBottomWidth)-i.height,natural:image.naturalWidth/image.naturalHeight,frameHeight:f.height,frameWidth:f.width,slotWidth:parseFloat(getComputedStyle(e.closest('.detail-hero')).gridTemplateColumns),fit:getComputedStyle(image).objectFit};});
+      expect(Math.abs(fit.width)).toBeLessThan(.02);expect(Math.abs(fit.height)).toBeLessThan(.02);expect(fit.natural).toBeGreaterThan(3.8);if(width>900)expect(fit.frameWidth).toBeCloseTo(fit.slotWidth,1);expect(fit.fit).toBe('fill');if(width>580)expect(fit.frameHeight).toBe(276);else expect(fit.frameWidth/fit.frameHeight).toBeCloseTo(16/9,2);
     }
     if(route!=='/')for(const choice of await page.locator('.rating-choice').all()){
       const offset=await choice.evaluate(e=>{const r=e.getBoundingClientRect(),b=e.querySelector('.dragon-ball').getBoundingClientRect();return b.y+b.height/2-r.y-r.height/2;});

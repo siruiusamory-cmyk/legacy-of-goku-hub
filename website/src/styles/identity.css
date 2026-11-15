@@ -117,9 +117,8 @@ body {
 .empty-directory {border: 1px solid var(--border); background: var(--panel-fill); border-radius: var(--frame-radius);}
 .project-artwork {position: relative; display: block; width: 100%; height: 100%; min-width: 0;}
 .project-artwork img {display: block; width: 100%; height: 100%;}
-.detail-art.project-artwork {height: auto; aspect-ratio: auto;}
-.detail-art.project-artwork img {height: auto; object-fit: contain;}
-.detail-art .artwork-unavailable {aspect-ratio: 16/9;}
+.detail-art.project-artwork {height: 276px;}
+.detail-art.project-artwork img {object-fit: fill;}
 .artwork-unavailable {height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 16px; background: var(--menu-fill); color: var(--muted); font-size: var(--text-small);}
 .artwork-unavailable>span {font-size: 24px; color: var(--gold);}
 @media(max-width:900px) {
@@ -148,6 +147,7 @@ body {
   .filter-controls .filter-chip,.sort-label select {min-height: 44px;}
   .directory-heading {gap: 10px;}
   .directory-heading h2 {padding-inline: 10px;}
+  .detail-art.project-artwork {height: auto; aspect-ratio: 16/9;}
   .detail-rating {padding: 18px 12px;}
   .panel {padding: 12px;}
   .description-box {padding: 12px;}

@@ -7,6 +7,7 @@ import {readJSON} from '../../src/records.js';
 import {validateSiteCatalog} from './catalog.js';
 import {fixtureInput} from './fixtures.js';
 import {copyRealPreview} from './real-preview.js';
+import {detailImage} from './artwork.js';
 const root = fileURLToPath(new URL('../../',import.meta.url));
 process.chdir(root);
 const fixture = process.argv.includes('--fixture');
@@ -44,6 +45,14 @@ else {
   provenance = {purpose:'production',point:recovered.point,snapshot_id:recovered.envelope.snapshot_id,source_commit:recovered.envelope.provenance.source_commit};
 }
 await validateSiteCatalog(catalog);
+const artwork={};
+for(const project of catalog.projects){
+  const image=await detailImage(await fs.readFile(path.join(root,'.site/input/public',project.cover)));
+  const src=`assets/${project.id}/detail.webp`;
+  await fs.writeFile(path.join(root,'.site/input/public',src),image.data);
+  artwork[project.id]={src,width:image.width,height:image.height};
+}
+await fs.writeFile(path.join(root,'.site/input/artwork.json'),JSON.stringify(artwork));
 await fs.writeFile(path.join(root,'.site/input/catalog.json'),JSON.stringify(catalog));
 await fs.writeFile(path.join(root,'.site/input/provenance.json'),JSON.stringify(provenance));
 await fs.writeFile(path.join(root,'.site/input/public/catalog.json'),JSON.stringify(catalog));

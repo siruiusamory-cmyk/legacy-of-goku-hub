@@ -1,8 +1,8 @@
 ---
 import PortraitFrame from './PortraitFrame.astro';
-const {framed = false, src, alt = '', class: className = '', loading = 'lazy', fetchpriority} = Astro.props;
+const {framed = false, src, width = 640, height = 360, alt = '', class: className = '', loading = 'lazy', fetchpriority} = Astro.props;
 ---
-<span class:list={['project-artwork',className]}><img src={src} alt={alt} width="640" height="360" loading={loading} fetchpriority={fetchpriority} decoding="async"/><span class="artwork-unavailable" hidden><span aria-hidden="true">◇</span>Project artwork unavailable</span>{framed && <PortraitFrame/>}</span>
+<span class:list={['project-artwork',className]}><img src={src} alt={alt} width={width} height={height} loading={loading} fetchpriority={fetchpriority} decoding="async"/><span class="artwork-unavailable" hidden><span aria-hidden="true">◇</span>Project artwork unavailable</span>{framed && <PortraitFrame/>}</span>
 <script>
   document.querySelectorAll('.project-artwork').forEach(frame=>{
     const image=frame.querySelector('img');
