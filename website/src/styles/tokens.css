@@ -39,7 +39,7 @@
   --leading-title: 1.08;
   --leading-ui: 1.35;
   --tracking-body: 0;
-  --tracking-display: .005em;
+  --tracking-display: .012em;
   --tracking-ui: 0;
   font-family: var(--font-body);
   font-synthesis: none;

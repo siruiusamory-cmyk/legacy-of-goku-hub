@@ -8,7 +8,7 @@ The existing Node 24, JSON Schema, GitHub release, Sharp image and deterministic
 
 ## Typography review
 
-LOG-HUB-004B self-hosts Latin Barlow Condensed 700 upright/italic and Inter 400/600 WOFF2 styles with SIL OFL licenses. It preserves the real-repository preview and detail cleanup. [Typography tokens, licensing and matching before/after screenshots](docs/frontend/typography/README.md) are available for owner review; no typography approval or deployment is implied.
+LOG-HUB-004B self-hosts Latin Barlow Condensed 700 upright/italic and Inter 400/600 WOFF2 styles with SIL OFL licenses. Final polish modestly enlarges the wordmark and opens heading spacing, with additional 320px/390px evidence. It preserves the real-repository preview and detail cleanup. [Typography tokens, licensing and matching before/after screenshots](docs/frontend/typography/README.md) are available for owner review; no typography approval or deployment is implied.
 
 ## Isolated real-repository preview and detail cleanup
 
