@@ -1,6 +1,6 @@
 # LOG-HUB-004: approved design implementation
 
-This Astro static frontend is awaiting controlled integration through stacked PRs #24 through #27. It has not been merged or publicly deployed. Existing submission, ownership, moderation, release synchronization, signed backup and recovery modules are unchanged. Current visual details are recorded in the [typography](typography/README.md) and [visual refinement](visual-identity/REFINEMENT.md) reports.
+The Astro frontend PRs #24–#27 and moderation #28 are integrated into main; the website is not deployed. Follow the current [launch report](../launch/README.md) and [deployment checklist](../launch/DEPLOYMENT.md). Historical verification below records the frontend milestone; its former merge/review status is superseded by LOG-HUB-008. Current visual details are recorded in the [typography](typography/README.md) and [visual refinement](visual-identity/REFINEMENT.md) reports.
 
 ## Architecture and data boundary
 
@@ -109,7 +109,7 @@ A separate Pages job has source read plus `pages:write` and `id-token:write`, no
 
 Before first public deployment, the owner must:
 
-1. Inspect these screenshots and the PR; obtain the normal approving CODEOWNER review and passing checks. Do not bypass protection.
+1. Use the current [deployment checklist](../launch/DEPLOYMENT.md), review the exact launch revision and passing checks, and obtain owner authorization. Observed protection requires PRs/strict `test` but zero human approving reviews and no enforced CODEOWNER review; this does not replace required human content inspection. Do not bypass or alter protection.
 2. Configure repository Settings -> Pages -> Source: GitHub Actions.
 3. Configure the `github-pages` environment's deployment branch restriction to protected main and any desired initial human approval. Permanent per-run approvals would intentionally prevent fully automatic updates, so choose that policy explicitly.
 4. After frontend approval/merge, set repository variable `SITE_DEPLOYMENT_ENABLED=true` and dispatch the catalog workflow. Inspect the deployed result and Actions receipt. No paid plan is required for the public repository.

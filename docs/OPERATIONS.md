@@ -1,5 +1,7 @@
 # LoG Hub operations : LOG-HUB-003
 
+Current launch guidance: [readiness report](launch/README.md), [maintainer moderation checklist](launch/MODERATION-CHECKLIST.md) and [deployment/rollback checklist](launch/DEPLOYMENT.md). Pages remains disabled. Catalog artifacts and the implemented static frontend do not imply a deployed website.
+
 Source: https://github.com/siruiusamory-cmyk/legacy-of-goku-hub (public).
 Recovery vault: https://github.com/siruiusamory-cmyk/legacy-of-goku-hub-backups (private).
 
@@ -25,7 +27,7 @@ The owner created a private GitHub App installed only on the vault, with Content
 
 Protect source `main` with PR/CI requirements, no force pushes/deletion and administrator enforcement; CODEOWNERS routes changes to the owner. Protect `refs/tags/loghub-anchor-v1/**` against updates/deletion without bypass actors. Enable immutable releases on the private vault; do not make it public. Keep Actions default token permissions read-only. Enable workflow failure notifications for maintainers in GitHub notification settings.
 
-Production branch protection requires the `test` check, an up-to-date branch, one approving review and CODEOWNER review, including administrators. A PR author cannot approve their own PR: an owner-authored change needs another authorized CODEOWNER; an independently authored change can be reviewed by the owner. The current sole CODEOWNER is the owner. Add a verified second CODEOWNER through an independently authored PR reviewed by the owner when needed. Do not relax protection or use admin merge to avoid that boundary. These protections affect code/policy changes, not routine project synchronization. Setup PRs were merged with CI and mandatory PRs before the final one-review requirement was enabled.
+Observed November 15, 2026 after the owner's LOG-HUB-005 change: production protection requires strict `test`, an up-to-date branch, a PR, linear history and administrator enforcement, with force pushes/deletions disabled. Required human approval count is zero and CODEOWNER review is not enforced. CODEOWNERS remains the ownership map; actual human content inspection is still required by the moderation procedure. Do not claim that a second human is enforced by these settings. No protection was changed during LOG-HUB-008. These settings affect code/policy changes, not routine project synchronization.
 
 The backup App is `log-backup-automation`, App ID `5764581`, installed only on the private vault. It has no source-repository installation. The public source's `BACKUP_APP_PRIVATE_KEY`, `BACKUP_SIGNING_KEY` and isolated `INTEGRATION_SIGNING_KEY` are encrypted Actions secrets. Only public verification keys are committed. Do not install an account-wide PAT as a substitute. Source Issues and Actions are enabled, Actions cannot approve PR reviews, and the integration fixture is explicitly delisted by numeric ID.
 
