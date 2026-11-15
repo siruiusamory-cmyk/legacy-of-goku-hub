@@ -1,5 +1,10 @@
 # Changelog
 
+## LOG-HUB-009: initial catalog approval
+
+- Record explicit owner approval of three disassembly resources from guided issues #31–#33, binding exact content and ordered source/normalized banner hashes to repository/owner/project identities.
+- Preserve fixture delisting and empty trusted-owner list; exclude DragonByte Z. No releases, ratings, deployment, upstream changes or recovery infrastructure changes are introduced.
+
 ## LOG-HUB-008: public launch preparation
 
 - Refresh four real candidate repositories and prepare unapproved submission drafts; DragonByte Z still needs current owner-approved cover art.

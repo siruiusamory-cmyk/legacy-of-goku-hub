@@ -3,6 +3,68 @@
   "trusted_owner_ids": [],
   "revoked_owner_ids": [],
   "projects": [
-    {"repository_id": 1458327252, "owner_id": 287528505, "decision": "delisted", "reason": "Isolated integration fixture; never a production community listing"}
+    {
+      "repository_id": 1458327252,
+      "owner_id": 287528505,
+      "decision": "delisted",
+      "reason": "Isolated integration fixture; never a production community listing"
+    },
+    {
+      "repository_id": 1432341427,
+      "owner_id": 287528505,
+      "project_id": "gh-1432341427",
+      "decision": "approved",
+      "content_digests": [
+        "a8b29226cd12fafd8ba279d0458de8f742fb9989fc3a28f3d2ae0346e74bf772"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "301720d00eb92b4ea1181aed68909766ac2e606d18bd521313aa9bdfe69600ac",
+            "sha256": "c2ec54f55f8b6cc498b57e63a20ce144b289821c484ed28f3be8790b73e30525"
+          }
+        ]
+      ],
+      "approved_issue": 31,
+      "approved_digest": "223fa76d9a2224ccba7104e530148f228c20b0d31e9bfd6ca20b3703429cb7c3"
+    },
+    {
+      "repository_id": 1429374563,
+      "owner_id": 287528505,
+      "project_id": "gh-1429374563",
+      "decision": "approved",
+      "content_digests": [
+        "7c56dac2b91b33ade27da34d07db8337294bd5429d02795f5e0a8c01e7115233"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "75d1a65a48d9213cae722a21bd1841c39f28606f6022ec43685e87f54e36dc4e",
+            "sha256": "a29a07a94f2a2db5c847793e340d0a57f69501e90a68ad72dc95c3e4ed79f73d"
+          }
+        ]
+      ],
+      "approved_issue": 32,
+      "approved_digest": "b9abf0e2887bda72afe5ecc2e6d2c713c00a7c81ebefe861adc0f23c9fe199f3"
+    },
+    {
+      "repository_id": 1398951057,
+      "owner_id": 287528505,
+      "project_id": "gh-1398951057",
+      "decision": "approved",
+      "content_digests": [
+        "d16454320d4ca4b06bf7e7af586b270d4770e3a8dbb1522b00199583391ccd03"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "ce5e032c00ba1198bb3e7d2709273a040bd79f0e61340ba88366fc4326e4da91",
+            "sha256": "d9ff717a7f5bf6c2556972dc5a5fa760a034541e940c3eb2654c0c24b7a19e2c"
+          }
+        ]
+      ],
+      "approved_issue": 33,
+      "approved_digest": "a8e3d67a64741b341e17e59b99247eb1f6536a79d0a6905c04527086ce1bc877"
+    }
   ]
 }
