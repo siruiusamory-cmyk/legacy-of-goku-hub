@@ -4,7 +4,7 @@ import {fileURLToPath} from 'node:url';
 import {execFileSync} from 'node:child_process';
 import {GitHub} from './github.js';
 import {readJSON, saveJSON} from './records.js';
-import {RecoveryStore, recoveryConfig, payloadFiles, materialize} from './recovery.js';
+import {RecoveryStore, recoveryConfig, payloadFiles, materialize, verifyPublicationFiles, verifyExport} from './recovery.js';
 import {selectSnapshot} from './service-cli.js';
 import {loadRecords} from './records.js';
 import {buildCatalog} from './catalog.js';
@@ -12,6 +12,11 @@ import {buildCatalog} from './catalog.js';
 export async function sourceIdentity(api, config) {
   const source = await api.request(`/repositories/${config.source_repository_id}`);
   if (source.id !== config.source_repository_id || source.full_name !== config.source_repository || source.private !== false || source.default_branch !== config.default_branch) throw Error('source repository identity/default branch mismatch');
+}
+export async function assertSourceRevision(api, config, revision) {
+  if (!/^[a-f0-9]{40}$/.test(revision || '')) throw Error('source revision must be a full commit SHA');
+  const head = await api.request(`/repos/${config.source_repository}/git/ref/heads/${config.default_branch}`);
+  if (head.object?.type !== 'commit' || head.object.sha !== revision) throw Error('source policy/revision changed; discard the stale candidate and rebuild');
 }
 export async function backupHealth(api, store, now = Date.now()) {
   const latest = await store.latest(); const c = store.config;
@@ -31,7 +36,19 @@ export async function backupHealth(api, store, now = Date.now()) {
 async function main() {
   const root = process.cwd(); const command = process.argv[2];
   const config = recoveryConfig(await readJSON(path.join(root, 'policy/recovery.json')));
+  if (command === 'verify-export' || command === 'restore-export') {
+    if (!process.argv[3]) throw Error('supply the extracted signed export directory');
+    const recovered = await verifyExport(config, path.resolve(process.argv[3]));
+    if (command === 'restore-export') {
+      if (process.env.OFFLINE_RECOVERY_AUTHORIZED !== 'I_AUTHORIZE_OFFLINE_RESTORE' || !process.argv[4]) throw Error('explicit offline restore authorization and a fresh destination are required');
+      await materialize(recovered, path.resolve(process.argv[4]));
+    }
+    console.log(`${command}: signed offline point ${recovered.point} verified; current publishing policy is not replaced`); return;
+  }
   const source = new GitHub();
+  const revision = execFileSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'}).trim();
+  if (process.env.SOURCE_COMMIT && process.env.SOURCE_COMMIT !== revision) throw Error('declared source commit differs from the checked-out code');
+  if (!['export', 'inspect'].includes(command)) await assertSourceRevision(source, config, revision);
   if (command === 'config') {
     if (process.env.GITHUB_REPOSITORY && process.env.GITHUB_REPOSITORY !== config.source_repository) throw Error('workflow repository is not configured source');
     if (process.env.GITHUB_REF && process.env.GITHUB_REF !== `refs/heads/${config.default_branch}`) throw Error('recovery is restricted to the protected source default branch');
@@ -59,8 +76,7 @@ async function main() {
     const snapshot = path.resolve(process.argv[3] || '.generated/snapshot');
     const catalog = path.resolve(process.argv[4] || '.generated/work/dist/catalog.json');
     if (command === 'initialize' && !process.argv[3] && (await selectSnapshot(source, config.source_repository, process.env.GITHUB_RUN_ID))) throw Error('existing publication exists; supply an explicit reviewed export path for initialization');
-    const commit = process.env.SOURCE_COMMIT || execFileSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'}).trim();
-    const provenance = {source_commit: commit, run_id: Number(process.env.GITHUB_RUN_ID), workflow: '.github/workflows/catalog.yml', ref: `refs/heads/${config.default_branch}`, kind: command === 'initialize' ? 'initialization' : 'publication'};
+    const provenance = {source_commit: revision, run_id: Number(process.env.GITHUB_RUN_ID), workflow: command === 'initialize' ? '.github/workflows/initialize-backup.yml' : '.github/workflows/catalog.yml', ref: `refs/heads/${config.default_branch}`, kind: command === 'initialize' ? 'initialization' : 'publication'};
     if (!process.env.BACKUP_SIGNING_KEY) throw Error('BACKUP_SIGNING_KEY required; never put it in files or arguments');
     const recovered = await store.backup(await payloadFiles(snapshot, catalog), provenance, process.env.BACKUP_SIGNING_KEY, {initialize: command === 'initialize'});
     await saveJSON(path.join(root, '.generated/backup-receipt.json'), {point: recovered.point, snapshot_id: recovered.envelope.snapshot_id, commit: recovered.commit, reused: recovered.reused, verified: true});
@@ -73,6 +89,8 @@ async function main() {
       const latest = await store.latest();
       const files = await payloadFiles(path.join(root, '.generated/snapshot'), path.join(root, '.generated/work/dist/catalog.json'));
       if (latest.point !== receipt.point || latest.commit !== receipt.commit || files.size !== latest.files.size || [...files].some(([name, bytes]) => !latest.files.get(name)?.equals(bytes))) throw Error('publication does not match protected durable recovery point');
+      await verifyPublicationFiles(latest, path.join(root, '.generated/work/dist'));
+      await assertSourceRevision(source, config, revision);
     }
     console.log(`${command}: protected durable recovery point verified`);
   } else if (command === 'health') console.log(JSON.stringify(await backupHealth(source, store)));

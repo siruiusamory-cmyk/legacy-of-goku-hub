@@ -5,12 +5,13 @@ import path from 'node:path';
 import os from 'node:os';
 import {generateKeyPairSync} from 'node:crypto';
 import sharp from 'sharp';
+import YAML from 'yaml';
 import {readJSON, saveJSON} from '../src/records.js';
 import {buildCatalog} from '../src/catalog.js';
 import {normalizeImage} from '../src/images.js';
 import {publish} from '../src/publishing.js';
-import {recoveryConfig, RecoveryStore, payloadFiles, materialize, seal, verifyEnvelope} from '../src/recovery.js';
-import {backupHealth} from '../src/backup-cli.js';
+import {recoveryConfig, RecoveryStore, payloadFiles, materialize, seal, verifyEnvelope, verifyExport} from '../src/recovery.js';
+import {backupHealth, assertSourceRevision} from '../src/backup-cli.js';
 import {gitVault, publicAnchors} from './helpers/git-vault.js';
 
 const project = await readJSON(new URL('./fixtures/project.json', import.meta.url));
@@ -125,4 +126,49 @@ test('backup-health alerts on API outages, no verified publications and stale ru
   assert.equal((await backupHealth(api, s.store, now)).verified_publication_run, 2);
   await assert.rejects(backupHealth(api, s.store, now + 49 * 3600000), /stale/);
   await assert.rejects(backupHealth({request: async () => {throw Error('API unavailable');}}, s.store), /unavailable/);
+});
+test('every operational job pins the triggering revision rather than a moving default branch', async () => {
+  for (const name of ['catalog.yml', 'initialize-backup.yml', 'backup-health.yml']) {
+    const workflow = YAML.parse(await fs.readFile(new URL('../.github/workflows/' + name, import.meta.url), 'utf8'));
+    for (const job of Object.values(workflow.jobs)) for (const step of job.steps) if (step.uses?.startsWith('actions/checkout@')) assert.equal(step.with.ref, '${{ github.sha }}');
+  }
+});
+test('final publication verification reads actual dist images and rejects changed, missing or extra files', async t => {
+  const s = await setup(t); const protectedPoint = await protect(s, s.files);
+  const module = await import('../src/recovery.js');
+  assert.equal(typeof module.verifyPublicationFiles, 'function');
+  const directory = path.join(s.snapshot, 'dist');
+  await module.verifyPublicationFiles(protectedPoint, directory);
+  const cover = path.join(directory, 'assets', project.id, 'cover.webp');
+  await fs.writeFile(cover, 'replaced only in dist');
+  await assert.rejects(module.verifyPublicationFiles(protectedPoint, directory), /publication/);
+  await fs.unlink(cover);
+  await assert.rejects(module.verifyPublicationFiles(protectedPoint, directory), /publication/);
+  await fs.writeFile(cover, s.files.get(`assets/${project.id}/cover.webp`));
+  await fs.writeFile(path.join(directory, 'unexpected.txt'), 'extra');
+  await assert.rejects(module.verifyPublicationFiles(protectedPoint, directory), /publication/);
+});
+test('immutable release must lock the exact signed private commit', async t => {
+  const s = await setup(t); const point = await protect(s, s.files);
+  s.api.git(['update-ref', 'refs/tags/loghub-v1/' + point.point, s.api.initial]);
+  await assert.rejects(s.store.latest(), /no valid recovery point/);
+});
+test('a moderation-policy merge invalidates an in-flight candidate before publication', async () => {
+  const original = 'a'.repeat(40); const updated = 'b'.repeat(40);
+  const current = {request: async () => ({object: {type: 'commit', sha: updated}})};
+  await assert.rejects(assertSourceRevision(current, config, original), /stale candidate/);
+  await assertSourceRevision(current, config, updated);
+});
+test('integration snapshots cannot be restored as production even with the same verification key', async t => {
+  const s = await setup(t);
+  const envelope = seal({...config, purpose: 'integration'}, s.files, {...provenance(1), workflow: '.github/workflows/hosted-integration.yml'}, privateKey);
+  assert.throws(() => verifyEnvelope(config, envelope), /integration/);
+});
+test('signed off-platform exports verify without GitHub and reject tampering', async t => {
+  const s = await setup(t); await protect(s, s.files); const directory = path.join(s.root, 'offline-export');
+  await materialize(await s.store.latest(), directory);
+  s.api.request = async () => {throw Error('GitHub unavailable');}; s.anchors.request = s.api.request;
+  assert.equal((await verifyExport(config, directory)).files.size, s.files.size);
+  await fs.writeFile(path.join(directory, 'assets', project.id, 'cover.webp'), 'changed');
+  await assert.rejects(verifyExport(config, directory), /checksum/);
 });

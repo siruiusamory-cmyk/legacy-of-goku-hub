@@ -2,6 +2,8 @@
 
 LOG-HUB-003 adds signed durable recovery in the private backup repository, free immutable releases, and protected public hash receipts. Production publication is gated on a verified backup. See [the maintainer guide](docs/OPERATIONS.md) for the current operational contract; the older artifact-only recovery description below is superseded.
 
+Hosted CI and the initial signed, immutable recovery point have passed. Operational integration tests use a separate, explicitly excluded fixture repository and purpose-bound test recovery namespace, never the production catalog.
+
 Static catalog infrastructure for Legacy of Goku, Legacy of Goku II and Buu's Fury. Developers submit through a repository manifest or guided GitHub form. GitHub Actions validates, normalizes and publishes eligible listings as artifacts. No frontend, CMS, dashboard, database, AI service, monetization or production server is needed.
 
 The existing Node 24, JSON Schema, GitHub release, Sharp image and deterministic catalog components remain in use. Legacy CLI tools and their regression tests are retained for migration, not the routine publishing path. Production policy and records are empty: test fixtures are not community-approved projects.

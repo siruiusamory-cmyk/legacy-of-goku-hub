@@ -11,8 +11,6 @@ const checkConfig = new Ajv({allErrors: true}).compile(await readJSON(new URL('.
 const checkCatalog = new Ajv().compile(await readJSON(new URL('../schema/catalog.schema.json', import.meta.url)));
 const HEX = /^[a-f0-9]{64}$/;
 const GIT_SHA = /^[a-f0-9]{40}$/;
-const PREFIX = 'refs/tags/loghub-v1/';
-const ANCHOR_PREFIX = 'refs/tags/loghub-anchor-v1/';
 const MAX_FILE = 2 * 1024 * 1024;
 const MAX_TOTAL = 128 * 1024 * 1024;
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -79,6 +77,7 @@ export async function payloadFiles(snapshot, catalogFile) {
 }
 function core(config, files) {
   return {schema_version: 1, source_repository_id: config.source_repository_id, backup_repository_id: config.backup_repository_id,
+    ...(config.purpose === 'integration' ? {purpose: 'integration'} : {}),
     files: [...files].map(([name, bytes]) => ({path: name, size: bytes.length, sha256: hash(bytes)})).sort((a, b) => a.path < b.path ? -1 : 1)};
 }
 export function seal(config, files, provenance, privateKey) {
@@ -93,11 +92,13 @@ function safeName(name) {
   return name === 'registry.json' || name === 'catalog.json' || /^(?:records|state)\/[a-z][a-z0-9-]{0,63}\.json$/.test(name) || /^assets\/[a-z][a-z0-9-]{0,63}\/(?:cover|screenshot-[1-6])\.webp$/.test(name);
 }
 export function verifyEnvelope(config, envelope, point) {
-  keys(envelope, ['schema_version', 'source_repository_id', 'backup_repository_id', 'files', 'snapshot_id', 'signing_key_id', 'provenance', 'signature'], 'envelope');
+  keys(envelope, ['schema_version', 'source_repository_id', 'backup_repository_id', 'files', 'snapshot_id', 'signing_key_id', 'provenance', 'signature', 'purpose'], 'envelope');
+  if ((envelope.purpose || 'production') !== (config.purpose || 'production')) throw Error('integration recovery point cannot become production authority');
   if (envelope.schema_version !== 1 || envelope.source_repository_id !== config.source_repository_id || envelope.backup_repository_id !== config.backup_repository_id || !HEX.test(envelope.snapshot_id) || !Array.isArray(envelope.files) || envelope.files.length > 16002) throw Error('recovery schema or repository identity mismatch');
   const p = envelope.provenance;
   keys(p, ['source_commit', 'run_id', 'workflow', 'ref', 'kind'], 'provenance');
-  if (!GIT_SHA.test(p.source_commit) || !Number.isSafeInteger(p.run_id) || p.run_id <= 0 || p.workflow !== '.github/workflows/catalog.yml' || p.ref !== `refs/heads/${config.default_branch}` || !['publication', 'initialization'].includes(p.kind)) throw Error('untrusted recovery provenance');
+  const allowedWorkflows = config.purpose === 'integration' ? ['.github/workflows/hosted-integration.yml'] : p.kind === 'initialization' ? ['.github/workflows/initialize-backup.yml', '.github/workflows/catalog.yml'] : ['.github/workflows/catalog.yml'];
+  if (!GIT_SHA.test(p.source_commit) || !Number.isSafeInteger(p.run_id) || p.run_id <= 0 || !allowedWorkflows.includes(p.workflow) || p.ref !== `refs/heads/${config.default_branch}` || !['publication', 'initialization'].includes(p.kind)) throw Error('untrusted recovery provenance');
   if (point && point !== `${p.run_id}-${envelope.snapshot_id}`) throw Error('recovery point/provenance mismatch');
   const names = new Set(); let total = 0;
   for (const file of envelope.files) {
@@ -106,7 +107,7 @@ export function verifyEnvelope(config, envelope, point) {
     names.add(file.path); total += file.size;
   }
   if (total > MAX_TOTAL || !names.has('registry.json') || !names.has('catalog.json')) throw Error('incomplete/oversized recovery point');
-  const body = {schema_version: envelope.schema_version, source_repository_id: envelope.source_repository_id, backup_repository_id: envelope.backup_repository_id, files: envelope.files};
+  const body = {schema_version: envelope.schema_version, source_repository_id: envelope.source_repository_id, backup_repository_id: envelope.backup_repository_id, files: envelope.files, ...(envelope.purpose ? {purpose: envelope.purpose} : {})};
   if (hash(canonical(body)) !== envelope.snapshot_id) throw Error('recovery manifest checksum mismatch');
   const {signature, ...signed} = envelope;
   const publicKey = config.public_keys[envelope.signing_key_id];
@@ -122,7 +123,7 @@ async function blob(api, slug, sha) {
   return bytes;
 }
 export class RecoveryStore {
-  constructor(config, api, sourceApi = api) { this.config = recoveryConfig(config); this.api = api; this.sourceApi = sourceApi; }
+  constructor(config, api, sourceApi = api) { this.config = recoveryConfig(config); this.api = api; this.sourceApi = sourceApi; this.namespace = config.purpose === 'integration' ? 'loghub-integration-v1' : 'loghub-v1'; this.anchorNamespace = config.purpose === 'integration' ? 'loghub-integration-anchor-v1' : 'loghub-anchor-v1'; }
   async identity() {
     const c = this.config; const repo = await this.api.request(`/repositories/${c.backup_repository_id}`);
     if (repo.id !== c.backup_repository_id || repo.full_name !== c.backup_repository || repo.private !== true || repo.archived !== false) throw Error('expected private backup repository identity unavailable');
@@ -130,12 +131,13 @@ export class RecoveryStore {
   }
   async privatePoints() {
     const slug = await this.identity();
-    const refs = await this.api.request(`/repos/${slug}/git/matching-refs/tags/loghub-v1/`);
+    const prefix = `refs/tags/${this.namespace}/`;
+    const refs = await this.api.request(`/repos/${slug}/git/matching-refs/tags/${this.namespace}/`);
     if (!Array.isArray(refs) || refs.length > 4096) throw Error('invalid/oversized backup ref history');
     const points = refs.map(r => {
-      const point = r.ref?.slice(PREFIX.length);
+      const point = r.ref?.slice(prefix.length);
       const match = /^([1-9][0-9]*)-([a-f0-9]{64})$/.exec(point || '');
-      if (!r.ref?.startsWith(PREFIX) || !match || !Number.isSafeInteger(Number(match[1])) || r.object?.type !== 'commit' || !GIT_SHA.test(r.object.sha)) throw Error('unauthorized/malformed backup reference');
+      if (!r.ref?.startsWith(prefix) || !match || !Number.isSafeInteger(Number(match[1])) || r.object?.type !== 'commit' || !GIT_SHA.test(r.object.sha)) throw Error('unauthorized/malformed backup reference');
       return {point, run_id: Number(match[1]), commit: r.object.sha};
     }).sort((a, b) => b.run_id - a.run_id);
     if (new Set(points.map(p => p.run_id)).size !== points.length) throw Error('conflicting recovery points for one run');
@@ -143,19 +145,20 @@ export class RecoveryStore {
   }
   async points() {
     await this.identity();
-    const refs = await this.sourceApi.request(`/repos/${this.config.source_repository}/git/matching-refs/tags/loghub-anchor-v1/`);
+    const prefix = `refs/tags/${this.anchorNamespace}/`;
+    const refs = await this.sourceApi.request(`/repos/${this.config.source_repository}/git/matching-refs/tags/${this.anchorNamespace}/`);
     if (!Array.isArray(refs) || refs.length > 4096) throw Error('invalid/oversized public recovery anchors');
     const points = refs.map(r => {
-      const value = r.ref?.slice(ANCHOR_PREFIX.length);
+      const value = r.ref?.slice(prefix.length);
       const match = /^([1-9][0-9]*)-([a-f0-9]{64})-([a-f0-9]{40})$/.exec(value || '');
-      if (!r.ref?.startsWith(ANCHOR_PREFIX) || !match || !Number.isSafeInteger(Number(match[1])) || r.object?.type !== 'commit' || !GIT_SHA.test(r.object.sha)) throw Error('malformed public recovery anchor');
+      if (!r.ref?.startsWith(prefix) || !match || !Number.isSafeInteger(Number(match[1])) || r.object?.type !== 'commit' || !GIT_SHA.test(r.object.sha)) throw Error('malformed public recovery anchor');
       return {point: `${match[1]}-${match[2]}`, commit: match[3], run_id: Number(match[1]), anchor_source_commit: r.object.sha};
     }).sort((a, b) => b.run_id - a.run_id);
     if (new Set(points.map(p => p.run_id)).size !== points.length) throw Error('conflicting public recovery anchors');
     return points;
   }
   async immutable(point, create = false) {
-    const slug = this.config.backup_repository; const tag = 'loghub-v1/' + point.point;
+    const slug = this.config.backup_repository; const tag = this.namespace + '/' + point.point;
     let release;
     try { release = await this.api.request(`/repos/${slug}/releases/tags/${encodeURIComponent(tag)}`); }
     catch (error) {
@@ -164,6 +167,8 @@ export class RecoveryStore {
       release = await this.api.request(`/repos/${slug}/releases/tags/${encodeURIComponent(tag)}`);
     }
     if (release.tag_name !== tag || release.immutable !== true || release.draft !== false) throw Error('private recovery release is not immutable; publication refused');
+    const locked = await this.api.request(`/repos/${slug}/git/ref/tags/${tag}`);
+    if (locked.ref !== `refs/tags/${tag}` || locked.object?.type !== 'commit' || locked.object.sha !== point.commit) throw Error('immutable release tag does not retain the signed recovery commit');
   }
   async read(point) {
     const c = this.config; const slug = c.backup_repository;
@@ -242,8 +247,8 @@ export class RecoveryStore {
     if (!GIT_SHA.test(createdTree.sha)) throw Error('invalid created backup tree');
     const commit = await this.api.request(`/repos/${slug}/git/commits`, {method: 'POST', body: {message: `LoG Hub recovery ${envelope.snapshot_id}`, tree: createdTree.sha, parents: previous ? [previous.commit] : []}});
     if (!GIT_SHA.test(commit.sha)) throw Error('invalid created backup commit');
-    await this.api.request(`/repos/${slug}/git/refs`, {method: 'POST', body: {ref: PREFIX + point, sha: commit.sha}});
-    await this.immutable({point, run_id: provenance.run_id}, true);
+    await this.api.request(`/repos/${slug}/git/refs`, {method: 'POST', body: {ref: `refs/tags/${this.namespace}/` + point, sha: commit.sha}});
+    await this.immutable({point, commit: commit.sha, run_id: provenance.run_id}, true);
     const recovered = await this.read({point, commit: commit.sha, run_id: provenance.run_id});
     return {...recovered, reused: false};
   }
@@ -256,11 +261,51 @@ export class RecoveryStore {
       return verified;
     }
     if (points[0] && points[0].run_id >= verified.run_id) throw Error('newer public recovery anchor exists; stale publication refused');
-    await this.sourceApi.request(`/repos/${this.config.source_repository}/git/refs`, {method: 'POST', body: {ref: ANCHOR_PREFIX + verified.point + '-' + verified.commit, sha: verified.envelope.provenance.source_commit}});
+    await this.sourceApi.request(`/repos/${this.config.source_repository}/git/refs`, {method: 'POST', body: {ref: `refs/tags/${this.anchorNamespace}/` + verified.point + '-' + verified.commit, sha: verified.envelope.provenance.source_commit}});
     const latest = (await this.points())[0];
     if (latest?.point !== verified.point || latest.commit !== verified.commit) throw Error('concurrent anchor changed; stale publication refused');
     return verified;
   }
+}
+export async function verifyPublicationFiles(recovered, directory) {
+  const catalog = JSON.parse(recovered.files.get('catalog.json'));
+  const expected = new Map([['catalog.json', recovered.files.get('catalog.json')]]);
+  for (const project of catalog.projects) for (const name of [project.cover, ...project.screenshots]) {
+    if (!safeName(name) || !recovered.files.has(name)) throw Error('invalid protected publication image');
+    expected.set(name, recovered.files.get(name));
+  }
+  const seen = new Set();
+  async function walk(relative = '') {
+    const root = path.join(directory, relative);
+    const stat = await fs.lstat(root).catch(() => {throw Error('missing publication directory/file');});
+    if (stat.isSymbolicLink() || !stat.isDirectory()) throw Error('invalid publication directory');
+    for (const entry of await fs.readdir(root, {withFileTypes: true})) {
+      const name = relative ? relative + '/' + entry.name : entry.name;
+      if (entry.isSymbolicLink()) throw Error('publication cannot contain links');
+      if (entry.isDirectory()) {await walk(name); continue;}
+      if (!entry.isFile() || !expected.has(name) || !(await regularFile(path.join(directory, name))).equals(expected.get(name))) throw Error('publication files differ from protected backup');
+      seen.add(name);
+    }
+  }
+  await walk();
+  if (seen.size !== expected.size) throw Error('publication files missing from upload directory');
+}
+export async function verifyExport(config, directory) {
+  recoveryConfig(config);
+  const envelope = JSON.parse(await regularFile(path.join(directory, 'recovery-envelope.json')));
+  const point = `${envelope.provenance?.run_id}-${envelope.snapshot_id}`;
+  verifyEnvelope(config, envelope, point);
+  const files = new Map();
+  for (const file of envelope.files) {
+    const bytes = await regularFile(path.join(directory, file.path));
+    if (bytes.length !== file.size || hash(bytes) !== file.sha256) throw Error('offline recovery checksum mismatch');
+    credentialCheck(bytes, file.path); files.set(file.path, bytes);
+  }
+  const recovered = {point, envelope, files};
+  const scratch = await fs.mkdtemp(path.join(os.tmpdir(), 'loghub-offline-check-'));
+  try {await materialize(recovered, path.join(scratch, 'verified'));}
+  finally {await fs.rm(scratch, {recursive: true, force: true});}
+  return recovered;
 }
 export async function materialize(recovered, destination) {
   const staging = destination + '.partial';

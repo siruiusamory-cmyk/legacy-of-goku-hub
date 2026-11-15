@@ -9,6 +9,9 @@
 - Added eleven recovery tests using real local Git objects alongside the existing 47 regressions.
 - Created the public source and private recovery repositories, configured backup-only App credentials and kept production disabled during verification.
 - Hosted workflow verification and independent review results will be recorded before enabling production.
+- Hosted CI passed and the initial signed immutable recovery point plus protected receipt were created successfully.
+- Independent review prompted revision pinning/current-policy guards, complete uploaded-image verification and immutable-tag commit binding, with regression coverage.
+- Added isolated live-GitHub fixture scenarios, purpose-separated integration recovery and offline signed-export verification.
 
 ## Self-service milestone
 
