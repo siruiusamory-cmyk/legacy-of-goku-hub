@@ -34,3 +34,5 @@
 - Complete hosted manifest/guided registration and update verification, production publication, artifact-loss recovery, offline export/restore, alert lifecycle and backup health. Record actual failures and scoped independent review outcomes.
 
 - Record successful issue-event production and feedback verification.
+
+- Clarify the sole-CODEOWNER review boundary for future owner-authored changes.

@@ -76,7 +76,7 @@ These are not counted as successful tests. The final hidden-artifact workflow se
 ## Remaining limits and human responsibilities
 
 - Production intentionally has no community listings. New untrusted projects, third-party representation, disputes, sensitive attribution/category/game changes, transfers, policy changes and destructive rollback remain human decisions. Approved routine updates are automatic.
-- One approving CODEOWNER review protects code/policy. A PR author cannot approve their own PR; owner-authored future changes require another authorized maintainer. Routine synchronization needs no PR.
+- One approving CODEOWNER review protects code/policy. A PR author cannot approve their own PR; owner-authored future changes require another authorized CODEOWNER, added through an independently authored PR reviewed by the current owner. Routine synchronization needs no PR.
 - Scheduled workflows are configured and manually verified; natural next-day cron execution and natural retention expiry were not waited out. Artifact unavailability was tested by deletion.
 - Complete GitHub outage, actual remote repository deletion/transfer, account takeover and signing-key compromise were not deliberately caused. Relevant failure paths have executable local coverage and documented recovery procedures.
 - A second GitHub repository does not protect against complete GitHub/account loss or an administrator deleting both repositories/releases. Copy exports to independent storage. No permanent off-platform service or third-party monitor was installed.
@@ -85,4 +85,5 @@ These are not counted as successful tests. The final hidden-artifact workflow se
 - GitHub hosting and validation do not establish malware safety, authorship, team authority or licensing. Submitted downloads were never executed. Archive contents/ROM absence still require human judgment. Cross-platform encoder equality is not promised.
 
 Previous milestone: [archived self-service verification](docs/VERIFICATION-SELF-SERVICE.md). All operational procedures work with Node/GitHub alone; Codex and Zeroshot are development tools only.
+
 

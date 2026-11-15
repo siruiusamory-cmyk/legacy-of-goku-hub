@@ -146,3 +146,5 @@ The candidate upload explicitly includes its hidden staging directory; download 
 LOG-HUB-003 hosted publication and recovery have passed. See VERIFICATION.md for exact run links, test counts, review findings and remaining operational responsibilities.
 
 Actual issue-event processing and feedback passed in production with the isolated fixture excluded.
+
+With the owner as sole CODEOWNER, independently authored policy PRs can be owner-reviewed; owner-authored PRs need a second designated CODEOWNER.
