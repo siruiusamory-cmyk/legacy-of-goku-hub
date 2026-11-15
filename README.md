@@ -140,3 +140,5 @@ Legacy approved Git records can seed the new publisher after an explicit numeric
 
 Recomp.fyi research and explicit differences are recorded in [docs/RECOMP-RESEARCH.md](docs/RECOMP-RESEARCH.md). Zeroshot is optional development-time verification only, documented in [docs/ZEROSHOT-REVIEW.md](docs/ZEROSHOT-REVIEW.md). The finished publisher works without Codex, Zeroshot or any AI account.
 
+
+The candidate upload explicitly includes its hidden staging directory; download steps use normal artifact inputs.
