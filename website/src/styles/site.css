@@ -134,18 +134,6 @@ section[id],h1,h2,h3 {
   color: var(--gold);
   font-style: inherit;
 }
-.brand>span:last-child:after {
-  content: '';
-  display: block;
-  position: absolute;
-  bottom: -8px;
-  left: 40%;
-  height: 4px;
-  width: 53%;
-  border-radius: 100%;
-  background: linear-gradient(90deg,transparent,var(--orange),transparent);
-  transform: rotate(-4deg);
-}
 .brand .dragon-ball {
   width: 40px;
   height: 40px;
@@ -228,18 +216,6 @@ section[id],h1,h2,h3 {
 .spotlight h1 {
   margin-bottom: 14px;
   position: relative;
-}
-.spotlight h1:after {
-  content: '';
-  display: block;
-  position: absolute;
-  bottom: -3px;
-  right: 4%;
-  width: 28%;
-  height: 4px;
-  background: linear-gradient(90deg,transparent,var(--orange),transparent);
-  border-radius: 100%;
-  transform: rotate(-4deg);
 }
 .badges {
   display: flex;
@@ -738,7 +714,7 @@ option {
 }
 .detail-intro {
   min-width: 0;
-  padding-right: 280px;
+  padding-right: 0;
 }
 .detail-intro h1 {
   font-size: 38px;
@@ -750,21 +726,10 @@ option {
   font-size: 20px;
   margin-bottom: 12px;
 }
-.detail-description {
-  font-size: 16px;
-  line-height: 1.2;
-  margin: 12px 0 18px;
-}
 .detail-intro .hero-actions {
   position: relative;
-  width: calc(100% + 45px);
-}
-.release-panel {
-  position: absolute;
-  width: 275px;
-  right: -10px;
-  top: 14px;
-  padding: 12px 16px!important;
+  width: 100%;
+  max-width: 500px;
 }
 .panel {
   border: 1px solid var(--border);
@@ -784,12 +749,6 @@ option {
   width: 8px;
   margin-right: 12px;
   vertical-align: -4px;
-}
-.release-panel .panel-title:before {
-  display: none;
-}
-.release-panel .panel-title {
-  font-size: 20px;
 }
 dl {
   margin: 0;
@@ -819,10 +778,6 @@ dd a svg {
   display: inline;
   margin-left: 8px;
   vertical-align: middle;
-}
-.release-panel dd {
-  font-weight: 700;
-  font-size: 15px;
 }
 .detail-rating {
   display: grid;
@@ -968,9 +923,6 @@ dd a svg {
   height: auto;
   aspect-ratio: 3/2;
 }
-.gallery-panel {
-  flex: 1;
-}
 .project-information dl {
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -1090,18 +1042,6 @@ dd a svg {
   .detail-intro h1 {
     white-space: normal;
     font-size: 34px;
-  }
-  .release-panel {
-    position: static;
-    width: auto;
-    grid-column: 1/-1;
-  }
-  .release-panel dl {
-    display: flex;
-    gap: 24px;
-  }
-  .release-panel dl>div {
-    flex: 1;
   }
   .detail-intro .hero-actions {
     width: 100%;
@@ -1307,10 +1247,6 @@ dd a svg {
   }
   .detail-intro h1 {
     font-size: 38px;
-  }
-  .release-panel dl {
-    flex-direction: column;
-    gap: 0;
   }
   .detail-rating {
     padding: 18px;
@@ -1662,9 +1598,6 @@ dd a svg {
   line-height: 1.15;
   margin-bottom: 8px;
 }
-.detail-description {
-  margin-bottom: 14px;
-}
 .detail-rating {
   padding-block: 12px;
 }
@@ -1733,6 +1666,18 @@ dd a svg {
   white-space: normal;
   overflow-wrap: anywhere;
 }
-h1,h2,h3,.developer,.detail-developer,.spotlight-description,.detail-description {
+h1,h2,h3,.developer,.detail-developer,.spotlight-description,.detail-intro {
   overflow-wrap: anywhere;
 }
+.preview-notice {
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--gold);
+  color: var(--gold);
+  background: var(--surface-low);
+  text-align: center;
+  font-size: 14px;
+}
+[data-category="resource"] .card-art img {object-position: center;}
+[data-category="resource"] .detail-art {object-fit: contain;}
+
+.detail-columns {align-items: start;}

@@ -13,3 +13,5 @@ export const sourceURL = 'https://github.com/siruiusamory-cmyk/legacy-of-goku-hu
 export const rating = project => provenance.purpose === 'fixture' && project.id !== 'fixture-1' ? {average: [6, 5.6, 6.2, 5.8, 6.1, 5.3, 6.4][catalog.projects.indexOf(project)] ?? 6, count: 412} : {};
 export const formatDate = value => new Intl.DateTimeFormat('en-US', {month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC'}).format(new Date(value));
 export const formatSize = size => size < 1048576 ? `${(size / 1024).toFixed(1)} KB` : `${(size / 1048576).toFixed(1)} MB`;
+
+export const featuredLabel = project => project.category === 'tool' ? 'Featured Tool' : project.category === 'resource' ? 'Featured Resource' : 'Featured Game';
