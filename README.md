@@ -1,5 +1,7 @@
 # Legacy of Goku Hub
 
+Launch preparation: the seven-ball selector is explicitly labeled “Preview only · not saved”; selections do not submit community votes. Public launch still requires a separate owner decision.
+
 LOG-HUB-005 integrated the reviewed frontend into main. LOG-HUB-006 adds mandatory exact-content artwork moderation; see [the moderation guide](docs/moderation.md). No website is deployed.
 
 LOG-HUB-003 provides signed durable recovery in the private backup repository, immutable releases, and protected public hash receipts. The public source is [legacy-of-goku-hub](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub). See [operations](docs/OPERATIONS.md) for setup, monitoring, recovery and off-platform export, and [verification](VERIFICATION.md) for measured hosted results. All configured features use GitHub Free.
