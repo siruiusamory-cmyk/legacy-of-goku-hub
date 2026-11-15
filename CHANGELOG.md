@@ -44,3 +44,5 @@
 - Consume signed recovery exports with current delisting, preserve existing catalog/backup stages, and prepare default-off Pages deployment with isolated permissions.
 - Add isolated fixtures, 20 browser checks, axe/performance evidence, palette mappings and bounded independent review; retain all existing regressions.
 - Keep reference artwork, installed development skills and local previews out of production. No auto merge or public deployment.
+
+- Select preinstalled Chrome for Ubuntu browser CI after the downloaded Chromium sandbox was blocked by AppArmor; retain sandboxing and repository permission boundaries.

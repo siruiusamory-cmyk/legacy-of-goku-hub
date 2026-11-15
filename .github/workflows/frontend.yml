@@ -17,11 +17,13 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci --ignore-scripts
-      - run: npx playwright install --with-deps chromium
+      - run: google-chrome --version
       - run: npm run site:fixture
       - run: node tools/site/build.js --fixture --empty
       - run: node tools/site/build.js --fixture --unfeatured
       - run: npm run test:browser
+        env:
+          PLAYWRIGHT_CHANNEL: chrome
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
