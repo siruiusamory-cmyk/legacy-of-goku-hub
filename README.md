@@ -170,3 +170,5 @@ The Astro implementation, honest empty state, stable project pages, responsive d
 Frontend CI uses the hosted runner's installed Chrome with sandboxing enabled; local Windows checks use project-local Chromium. Visual captures explicitly load and decode lazy images before inspecting them.
 
 [PR #24](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/pull/24) has passing hosted Node and browser checks. Owner review and deployment authorization remain pending.
+
+Detail artwork sizing follows the normalized image ratio, so the image meets the portrait frame without added CSS letterboxing.

@@ -83,6 +83,10 @@ test('portrait frames have transparent corner surfaces and one complete centered
   for(const width of [320,390,760,1448])for(const route of ['/','/projects/gh-1429374563/']){
     await page.setViewportSize({width,height:844});await page.goto(route);
     const frame=page.locator(route==='/'?'.spotlight-inner':'.detail-art');
+    if(route!=='/'){
+      const fit=await frame.evaluate(e=>{const f=e.getBoundingClientRect(),i=e.querySelector('img').getBoundingClientRect(),s=getComputedStyle(e);return {width:f.width-parseFloat(s.borderLeftWidth)-parseFloat(s.borderRightWidth)-i.width,height:f.height-parseFloat(s.borderTopWidth)-parseFloat(s.borderBottomWidth)-i.height,ratio:i.width/i.height};});
+      expect(Math.abs(fit.width)).toBeLessThan(.02);expect(Math.abs(fit.height)).toBeLessThan(.02);expect(fit.ratio).toBeCloseTo(16/9,3);
+    }
     if(route!=='/')for(const choice of await page.locator('.rating-choice').all()){
       const offset=await choice.evaluate(e=>{const r=e.getBoundingClientRect(),b=e.querySelector('.dragon-ball').getBoundingClientRect();return b.y+b.height/2-r.y-r.height/2;});
       expect(Math.abs(offset)).toBeLessThan(1);
