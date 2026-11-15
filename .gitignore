@@ -11,3 +11,12 @@ report.json
 .integration/
 recovery-export*/
 *.private-key.pem
+
+.agents/
+design-references/
+log-hub-design-references.zip
+.site/
+website/dist/
+website/.astro/
+playwright-report/
+test-results/
