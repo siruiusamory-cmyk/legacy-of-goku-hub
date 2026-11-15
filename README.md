@@ -154,3 +154,5 @@ With the owner as sole CODEOWNER, independently authored policy PRs can be owner
 The Astro implementation, honest empty state, stable project pages, responsive directory and accurate seven-Dragon-Ball preview are ready for normal PR review. Persistent voting and public deployment remain disabled. See [the frontend report and Windows guide](docs/frontend/README.md), [rendered screenshots](docs/frontend/evidence/empty-desktop.png), [skill investigation](docs/frontend/SKILLS.md) and [independent review](docs/frontend/REVIEW.md). The site consumes signed recovery exports and never substitutes synthetic fixtures for approved projects.
 
 Frontend CI uses the hosted runner's installed Chrome with sandboxing enabled; local Windows checks use project-local Chromium. Visual captures explicitly load and decode lazy images before inspecting them.
+
+[PR #24](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/pull/24) has passing hosted Node and browser checks. Owner review and deployment authorization remain pending.
