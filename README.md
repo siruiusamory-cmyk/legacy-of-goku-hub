@@ -1,7 +1,5 @@
 # Legacy of Goku Hub
 
-Current launch status: [LOG-HUB-008 readiness report](docs/launch/README.md), [candidate inventory](docs/launch/INVENTORY.md), [moderation checklist](docs/launch/MODERATION-CHECKLIST.md) and [deployment/rollback checklist](docs/launch/DEPLOYMENT.md). The launch plan is prepared; public launch remains blocked on the listed owner decisions and rating disclosure PR #29. No deployment or real listing approval is authorized here. Historical milestone reports below describe their state at the time.
-
 LOG-HUB-005 integrated the reviewed frontend into main. LOG-HUB-006 adds mandatory exact-content artwork moderation; see [the moderation guide](docs/moderation.md). No website is deployed.
 
 LOG-HUB-003 provides signed durable recovery in the private backup repository, immutable releases, and protected public hash receipts. The public source is [legacy-of-goku-hub](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub). See [operations](docs/OPERATIONS.md) for setup, monitoring, recovery and off-platform export, and [verification](VERIFICATION.md) for measured hosted results. All configured features use GitHub Free.
@@ -9,6 +7,8 @@ LOG-HUB-003 provides signed durable recovery in the private backup repository, i
 Static catalog infrastructure for Legacy of Goku, Legacy of Goku II and Buu's Fury. Developers submit through a repository manifest or guided GitHub form. GitHub Actions validates, normalizes and publishes eligible listings as artifacts. An Astro static frontend is implemented for review; it is not publicly deployed. No CMS, dashboard, database, runtime AI service, monetization or production server is needed.
 
 The existing Node 24, JSON Schema, GitHub release, Sharp image and deterministic catalog components remain in use. Legacy CLI tools and their regression tests are retained for migration, not the routine publishing path. Production has no community-approved records. Policy explicitly delists the isolated integration fixture; test data never becomes a community listing.
+
+Current launch status: [LOG-HUB-008 readiness report](docs/launch/README.md), [candidate inventory](docs/launch/INVENTORY.md), [moderation checklist](docs/launch/MODERATION-CHECKLIST.md) and [deployment/rollback checklist](docs/launch/DEPLOYMENT.md). The launch plan is prepared; public launch remains blocked on the listed owner decisions and rating disclosure PR #29. No deployment or real listing approval is authorized here. Historical milestone reports below describe their state at the time.
 
 ## Legacy of Goku visual identity
 
