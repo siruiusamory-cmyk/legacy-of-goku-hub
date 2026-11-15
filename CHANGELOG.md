@@ -12,6 +12,8 @@
 - Hosted CI passed and the initial signed immutable recovery point plus protected receipt were created successfully.
 - Independent review prompted revision pinning/current-policy guards, complete uploaded-image verification and immutable-tag commit binding, with regression coverage.
 - Added isolated live-GitHub fixture scenarios, purpose-separated integration recovery and offline signed-export verification.
+- Hosted manifest registration and automatic-update tests passed, with recovery after actual Actions state-artifact deletion.
+- Added direct immutable/protected-tag denial probes and deduplicated owner issue alerts for backup/publication failures.
 
 ## Self-service milestone
 

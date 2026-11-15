@@ -35,6 +35,8 @@ Developers use the manifest registration or guided Issue Form described in READM
 
 Every failed protected publication is an Actions failure and must not be described as backed up. **Verify backup health** independently runs daily: it checks signed durable recovery plus a successful final publication/verification within 48 hours. Maintainers must subscribe to Actions failure emails; the workflow itself does not send third-party messages. Inspect the failed step and the `validation-report`/protected receipt artifacts. During a complete GitHub/Actions outage the monitor cannot send an alert; retain off-platform exports and monitor GitHub availability through ordinary maintainer practice.
 
+An isolated notification job also opens/reuses a `loghub-operations` issue mentioning the repository owner when backup/publication or health fails. Repeated failures add comments instead of new issues. Only a successful final publication closes it automatically; a cancelled run or an unrelated healthy check cannot clear a publication failure. Operational issue events are excluded from catalog synchronization to avoid alert-triggered retry loops. A controlled hosted alert self-test is explicitly labeled as a test and is closed after verification.
+
 An old immutable recovery commit is healthy when daily unchanged-state verification succeeds. Its creation age alone is not a stale-backup signal. The monitor checks successful verification activity, not unnecessary daily duplicate commits.
 
 ## Restore and off-platform export (Windows)

@@ -8,6 +8,7 @@ import {readJSON, saveJSON} from '../src/records.js';
 import {publish} from '../src/publishing.js';
 import {RecoveryStore, payloadFiles, materialize, verifyPublicationFiles} from '../src/recovery.js';
 import {assertSourceRevision} from '../src/backup-cli.js';
+import {notifyOperations} from './notify-operations.js';
 
 const source = process.env.GITHUB_REPOSITORY;
 const phase = process.env.INTEGRATION_PHASE;
@@ -84,6 +85,18 @@ if (command === 'after-artifact-loss') {
     await store.anchor(point);
     const protectedPoint = await store.latest();
     await verifyPublicationFiles(protectedPoint, path.join(output, 'work/dist'));
+    const privateTag = `tags/loghub-integration-v1/${point.point}`;
+    const otherPrivateCommit = await store.api.request(`/repos/${config.backup_repository}/git/ref/heads/main`);
+    await assert.rejects(store.api.request(`/repos/${config.backup_repository}/git/refs/${privateTag}`, {method: 'PATCH', body: {sha: otherPrivateCommit.object.sha, force: true}}), error => [403, 422].includes(error.status));
+    const stillLocked = await store.api.request(`/repos/${config.backup_repository}/git/ref/${privateTag}`);
+    assert.equal(stillLocked.object.sha, point.commit);
+    const probe = `tags/loghub-protection-test/${process.env.GITHUB_RUN_ID}`;
+    await api.request(`/repos/${source}/git/refs`, {method: 'POST', body: {ref: 'refs/' + probe, sha: revision}});
+    const commits = await api.request(`/repos/${source}/commits?per_page=2`);
+    const otherSourceCommit = commits.find(c => c.sha !== revision);
+    assert.ok(otherSourceCommit);
+    await assert.rejects(api.request(`/repos/${source}/git/refs/${probe}`, {method: 'PATCH', body: {sha: otherSourceCommit.sha, force: true}}), error => [403, 422].includes(error.status));
+    await assert.rejects(api.request(`/repos/${source}/git/refs/${probe}`, {method: 'DELETE'}), error => [403, 422].includes(error.status));
     await materialize(protectedPoint, path.join(work, 'restored'));
     const policyRoot = path.join(work, 'delisting'); await fs.mkdir(path.join(policyRoot, 'records'), {recursive: true});
     await saveJSON(path.join(policyRoot, 'policy/publishing.json'), {...untrustedPolicy, projects: [{repository_id: fixtureId, owner_id: repo.owner.id, decision: 'delisted'}]});
@@ -93,7 +106,16 @@ if (command === 'after-artifact-loss') {
       actual_owner_id: repo.owner.id, owner_issue: issue.number, rejected_bot_issue: attacker.number, rejected_bot_user_id: attacker.user.id,
       version: project.release.version, file_size: project.release.file_size, sha256: project.release.sha256,
       cover: [cover.width, cover.height], screenshot: [screen.width, screen.height], point: point.point, backup_commit: point.commit,
-      recovered: true, current_delisting_reapplied: true, no_routine_update_approval: phase.endsWith('update'), production_catalog_contains_fixture: false});
+      recovered: true, current_delisting_reapplied: true, no_routine_update_approval: phase.endsWith('update'), production_catalog_contains_fixture: false,
+      private_tag_force_update_blocked: true, public_receipt_update_blocked: true, public_receipt_delete_blocked: true});
+    if (phase === 'guided-update') {
+      const alert = await notifyOperations(api, source, {failed: true, runId: process.env.GITHUB_RUN_ID, selfTest: true});
+      assert.equal((await api.request(`/repos/${source}/issues/${alert}`)).state, 'open');
+      await notifyOperations(api, source, {failed: false, runId: process.env.GITHUB_RUN_ID});
+      assert.equal((await api.request(`/repos/${source}/issues/${alert}`)).state, 'closed');
+      const report = await readJSON(path.join(work, 'report.json')); report.operational_alert_test = alert;
+      await saveJSON(path.join(work, 'report.json'), report);
+    }
     console.log('Live GitHub integration passed:', phase, project.release.version, point.point);
   } finally {
     await api.request(`/repos/${source}/issues/${attacker.number}`, {method: 'PATCH', body: {state: 'closed'}});
