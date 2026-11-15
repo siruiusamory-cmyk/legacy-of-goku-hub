@@ -8,6 +8,8 @@ import {RecoveryStore, recoveryConfig, payloadFiles, materialize, verifyPublicat
 import {selectSnapshot} from './service-cli.js';
 import {loadRecords} from './records.js';
 import {buildCatalog} from './catalog.js';
+import {readSnapshot} from './publishing.js';
+import {assertPublicationPolicy} from './moderation.js';
 
 export async function sourceIdentity(api, config) {
   const source = await api.request(`/repositories/${config.source_repository_id}`);
@@ -75,6 +77,7 @@ async function main() {
     if (command === 'initialize' && process.env.INITIALIZE_BACKUP !== 'I_AUTHORIZE_INITIAL_RECOVERY_POINT') throw Error('explicit administrator initialization acknowledgment required');
     const snapshot = path.resolve(process.argv[3] || '.generated/snapshot');
     const catalog = path.resolve(process.argv[4] || '.generated/work/dist/catalog.json');
+    await assertPublicationPolicy(snapshot, await readJSON(catalog), await readJSON(path.join(root, 'policy/publishing.json')), await readSnapshot(snapshot));
     if (command === 'initialize' && !process.argv[3] && (await selectSnapshot(source, config.source_repository, process.env.GITHUB_RUN_ID))) throw Error('existing publication exists; supply an explicit reviewed export path for initialization');
     const provenance = {source_commit: revision, run_id: Number(process.env.GITHUB_RUN_ID), workflow: command === 'initialize' ? '.github/workflows/initialize-backup.yml' : '.github/workflows/catalog.yml', ref: `refs/heads/${config.default_branch}`, kind: command === 'initialize' ? 'initialization' : 'publication'};
     if (!process.env.BACKUP_SIGNING_KEY) throw Error('BACKUP_SIGNING_KEY required; never put it in files or arguments');
@@ -90,6 +93,7 @@ async function main() {
       const files = await payloadFiles(path.join(root, '.generated/snapshot'), path.join(root, '.generated/work/dist/catalog.json'));
       if (latest.point !== receipt.point || latest.commit !== receipt.commit || files.size !== latest.files.size || [...files].some(([name, bytes]) => !latest.files.get(name)?.equals(bytes))) throw Error('publication does not match protected durable recovery point');
       await verifyPublicationFiles(latest, path.join(root, '.generated/work/dist'));
+      await assertPublicationPolicy(path.join(root, '.generated/snapshot'), await readJSON(path.join(root, '.generated/work/dist/catalog.json')), await readJSON(path.join(root, 'policy/publishing.json')), await readSnapshot(path.join(root, '.generated/snapshot')));
       await assertSourceRevision(source, config, revision);
     }
     console.log(`${command}: protected durable recovery point verified`);

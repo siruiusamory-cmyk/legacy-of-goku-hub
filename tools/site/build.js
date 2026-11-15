@@ -8,6 +8,8 @@ import {validateSiteCatalog} from './catalog.js';
 import {fixtureInput} from './fixtures.js';
 import {copyRealPreview} from './real-preview.js';
 import {detailImage} from './artwork.js';
+import {readSnapshot} from '../../src/publishing.js';
+import {entryApproved, verifyEntryArtwork, policyCheck} from '../../src/moderation.js';
 const root = fileURLToPath(new URL('../../',import.meta.url));
 process.chdir(root);
 const fixture = process.argv.includes('--fixture');
@@ -33,8 +35,16 @@ else {
   const config = await readJSON(path.join(root,'policy/recovery.json'));
   const recovered = await verifyExport(config,path.resolve(snapshot));
   catalog = JSON.parse(recovered.files.get('catalog.json'));
-  const policy = await readJSON(path.join(root,'policy/publishing.json'));
-  const excluded = new Set(policy.projects.filter(p=>['suspended','delisted'].includes(p.decision)).map(p=>p.repository_id));
+  const policy = policyCheck(await readJSON(path.join(root,'policy/publishing.json')));
+  const entries = await readSnapshot(path.resolve(snapshot));
+  const eligible = new Set();
+  for (const entry of entries) {
+    const rule = policy.projects.find(p=>p.repository_id===entry.repository_id);
+    if (entryApproved(entry,policy) && !['suspended','delisted'].includes(rule.decision) && !policy.revoked_owner_ids.includes(entry.owner_id)) {
+      await verifyEntryArtwork(entry); eligible.add(entry.repository_id);
+    }
+  }
+  const excluded = new Set(catalog.projects.filter(p=>!eligible.has(p.repository_id)).map(p=>p.repository_id));
   catalog.projects = catalog.projects.filter(p=>!excluded.has(p.repository_id));
   const ids = new Set(catalog.projects.map(p=>p.id));
   for (const key of Object.keys(catalog.sort)) catalog.sort[key] = catalog.sort[key].filter(id=>ids.has(id));

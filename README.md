@@ -1,6 +1,6 @@
 # Legacy of Goku Hub
 
-LOG-HUB-005 final technical review found no blocking defect in the frontend stack. Controlled integration awaits the required GitHub CODEOWNER approval; no merge or deployment is implied.
+LOG-HUB-005 integrated the reviewed frontend into main. LOG-HUB-006 adds mandatory exact-content artwork moderation; see [the moderation guide](docs/moderation.md). No website is deployed.
 
 LOG-HUB-003 provides signed durable recovery in the private backup repository, immutable releases, and protected public hash receipts. The public source is [legacy-of-goku-hub](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub). See [operations](docs/OPERATIONS.md) for setup, monitoring, recovery and off-platform export, and [verification](VERIFICATION.md) for measured hosted results. All configured features use GitHub Free.
 
@@ -52,11 +52,11 @@ Unset `SNAPSHOT_DIR` only for a genuine first publication with no previous catal
 
 ## Submit without editing hub source
 
-**Method A : repository manifest:** put `.loghub.json` at the root of your public repository's default branch, then open **Register repository manifest** and supply the repository URL. Anyone may point to a manifest; the person submitting its URL does not gain edit authority. After approval, the file is read daily. Editing it updates your listing automatically.
+**Method A : repository manifest:** put `.loghub.json` at the root of your public repository's default branch, then open **Register repository manifest** and supply the repository URL. Anyone may point to a manifest; the person submitting its URL does not gain edit authority. After approval, the file is read daily. Approved metadata synchronizes automatically; new or changed artwork is held until its exact bytes are approved. Every first listing needs explicit content review, including trusted owners.
 
 **Method B : guided form:** open **Submit, update or claim a project**. Fill individual inputs and dropdowns, without JSON or fenced code. Select the base game, category and status, provide a title, attribution, description and image paths. The bot reads releases from GitHub. Submit from the repository owner's account, or an explicitly approved representative's account. Third-party suggestions can be reviewed but never grant control of an existing listing.
 
-Keep the generated `###` field headings when editing an issue. Editing or closing/reopening it starts another synchronization; closed issues remain in the durable input ledger. Duplicate repository URLs, aliases and claims coalesce by numeric repository ID, not by user-supplied project identifiers. The public ID is generated as `gh-REPOSITORY_ID`; a migrated listing keeps its previous approved ID.
+Keep the generated `###` field headings when editing an issue. Editing or closing/reopening it starts another synchronization; the last approved guided issue is retrieved directly even when closed. Intake scans at most the newest 200 open issues, so resolve spam promptly. Duplicate repository URLs, aliases and claims coalesce by numeric repository ID, not by user-supplied project identifiers. The public ID is generated as `gh-REPOSITORY_ID`; a migrated listing keeps its previous approved ID.
 
 Validation feedback appears in the issue and in the Actions `validation-report` artifact. A review outcome identifies the reason and submission digest where relevant. Fix mechanical errors by editing the issue or manifest. Review decisions go through administrator policy, not a self-declared checkbox or bot-applied label. The artifact is the publication for this milestone; no site is deployed.
 
@@ -85,36 +85,9 @@ Optional project links are HTTPS pages on `github.com`, a `*.github.io` project 
 
 ## Ownership, trust and approval
 
-[policy/publishing.json](policy/publishing.json) is the administrator-controlled authority, validated by [schema/policy.schema.json](schema/policy.schema.json). Protect this file with branch review and CODEOWNERS. Login names and repository URLs are display/routing information; decisions bind to GitHub **numeric repository and owner/account IDs** obtained from the API.
+[policy/publishing.json](policy/publishing.json) is the administrator-controlled authority. Numeric repository and owner IDs establish repository control, not authority to represent a team. Trust never replaces first-content approval or exact artwork-set approval. Labels, issue edits and manifests cannot approve content.
 
-| Situation | Behavior |
-|---|---|
-| New manifest under a trusted numeric owner ID | Mechanically valid project publishes automatically; issue author gains no claim |
-| Guided form from a trusted repository owner | Automatically eligible after identical validation |
-| New/untrusted owner | First publication requires an administrator policy approval |
-| Previously published project, same numeric owner | Manifest and authorized guided updates synchronize without update PRs |
-| Third-party suggestion | Review only; exact issue number + normalized submission digest must be approved; listing is unclaimed |
-| Owner claims an unclaimed project | Actual repository control is verified; authorized updates can take over its metadata source |
-| Organization member | Membership alone grants no edit authority; use the repository manifest or explicit administrator-approved representative IDs |
-| Ownership dispute | Recorded for human review; the report itself cannot seize or delist a project |
-| Repository rename | Resolve by stable repository ID and update canonical links |
-| Repository transfer | Freeze the prior listing until policy approves the new numeric owner ID |
-| Attribution/base-game/category change | Freeze until the exact new metadata digest is approved |
-| Invalid manifest, missing assets, API/rate/image/download failure | Retain the previous valid listing with an unavailable warning; retry next run |
-| Manifest removed | Freeze its last valid claim and metadata; do not silently return it to strangers |
-| Suspended/delisted | Omit from the current public catalog; retain a recovery snapshot |
-
-Repository control and team representation are separate facts. The `ownership` field exposes the claim plus `representation_verified`. A committed manifest establishes repository control, not authorship, licensing, development-team consent or software safety. Only an administrator can set `representation_verified: true` after checking authority. Personal owner submissions are checked by numeric account ID; a matching developer name or URL proves nothing. Existing claimants cannot carry a claim across an unapproved repository transfer.
-
-Trust is granted by adding a verified numeric owner ID to `trusted_owner_ids` through normal administrator PR review. Removing it prevents new automatic listings; already approved listings continue normal maintenance. To revoke existing automatic-update authority as well, add the ID to `revoked_owner_ids`, or hold a specific project with `decision: "review"`. Revocation freezes the last good listing; `suspended`/`delisted` removes it from current output. Clearing a revocation/hold after investigation permits synchronization to recover.
-
-### Exceptional human decisions
-
-For a first-time project, review the bot's report and the actual repository, content rights, attribution and distribution. Add a policy project entry with its real `repository_id`, current `owner_id` and `decision: "approved"`. For third-party metadata, also bind `approved_issue` and `approved_digest` from the report. Editing that issue invalidates the approval. This is a content approval, not a grant of future edit authority. To authorize a team representative, explicitly list their verified numeric account ID under `representative_ids`.
-
-For a held attribution/game/category change, review it and set `approved_metadata_digest` to the exact digest shown in the report. A transfer needs a separately verified new `owner_id`; do not approve on a matching old URL alone. Use `decision: "review"` while investigating a dispute, `suspended` for a temporary removal and `delisted` for removal. Optional `reason` explains the decision; `featured` remains administrator-owned.
-
-Policy changes merge through normal protected PRs. They trigger publication automatically. No bot can write policy or push to the protected production branch in the routine flow. The only recurring human work is genuinely exceptional content, ownership and security review.
+Follow [docs/moderation.md](docs/moderation.md) for private local review, exact policy fields, protected policy PRs, rejected submissions, holds, suspension, delisting, recovery and spam limits. The old public artwork-staging workflow is retired. Do not commit or upload unapproved images.
 
 ## Validation retained from the first milestone
 

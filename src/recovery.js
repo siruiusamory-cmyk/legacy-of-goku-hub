@@ -47,7 +47,7 @@ export async function payloadFiles(snapshot, catalogFile) {
   const registry = JSON.parse(registryBytes);
   keys(registry, ['version', 'entries'], 'registry');
   for (const entry of registry.entries || []) {
-    keys(entry, ['id', 'repository_id', 'owner_id', 'source'], 'registration');
+    keys(entry, ['id', 'repository_id', 'owner_id', 'source', 'moderation'], 'registration');
     keys(entry.source, ['method', 'issue', 'user_id', 'digest'], 'source');
     for (const name of ['issue', 'user_id']) if (entry.source[name] != null && (!Number.isSafeInteger(entry.source[name]) || entry.source[name] <= 0)) throw Error('invalid recovery source identity');
     if (entry.source.digest != null && !HEX.test(entry.source.digest)) throw Error('invalid source digest');

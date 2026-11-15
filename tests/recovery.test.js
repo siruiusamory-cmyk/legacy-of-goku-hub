@@ -8,7 +8,7 @@ import sharp from 'sharp';
 import YAML from 'yaml';
 import {readJSON, saveJSON} from '../src/records.js';
 import {buildCatalog} from '../src/catalog.js';
-import {normalizeImage} from '../src/images.js';
+import {imageHash, normalizeImage} from '../src/images.js';
 import {publish} from '../src/publishing.js';
 import {recoveryConfig, RecoveryStore, payloadFiles, materialize, seal, verifyEnvelope, verifyExport} from '../src/recovery.js';
 import {backupHealth, assertSourceRevision} from '../src/backup-cli.js';
@@ -32,6 +32,9 @@ async function setup(t) {
   const png = await sharp({create: {width: 20, height: 30, channels: 3, background: 'red'}}).png().toBuffer();
   await fs.mkdir(path.join(snapshot, 'assets', project.id), {recursive: true});
   for (const [name, kind] of [['cover.webp', 'cover'], ['screenshot-1.webp', 'screenshot']]) await fs.writeFile(path.join(snapshot, 'assets', project.id, name), await normalizeImage(png, kind));
+  const registry = await readJSON(path.join(snapshot, 'registry.json'));
+  registry.entries[0].moderation = {initial_content_digest: 'c'.repeat(64), artwork: await Promise.all(['cover.webp','screenshot-1.webp'].map(async name => ({source_sha256: imageHash(png), sha256: imageHash(await fs.readFile(path.join(snapshot,'assets',project.id,name)))})))};
+  await saveJSON(path.join(snapshot,'registry.json'),registry);
   await buildCatalog(snapshot);
   const catalog = path.join(snapshot, 'dist/catalog.json');
   const api = await gitVault(path.join(root, 'vault.git'), config); const anchors = publicAnchors(config, sourceCommit);
@@ -106,7 +109,7 @@ test('restoring never overwrites existing directories and re-applies current del
   await materialize(await s.store.latest(), destination);
   await assert.rejects(materialize(await s.store.latest(), destination), /overwrite/);
   const current = path.join(s.root, 'current'); await fs.mkdir(path.join(current, 'records'), {recursive: true});
-  await saveJSON(path.join(current, 'policy/publishing.json'), {version: 1, trusted_owner_ids: [], revoked_owner_ids: [99], projects: [{repository_id: 123, owner_id: 99, decision: 'delisted'}]});
+  await saveJSON(path.join(current, 'policy/publishing.json'), {version: 1, trusted_owner_ids: [], revoked_owner_ids: [99], projects: [{repository_id: 123, owner_id: 99, project_id: project.id, content_digests: ['c'.repeat(64)], artwork_sets: [JSON.parse(s.files.get('registry.json')).entries[0].moderation.artwork], decision: 'delisted'}]});
   const result = await publish({root: current, previous: destination, output: path.join(s.root, 'output'), issues: [], api: {request: async () => {throw Error('API outage');}}});
   assert.equal(result.catalog.projects.length, 0);
   assert.equal((await readJSON(path.join(s.root, 'output/snapshot/registry.json'))).entries.length, 1);
