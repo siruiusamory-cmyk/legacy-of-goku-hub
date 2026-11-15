@@ -49,7 +49,7 @@ All scenarios used owner-controlled test data, real GitHub identities/releases a
 
 Every successful scenario physically deleted its ephemeral Actions state artifact, then restored consistent metadata/images from the durable vault. Covers were 640x360; screenshots 480x320. Current delisting was reapplied after recovery. Final guided asset: 282 bytes, SHA-256 `bb91b7e11c234478b605414b68ddf6e42032783ab4ac7fc670627631a8b11087`, containing only fixture text. The final run also verified actual private-tag force-update denial, public-receipt update/delete denial, production ruleset coverage, and creation/closure of controlled alert issue 18.
 
-GitHub issues used the exact form headings and real parser. Browser clicks through form widgets were not automated: real issue creation/editing used the authenticated CLI. Owner fixture issues 6/7 were closed after verification and remain in the ledger. Issue-triggered workflows also run when these actual submission issues change.
+GitHub issues used the exact form headings and real parser. Browser clicks through form widgets were not automated: real issue creation/editing used the authenticated CLI. Owner fixture issues 6/7 were closed after verification and remain in the ledger. Actual production issue-event run [43665108215](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/actions/runs/43665108215) passed synchronization, backup, receipt, publication and feedback after the manifest fixture issue closed. This validates the event path with the fixture still delisted; eligible fixture publication was tested separately in the isolated driver.
 
 ## Tests and independent review
 
@@ -85,3 +85,4 @@ These are not counted as successful tests. The final hidden-artifact workflow se
 - GitHub hosting and validation do not establish malware safety, authorship, team authority or licensing. Submitted downloads were never executed. Archive contents/ROM absence still require human judgment. Cross-platform encoder equality is not promised.
 
 Previous milestone: [archived self-service verification](docs/VERIFICATION-SELF-SERVICE.md). All operational procedures work with Node/GitHub alone; Codex and Zeroshot are development tools only.
+

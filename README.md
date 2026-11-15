@@ -144,3 +144,5 @@ Recomp.fyi research and explicit differences are recorded in [docs/RECOMP-RESEAR
 The candidate upload explicitly includes its hidden staging directory; download steps use normal artifact inputs.
 
 LOG-HUB-003 hosted publication and recovery have passed. See VERIFICATION.md for exact run links, test counts, review findings and remaining operational responsibilities.
+
+Actual issue-event processing and feedback passed in production with the isolated fixture excluded.
