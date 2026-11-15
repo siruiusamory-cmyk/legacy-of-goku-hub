@@ -3,7 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {GitHub} from './github.js';
 import {readJSON, saveJSON} from './records.js';
-import {listSubmissions, publish} from './publishing.js';
+import {listSubmissions, publish, readSnapshot} from './publishing.js';
 
 const root = process.cwd(); const command = process.argv[2];
 const api = new GitHub(); const hub = process.env.GITHUB_REPOSITORY;
@@ -42,7 +42,14 @@ async function main() {
     }
     const output = path.join(root, '.generated');
     await fs.rm(output, {recursive: true, force: true});
-    const result = await publish({root, previous, output, api, issues: await listSubmissions(api, hub)});
+    const issues = await listSubmissions(api, hub);
+    for (const entry of await readSnapshot(previous)) {
+      if (entry.source.issue && !issues.some(i => i.number === entry.source.issue)) {
+        try { issues.push(await api.request(`/repos/${hub}/issues/${entry.source.issue}`)); }
+        catch (error) { if (error.status !== 404 && error.status !== 410) throw error; }
+      }
+    }
+    const result = await publish({root, previous, output, api, issues});
     await saveJSON(path.join(output, 'snapshot/github-cache.json'), Object.fromEntries(Object.entries(api.cache).filter(([key]) => api.used.has(key))));
     console.log(`Validated candidate: ${result.catalog.projects.length} projects; ${result.report.filter(r => r.outcome !== 'published').length} review/retention notices. Durable backup and protected receipt are required before publication.`);
   } else if (command === 'feedback') {

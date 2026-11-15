@@ -6,7 +6,9 @@ import os from 'node:os';
 import sharp from 'sharp';
 import YAML from 'yaml';
 import {readJSON, saveJSON} from '../src/records.js';
-import {GitHub} from '../src/github.js';
+import {GitHub, releaseInfo} from '../src/github.js';
+import {contentDigest} from '../src/moderation.js';
+import {inspectImages} from '../src/images.js';
 import {loadManifest, manifestRecord, parseSubmission, digest} from '../src/intake.js';
 import {publish, policyCheck, readSnapshot} from '../src/publishing.js';
 import {selectSnapshot} from '../src/service-cli.js';
@@ -19,6 +21,7 @@ const metadata = {schema_version: 1, title: 'TEST FIXTURE only', developer: 'Fix
 const sha = 'a'.repeat(40);
 const png = await sharp({create: {width: 80, height: 120, channels: 3, background: 'red'}}).png().toBuffer();
 const fetchImages = async (_, options) => new Response(options.method === 'HEAD' ? null : png);
+const fixtureApproval = {project_id: 'gh-123', content_digests: [contentDigest(manifestRecord(metadata, repository, sha), repository, await releaseInfo(api(), {}, repository))], artwork_sets: [(await inspectImages(manifestRecord(metadata, repository, sha), fetchImages)).artwork]};
 const emptyPolicy = () => ({version: 1, trusted_owner_ids: [], revoked_owner_ids: [], projects: []});
 function issue({method = 'Repository manifest', number = 1, user_id = 99, action = 'Submit or update', data = metadata} = {}) {
   const fields = {'Repository URL': repo.html_url, 'Submission method': method, Request: action};
@@ -51,7 +54,7 @@ async function run(root, {client = api(), issues = [issue()], previous, name = '
   const output = path.join(root, name);
   return {...await publish({root, output, api: client, issues, previous, fetcher}), snapshot: path.join(output, 'snapshot')};
 }
-function trusted() {return {...emptyPolicy(), trusted_owner_ids: [99]};}
+function trusted() {return {...emptyPolicy(), trusted_owner_ids: [99], projects: [{...fixtureApproval, repository_id: 123, owner_id: 99, decision: 'approved'}]};}
 
 test('manifest discovery is bounded, versioned and cannot override identity or policy', async () => {
   const loaded = await loadManifest(api(), repository);
@@ -67,7 +70,7 @@ test('guided fields need no JSON and produce the same internal record as a manif
   assert.deepEqual(manifestRecord(parsed.metadata, repository, sha), manifestRecord({...metadata, links: []}, repository, sha));
   assert.throws(() => parseSubmission({...issue(), body: issue().body + '\n\n### Repository URL\n\nhttps://github.com/attacker/repo'}), /duplicate/);
 });
-test('trusted manifest owner publishes automatically even if a third party points to it', async t => {
+test('content-approved manifest owner publishes even if a third party points to it', async t => {
   const root = await setup(t, trusted()); const result = await run(root, {issues: [issue({user_id: 999})]});
   assert.equal(result.catalog.projects.length, 1); assert.equal(result.catalog.projects[0].ownership.claim, 'repository-controlled');
   assert.equal(result.catalog.projects[0].ownership.representation_verified, false);
@@ -79,7 +82,7 @@ test('new/untrusted manifest and guided submissions enter review', async t => {
     assert.equal(result.catalog.projects.length, 0); assert.ok(result.report.some(r => /review/.test(r.reason)));
   }
 });
-test('trusted guided owner publishes; matching URL from an untrusted author grants no control', async t => {
+test('content-approved guided owner publishes; matching URL from an untrusted author grants no control', async t => {
   const root = await setup(t, trusted());
   const first = await run(root, {client: api({noManifest: true}), issues: [issue({method: 'Guided form'})]});
   const forged = issue({method: 'Guided form', user_id: 666, number: 2, action: 'Claim ownership', data: {...metadata, title: 'Takeover'}});
@@ -88,7 +91,7 @@ test('trusted guided owner publishes; matching URL from an untrusted author gran
   assert.ok(next.report.some(r => r.issue === 2 && r.outcome === 'review'));
 });
 test('approved third-party submission stays unclaimed; edited body cannot reuse approval', async t => {
-  const candidate = issue({method: 'Guided form', user_id: 666}); const approval = {repository_id: 123, owner_id: 99, decision: 'approved', approved_issue: 1, approved_digest: parseSubmission(candidate).digest};
+  const candidate = issue({method: 'Guided form', user_id: 666}); const approval = {...fixtureApproval, repository_id: 123, owner_id: 99, decision: 'approved', approved_issue: 1, approved_digest: parseSubmission(candidate).digest};
   const root = await setup(t, {...emptyPolicy(), projects: [approval]});
   const first = await run(root, {client: api({noManifest: true}), issues: [candidate]});
   assert.equal(first.catalog.projects[0].ownership.claim, 'unclaimed');
@@ -99,7 +102,7 @@ test('approved third-party submission stays unclaimed; edited body cannot reuse 
 });
 test('repository owner can claim an approved unclaimed project without seizing team representation', async t => {
   const third = issue({method: 'Guided form', user_id: 666});
-  const root = await setup(t, {...emptyPolicy(), projects: [{repository_id: 123, owner_id: 99, decision: 'approved', approved_issue: 1, approved_digest: parseSubmission(third).digest}]});
+  const root = await setup(t, {...emptyPolicy(), projects: [{...fixtureApproval, repository_id: 123, owner_id: 99, decision: 'approved', approved_issue: 1, approved_digest: parseSubmission(third).digest}]});
   const first = await run(root, {client: api({noManifest: true}), issues: [third]});
   const claim = issue({method: 'Guided form', number: 2, action: 'Claim ownership'});
   const next = await run(root, {name: 'next', previous: first.snapshot, client: api({noManifest: true}), issues: [third, claim]});
@@ -111,7 +114,7 @@ test('organization membership is not control; representatives require administra
   const root = await setup(t, trusted());
   const candidate = issue({method: 'Guided form'});
   assert.equal((await run(root, {client: api({repository: org, noManifest: true}), issues: [candidate]})).catalog.projects.length, 0);
-  await saveJSON(path.join(root, 'policy/publishing.json'), {...emptyPolicy(), projects: [{repository_id: 123, owner_id: 99, decision: 'approved', representative_ids: [99], representation_verified: true}]});
+  await saveJSON(path.join(root, 'policy/publishing.json'), {...emptyPolicy(), projects: [{...fixtureApproval, repository_id: 123, owner_id: 99, decision: 'approved', representative_ids: [99], representation_verified: true}]});
   const result = await run(root, {name: 'second', client: api({repository: org, noManifest: true}), issues: [candidate]});
   assert.equal(result.catalog.projects[0].ownership.representation_verified, true);
 });
@@ -124,7 +127,7 @@ test('sensitive attribution changes freeze until their exact metadata digest is 
   const root = await setup(t, trusted()); const first = await run(root); const changed = {...metadata, developer: 'Another team'};
   const held = await run(root, {name: 'held', previous: first.snapshot, client: api({metadata: changed})});
   assert.equal(held.catalog.projects[0].developer, metadata.developer); assert.match(held.report.at(-1).reason, /sensitive/);
-  await saveJSON(path.join(root, 'policy/publishing.json'), {...emptyPolicy(), projects: [{repository_id: 123, owner_id: 99, decision: 'approved', approved_metadata_digest: digest(changed)}]});
+  await saveJSON(path.join(root, 'policy/publishing.json'), {...emptyPolicy(), projects: [{...fixtureApproval, repository_id: 123, owner_id: 99, decision: 'approved', approved_metadata_digest: digest(changed)}]});
   assert.equal((await run(root, {name: 'approved', previous: held.snapshot, client: api({metadata: changed})})).catalog.projects[0].developer, changed.developer);
 });
 test('transfers freeze claims; same-ID renames work; explicit new-owner approval allows transfer', async t => {
@@ -135,7 +138,7 @@ test('transfers freeze claims; same-ID renames work; explicit new-owner approval
   const renamed = {...repo, full_name: 'fixture-owner/renamed', html_url: 'https://github.com/fixture-owner/renamed'};
   const renamedResult = await run(root, {name: 'renamed', previous: first.snapshot, client: api({repository: renamed})});
   assert.equal(renamedResult.catalog.projects[0].repository, renamed.html_url); assert.equal(renamedResult.catalog.projects[0].id, 'gh-123');
-  await saveJSON(path.join(root, 'policy/publishing.json'), {...emptyPolicy(), projects: [{repository_id: 123, owner_id: 777, decision: 'approved'}]});
+  await saveJSON(path.join(root, 'policy/publishing.json'), {...emptyPolicy(), projects: [{...fixtureApproval, content_digests: [...fixtureApproval.content_digests, contentDigest(manifestRecord(metadata, {...repository, owner_id: 777}, sha), {...repository, owner_id: 777}, await releaseInfo(api(), {}, repository))], repository_id: 123, owner_id: 777, decision: 'approved'}]});
   assert.equal((await readSnapshot((await run(root, {name: 'approved', previous: first.snapshot, client: api({repository: transferred})})).snapshot))[0].owner_id, 777);
 });
 test('revocation freezes; suspension and delisting omit projects but retain recovery snapshots', async t => {
@@ -143,7 +146,7 @@ test('revocation freezes; suspension and delisting omit projects but retain reco
   await saveJSON(path.join(root, 'policy/publishing.json'), {...trusted(), revoked_owner_ids: [99]});
   const held = await run(root, {name: 'held', previous: first.snapshot}); assert.match(held.report.at(-1).reason, /revoked/);
   for (const decision of ['suspended', 'delisted']) {
-    await saveJSON(path.join(root, 'policy/publishing.json'), {...trusted(), projects: [{repository_id: 123, owner_id: 99, decision}]});
+    await saveJSON(path.join(root, 'policy/publishing.json'), {...trusted(), projects: [{...fixtureApproval, repository_id: 123, owner_id: 99, decision}]});
     const result = await run(root, {name: decision, previous: first.snapshot});
     assert.equal(result.catalog.projects.length, 0); assert.equal((await readSnapshot(result.snapshot)).length, 1);
   }
@@ -209,6 +212,8 @@ test('missing newest guided source must not roll metadata back to an older issue
   const root = await setup(t, trusted());
   const original = issue({method: 'Guided form'});
   const update = issue({method: 'Guided form', number: 2, data: {...metadata, title: 'Newest published title'}});
+  const approved = trusted(); approved.projects[0].content_digests.push(contentDigest(manifestRecord(parseSubmission(update).metadata, repository, sha), repository, await releaseInfo(api(), {}, repository)));
+  await saveJSON(path.join(root, 'policy/publishing.json'), approved);
   const first = await run(root, {client: api({noManifest: true}), issues: [original, update]});
   const result = await run(root, {name: 'next', previous: first.snapshot, client: api({noManifest: true}), issues: [original]});
   assert.equal(result.catalog.projects[0].title, 'Newest published title');
@@ -241,8 +246,8 @@ test('untrusted submissions still receive mechanical validation and never enter 
   assert.match(result.report.at(-1).reason, /manifest:/);
   assert.deepEqual((await readJSON(path.join(result.snapshot, 'registry.json'))).entries, []);
 });
-test('approved legacy migration retains a valid ownership-bound snapshot during an API outage', async t => {
-  const root = await setup(t, {...emptyPolicy(), projects: [{repository_id: 123, owner_id: 99, decision: 'approved'}]});
+test('legacy migration without exact artwork approval is held even during an API outage', async t => {
+  const root = await setup(t, {...emptyPolicy(), projects: [{...fixtureApproval, repository_id: 123, owner_id: 99, decision: 'approved'}]});
   const record = manifestRecord(metadata, repository, sha, 'legacy-fixture');
   await saveJSON(path.join(root, 'records/legacy-fixture.json'), record);
   await saveJSON(path.join(root, 'state/legacy-fixture.json'), {repository: {id: 123, url: repo.html_url, owner: 'fixture-owner', owner_type: 'User', archived: false, updated_at: '2026-01-02T00:00:00Z'}, release: null, availability: 'available', warning: null, last_updated: '2026-01-02T00:00:00Z'});
@@ -250,8 +255,98 @@ test('approved legacy migration retains a valid ownership-bound snapshot during 
   await fs.writeFile(path.join(root, 'assets/legacy-fixture/cover.webp'), await normalizeImage(png, 'cover'));
   await fs.writeFile(path.join(root, 'assets/legacy-fixture/screenshot-1.webp'), await normalizeImage(png, 'screenshot'));
   const first = await run(root, {client: api({failure: 503}), issues: []});
-  assert.equal(first.catalog.projects.length, 1);
-  assert.equal((await readSnapshot(first.snapshot))[0].state.repository.owner_id, 99);
+  assert.equal(first.catalog.projects.length, 0);
+  assert.equal((await readSnapshot(first.snapshot)).length, 0);
   const recovered = await run(root, {name: 'recovered', previous: first.snapshot, client: api({noManifest: true}), issues: []});
-  assert.equal(recovered.catalog.projects[0].warning, null);
+  assert.equal(recovered.catalog.projects.length, 0);
+});
+
+test('trusted owner still needs explicit first-content approval in both submission methods', async t => {
+  for (const method of ['Repository manifest', 'Guided form']) {
+    const root = await setup(t, {...emptyPolicy(), trusted_owner_ids: [99]});
+    const held = await run(root, {client: api({noManifest: method === 'Guided form'}), issues: [issue({method})]});
+    assert.equal(held.catalog.projects.length, 0);
+    assert.equal((await readSnapshot(held.snapshot)).length, 0);
+    assert.ok(held.report.some(r=>r.content_digest && r.artwork.length === 2));
+    assert.deepEqual(await fs.readdir(path.join(root,'first')), ['report.json','snapshot','work']);
+    assert.equal(await fs.stat(path.join(root,'first/candidates')).then(()=>true,()=>false), false);
+  }
+});
+
+test('exact reviewed content publishes; post-review changes and approved artwork reordering are held', async t => {
+  const root = await setup(t); const held = await run(root);
+  const proposal = held.report.find(r=>r.content_digest);
+  const approved = {...emptyPolicy(), projects: [{repository_id: 123, owner_id: 99, project_id: proposal.project_id, decision: 'approved', content_digests: [proposal.content_digest], artwork_sets: [proposal.artwork]}]};
+  await saveJSON(path.join(root,'policy/publishing.json'), approved);
+  const changed = await run(root,{name:'raced',client:api({metadata:{...metadata,title:'Changed after review'}})});
+  assert.equal(changed.catalog.projects.length,0);
+  const first = await run(root,{name:'approved'}); assert.equal(first.catalog.projects.length,1);
+  const wrong = structuredClone(approved); wrong.projects[0].artwork_sets[0].reverse();
+  await saveJSON(path.join(root,'policy/publishing.json'),wrong);
+  const reordered = await run(root,{name:'wrong-order',previous:first.snapshot});
+  assert.equal(reordered.catalog.projects.length,0);
+});
+
+test('changed cover at same URL cannot overwrite approved bytes or leak into artifacts', async t => {
+  const root = await setup(t,trusted()); const first = await run(root);
+  const replacement = await sharp({create:{width:80,height:120,channels:3,background:'blue'}}).png().toBuffer();
+  const held = await run(root,{name:'replacement',previous:first.snapshot,fetcher:async (_,options)=>new Response(options.method==='HEAD'?null:replacement)});
+  assert.equal(held.catalog.projects[0].title, metadata.title);
+  const oldBytes=await fs.readFile(path.join(first.snapshot,'assets/gh-123/cover.webp'));
+  assert.deepEqual(await fs.readFile(path.join(root,'replacement/work/dist/assets/gh-123/cover.webp')),oldBytes);
+  assert.deepEqual(await fs.readFile(path.join(held.snapshot,'assets/gh-123/cover.webp')),oldBytes);
+  assert.ok(held.report.some(r=>r.artwork && r.artwork[0].source_sha256 !== fixtureApproval.artwork_sets[0][0].source_sha256));
+  assert.match(held.report.at(-1).reason,/pending/);
+  const resumed=await run(root,{name:'resumed',previous:held.snapshot}); assert.equal(resumed.catalog.projects[0].warning,null);
+});
+
+test('raw bytes require approval even if normalization produces identical display bytes', async t => {
+  const root=await setup(t,trusted()); const first=await run(root);
+  const changed=await sharp(png).withMetadata({density:144}).png().toBuffer();
+  const held=await run(root,{name:'raw-drift',previous:first.snapshot,fetcher:async (_,options)=>new Response(options.method==='HEAD'?null:changed)});
+  assert.ok(held.report.some(r=>r.content_digest)); assert.match(held.report.at(-1).reason,/pending/);
+});
+
+test('new manifest commit with unchanged approved image content synchronizes normally', async t => {
+  const root=await setup(t,trusted());const first=await run(root);
+  const next=await run(root,{name:'new-commit',previous:first.snapshot,client:api({sha:'b'.repeat(40)})});
+  assert.equal(next.catalog.projects.length,1);assert.equal(next.catalog.projects[0].warning,null);
+});
+
+test('project identity, owner identity, missing approval and current revocation cannot be restored around', async t => {
+  const root=await setup(t,trusted());const first=await run(root);
+  for(const [name,change] of [['project',p=>p.projects[0].project_id='other-id'],['owner',p=>p.projects[0].owner_id=777],['artwork',p=>p.projects[0].artwork_sets=[]],['content',p=>p.projects[0].content_digests=[]],['revoked',p=>p.revoked_owner_ids=[99]]]) {
+    const p=trusted();change(p);await saveJSON(path.join(root,'policy/publishing.json'),p);
+    const result=await run(root,{name,previous:first.snapshot});assert.equal(result.catalog.projects.length,0);
+  }
+});
+
+test('blocked accounts, rejected issues and spam bursts cannot publish or multiply repository records', async t => {
+  const root=await setup(t,trusted());const first=await run(root);
+  const p=trusted();p.blocked_user_ids=[666];p.rejected_issue_numbers=[88];await saveJSON(path.join(root,'policy/publishing.json'),p);
+  const burst=[...Array(100)].map((_,i)=>issue({user_id:666,number:i+2}));burst.push(issue({number:88}),issue());
+  const next=await run(root,{name:'spam',previous:first.snapshot,issues:burst});
+  assert.equal(next.catalog.projects.length,1);assert.equal((await readSnapshot(next.snapshot)).length,1);
+  assert.ok(next.report.some(r=>/rejected/.test(r.reason)));
+  const ownerBurst=await run(root,{name:'owner-spam',previous:first.snapshot,issues:[...Array(30)].map((_,i)=>issue({number:i+1}))});
+  assert.equal(ownerBurst.catalog.projects.length,1);assert.ok(ownerBurst.report.some(r=>/intake limit/.test(r.reason)));
+});
+
+test('revoked-owner removal remains effective during a GitHub outage',async t=>{
+ const root=await setup(t,trusted());const first=await run(root);
+ await saveJSON(path.join(root,'policy/publishing.json'),{...trusted(),revoked_owner_ids:[99]});
+ const result=await run(root,{name:'revoked-outage',previous:first.snapshot,client:api({failure:503})});
+ assert.equal(result.catalog.projects.length,0);
+});
+
+test('approving a replacement resumes sync and rejected bytes never overwrite prior artwork',async t=>{
+ const root=await setup(t,trusted());const first=await run(root);
+ const replacement=await sharp({create:{width:80,height:120,channels:3,background:'blue'}}).png().toBuffer();
+ const fetcher=async(_,options)=>new Response(options.method==='HEAD'?null:replacement);
+ const held=await run(root,{name:'held-new',previous:first.snapshot,fetcher});
+ const proposed=held.report.find(r=>r.artwork).artwork;
+ const p=trusted();p.projects[0].artwork_sets.push(proposed);await saveJSON(path.join(root,'policy/publishing.json'),p);
+ const approved=await run(root,{name:'approved-new',previous:held.snapshot,fetcher});
+ assert.equal(approved.catalog.projects[0].warning,null);
+ assert.deepEqual(await fs.readFile(path.join(approved.snapshot,'assets/gh-123/cover.webp')),await normalizeImage(replacement,'cover'));
 });

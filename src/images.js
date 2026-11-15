@@ -1,6 +1,7 @@
 import sharp from 'sharp';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import {createHash} from 'node:crypto';
 import {imageURL} from './records.js';
 
 export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -31,14 +32,27 @@ export async function normalizeImage(bytes, kind) {
   const [width, height] = kind === 'cover' ? [640, 360] : [480, 320];
   return sharp(bytes, options).rotate().resize(width, height, {fit: 'contain', background: '#161616'}).flatten({background: '#161616'}).webp({quality: 82, effort: 6}).toBuffer();
 }
-export async function processImages(record, root, fetcher = fetch) {
+export const imageHash = bytes => createHash('sha256').update(bytes).digest('hex');
+export async function inspectImages(record, fetcher = fetch) {
   const outputs = [];
+  const artwork = [];
   for (const [i, url] of [record.cover, ...(record.screenshots || [])].entries()) {
     const response = await fetcher(imageURL(url, record.repository), {redirect: 'error', signal: AbortSignal.timeout(20000)});
     if (!response.ok) throw Error(`image ${i + 1}: HTTP ${response.status}; check public pinned URL`);
-    outputs.push(await normalizeImage(await boundedBody(response, MAX_IMAGE_BYTES), i === 0 ? 'cover' : 'screenshot'));
+    const bytes = await boundedBody(response, MAX_IMAGE_BYTES);
+    const normalized = await normalizeImage(bytes, i === 0 ? 'cover' : 'screenshot');
+    outputs.push(normalized);
+    artwork.push({source_sha256: imageHash(bytes), sha256: imageHash(normalized)});
   }
+  return {outputs, artwork};
+}
+export async function writeImages(record, root, outputs) {
   const directory = path.join(root, 'assets', record.id);
   await fs.mkdir(directory, {recursive: true});
   for (let i = 0; i < outputs.length; i++) await fs.writeFile(path.join(directory, i === 0 ? 'cover.webp' : `screenshot-${i}.webp`), outputs[i]);
+}
+export async function processImages(record, root, fetcher = fetch) {
+  const result = await inspectImages(record, fetcher);
+  await writeImages(record, root, result.outputs);
+  return result.artwork;
 }

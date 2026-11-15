@@ -6,6 +6,7 @@ import Ajv from 'ajv';
 import {readJSON, json, repoSlug, validateRecord} from './records.js';
 import {readSnapshot} from './publishing.js';
 import {buildCatalog, validateState} from './catalog.js';
+import {policyCheck} from './moderation.js';
 
 const checkConfig = new Ajv({allErrors: true}).compile(await readJSON(new URL('../schema/recovery.schema.json', import.meta.url)));
 const checkCatalog = new Ajv().compile(await readJSON(new URL('../schema/catalog.schema.json', import.meta.url)));
@@ -47,7 +48,7 @@ export async function payloadFiles(snapshot, catalogFile) {
   const registry = JSON.parse(registryBytes);
   keys(registry, ['version', 'entries'], 'registry');
   for (const entry of registry.entries || []) {
-    keys(entry, ['id', 'repository_id', 'owner_id', 'source'], 'registration');
+    keys(entry, ['id', 'repository_id', 'owner_id', 'source', 'moderation'], 'registration');
     keys(entry.source, ['method', 'issue', 'user_id', 'digest'], 'source');
     for (const name of ['issue', 'user_id']) if (entry.source[name] != null && (!Number.isSafeInteger(entry.source[name]) || entry.source[name] <= 0)) throw Error('invalid recovery source identity');
     if (entry.source.digest != null && !HEX.test(entry.source.digest)) throw Error('invalid source digest');
@@ -215,7 +216,7 @@ export class RecoveryStore {
     }
     throw Error('no valid recovery point; ' + failures.map(f => f.reason).join('; '));
   }
-  async backup(files, provenance, privateKey, {initialize = false} = {}) {
+  async backup(files, provenance, privateKey, {initialize = false, policy} = {}) {
     const c = this.config; const slug = c.backup_repository;
     const points = await this.points();
     if (!points.length && !initialize) throw Error('backup is not initialized; refusing automatic empty bootstrap');
@@ -225,7 +226,11 @@ export class RecoveryStore {
     if (initialize && points.length) throw Error('initialization cannot overwrite existing recovery history');
     if (previous && provenance.run_id <= points[0].run_id) throw Error('backup run would roll state backward or reuse a run ID');
     const oldCount = previous ? JSON.parse(previous.files.get('registry.json')).entries.length : 0;
-    if (oldCount && JSON.parse(files.get('registry.json')).entries.length === 0) throw Error('refusing to replace existing recovery state with an empty catalog registry');
+    if (oldCount && JSON.parse(files.get('registry.json')).entries.length === 0) {
+      if (policy) policyCheck(policy);
+      const authorized = policy && JSON.parse(previous.files.get('registry.json')).entries.every(entry => policy.projects.some(rule => rule.repository_id === entry.repository_id && rule.owner_id === entry.owner_id && rule.project_id === entry.id && ['suspended', 'delisted'].includes(rule.decision)));
+      if (!authorized) throw Error('refusing to replace existing recovery state with an empty catalog registry without explicit identity-bound suspension/delisting policy');
+    }
     const point = `${provenance.run_id}-${envelope.snapshot_id}`;
     const existing = (await this.privatePoints()).find(p => p.point === point);
     if (existing) {

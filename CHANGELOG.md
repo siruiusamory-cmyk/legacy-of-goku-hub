@@ -1,5 +1,14 @@
 # Changelog
 
+## LOG-HUB-006 (content moderation review candidate)
+
+- Require protected first-content approval and ordered raw/normalized artwork hash approvals for every owner.
+- Hold changed artwork without exposing candidate image bytes; retain approved listings.
+- Reapply current moderation to recovery/publication/site assets, add private local review tooling, and retire public artwork staging.
+- Bound issue intake and add rejected-issue/blocked-submitter policy controls with moderation regression coverage.
+- Updated both Issue Forms to explain mandatory review and discourage public image attachments.
+- No listings approved, deployment enabled, dependencies added or protection changes.
+
 ## LOG-HUB-005 (final review and integration gate)
 
 - Corrected the general frontend guide to describe the current self-hosted fonts and minimal rating selector following independent review. Runtime behavior is unchanged.
@@ -89,3 +98,7 @@
 - Centered the title-logo regions for all three disassembly detail images inside the original unchanged frames. Crop rectangles are pinned to source content hashes so updated artwork cannot receive stale crops.
 
 - Removed rating instructions, preview-status copy and text labels; centered Rate this project on the same desktop centerline as the balls while retaining accessible radio names and nonpersistent interaction.
+
+LOG-HUB-006 independent review correction: last-artwork removal may create an empty protected snapshot only under explicit identity-bound suspension/delisting policy; accidental empty resets remain blocked.
+
+Use the Report project content Issue Form for inappropriate artwork or misleading information. Reports notify maintainers, carry no publication authority and do not automatically hide projects. Supply URLs and text only, not image attachments.

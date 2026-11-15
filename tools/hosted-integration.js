@@ -58,8 +58,11 @@ if (command === 'after-artifact-loss') {
     const held = await publish({root, output: path.join(work, 'untrusted'), api, issues: [issue]});
     assert.equal(held.catalog.projects.length, 0);
     assert.ok(held.report.some(r => r.outcome === 'review'));
-    await saveJSON(path.join(root, 'policy/publishing.json'), {...untrustedPolicy, trusted_owner_ids: [repo.owner.id]});
   }
+  const approvedFixturePolicy = await readJSON('policy/integration-content.json');
+  assert.ok(approvedFixturePolicy.projects.every(p => p.repository_id === fixtureId), 'integration policy must not authorize community projects');
+  assert.ok(approvedFixturePolicy.projects.some(p => p.repository_id === fixtureId && p.decision === 'approved'), 'review fixture artwork locally and merge exact approvals into policy/integration-content.json before hosted integration');
+  await saveJSON(path.join(root, 'policy/publishing.json'), approvedFixturePolicy);
   const attackerBody = [
     ['Repository URL', 'https://github.com/' + fixture], ['Submission method', 'Guided form'], ['Request', 'Claim ownership'],
     ['Project title', 'UNAUTHORIZED BOT CHANGE'], ['Developer or team', 'LoG Hub operational tests'],

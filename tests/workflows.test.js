@@ -24,16 +24,14 @@ test('workflow YAML parses; actions are immutable; untrusted PR jobs have no wri
     }
   }
 });
-test('moderation produces a PR, dispatches CI, and never pushes to the default branch', async () => {
+test('legacy approval workflow cannot stage public unapproved artwork or grant approvals', async () => {
   const source = await fs.readFile(new URL('approve.yml', directory), 'utf8');
   const workflow = YAML.parse(source);
-  assert.equal(workflow.jobs.stage.environment, 'moderation');
-  assert.match(workflow.jobs.stage.if, /default_branch/);
-  assert.ok(workflow.jobs.stage.steps.some(s => s.uses?.startsWith('peter-evans/create-pull-request@')));
-  assert.match(workflow.jobs.checks.steps[0].run, /gh workflow run ci.yml/);
-  assert.equal(workflow.jobs.checks.permissions.actions, 'write');
+  assert.deepEqual(workflow.permissions, {contents: 'read'});
+  assert.ok(!source.includes('upload-artifact') && !source.includes('create-pull-request') && !source.includes('src/cli.js stage'));
   assert.ok(!source.includes('git push'));
 });
+
 test('archived legacy issue form preserves the exact parser heading and JSON field', async () => {
   const form = YAML.parse(await fs.readFile(new URL('../.github/legacy/submit.yml', import.meta.url), 'utf8'));
   const field = form.body.find(b => b.id === 'record');
