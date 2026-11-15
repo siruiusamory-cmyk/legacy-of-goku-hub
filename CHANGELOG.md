@@ -1,5 +1,10 @@
 # Changelog
 
+## LOG-HUB-005 (final review and integration gate)
+
+- Corrected the general frontend guide to describe the current self-hosted fonts and minimal rating selector following independent review. Runtime behavior is unchanged.
+- Integration remains gated on required GitHub CODEOWNER approval; no branch protection or deployment setting was changed.
+
 ## LOG-HUB-004C (visual identity review candidate)
 
 - Added owner-selected per-game scenery rendered once without tiling, and removed redundant visible rating numbers while preserving accessible labels.

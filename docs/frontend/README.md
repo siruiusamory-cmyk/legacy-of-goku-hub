@@ -1,6 +1,6 @@
 # LOG-HUB-004: approved design implementation
 
-This is a reviewable Astro static frontend on `log-hub-004-approved-design`. It has not been merged or publicly deployed. Existing submission, ownership, moderation, release synchronization, signed backup and recovery modules are unchanged.
+This Astro static frontend is awaiting controlled integration through stacked PRs #24 through #27. It has not been merged or publicly deployed. Existing submission, ownership, moderation, release synchronization, signed backup and recovery modules are unchanged. Current visual details are recorded in the [typography](typography/README.md) and [visual refinement](visual-identity/REFINEMENT.md) reports.
 
 ## Architecture and data boundary
 
@@ -59,7 +59,7 @@ On another machine, first obtain a signed export using the LOG-HUB-003 [operatio
 | Teal | BG 69 | `#00C8C8` |
 | Star red | OBJ 25 | `#D01028` |
 
-Typography uses local Arial/Helvetica sans-serif, bold italic showcase headings, 46px desktop hero, 32px section headings and 24px card titles. Compact layouts reduce those scales to 30/27/18px. Body text is 16px. There are no external font requests.
+Typography self-hosts Barlow Condensed 700 upright/italic for headings and selected branding, and Inter 400/600 for body text and interface controls. The reusable sizes, line heights and letter spacing are defined in `website/src/styles/typography.css` and documented in the [typography report](typography/README.md). There are no external font requests.
 
 Desktop uses a 1448px maximum canvas, 36px directory gutters, 48px hero gutters, three card columns, 16px card gaps, 322px hero media, 122px card media, 16px panels and 10px controls. Layout changes at 1279, 900, 580 and 350px. Mobile stacks spotlight/media, uses two directory columns where readable, then one at very narrow widths. Filters wrap and rating touch targets remain at least 44px. No phone frame or fake operating-system status bar is implemented.
 
@@ -67,7 +67,7 @@ Gold gradient buttons are primary; dark bordered buttons are secondary. Blue ide
 
 ## Rating boundary and accurate stars
 
-Production has no rating aggregate source: it shows **Not rated yet**, never fixture scores. The seven native radio inputs support arrows/Space, pointer and touch, with accessible labels and a live preview announcement. The UI explicitly states that choices are not submitted or saved. There is no submit endpoint, cookie, localStorage or aggregation; reload resets the preview.
+Production has no rating aggregate source: it shows **Not rated yet**, never fixture scores. The selector displays only **Rate this project** and seven Dragon Balls. Native radio inputs retain numeric `aria-label` names, a group named by the visible heading, and arrows/Space, pointer and touch support. The heading and balls share the desktop panel centerline. There is no instruction/status paragraph or live preview announcement. Choices remain local and unsaved: there is no submit endpoint, cookie, localStorage or aggregation, and `pageshow` resets the preview.
 
 Star patterns were checked against the [official Banpresto seven-ball image](https://en.dragon-ball-official.com/news/01_2525.html). The source photo is local review evidence only; the website uses original SVG geometry. Two stars run upper-left to lower-right; three form a triangle; four form a square. Five uses 1-2-2 rows, six 2-3-1 with a center star, and seven a hexagonal ring plus center, 2-3-2. Every star is an upright five-point polygon. Native font glyph differences cannot change them. Unit tests check positions, count and orientation; browser tests check rendered polygon counts.
 
