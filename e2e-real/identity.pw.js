@@ -93,7 +93,7 @@ test('portrait frames have transparent corner surfaces and one complete centered
       expect(Math.abs(offset)).toBeLessThan(1);
     }
     if(route!=='/'&&width>900){
-      await expect(page.locator('.rating-selector')).toHaveText('Rate this project');
+      await expect(page.locator('.rating-selector')).toHaveText('Preview only · not saved');
       const headingOffset=await page.locator('.rating-selector h2').evaluate(e=>{const r=e.getBoundingClientRect(),p=e.closest('.detail-rating').getBoundingClientRect();return r.y+r.height/2-p.y-p.height/2;});
       expect(Math.abs(headingOffset)).toBeLessThan(.02);
       for(const ball of await page.locator('.rating-options .dragon-ball').all()){

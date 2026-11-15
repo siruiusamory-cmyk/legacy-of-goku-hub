@@ -32,7 +32,7 @@ for(const p of plan.projects)test(`real detail ${p.repository.split('/').at(-1)}
   await expect(page.locator(`a[href="${p.repository}"]`)).toHaveCount(1);
   expect((await page.locator('.project-information dt').allTextContents()).some(label=>['Game','Category','Status','Repository'].includes(label))).toBe(false);
   await expect(page.locator('.community-rating')).toContainText('Not rated yet');
-  await expect(page.getByRole('heading',{name:'Rate this project'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Preview only · not saved'})).toBeVisible();
   await expect(page.getByRole('heading',{name:'Screenshots',exact:true})).toHaveCount(0);
   expect(await page.locator('body').innerText()).not.toMatch(/412 ratings|fixture-v1|ROM Hack/);
   expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);
