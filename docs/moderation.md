@@ -61,3 +61,5 @@ Review staging is local-only; the existing real-repository preview is a developm
 The production catalog is empty. This milestone approves no community project and does not deploy a site. No new runtime dependencies, CMS, dashboard, database or AI service are introduced.
 
 Isolated hosted integration fixtures also need explicit reviewed hashes in `policy/integration-content.json` before running `hosted-integration.yml`. That separate file starts empty and can authorize only the existing integration fixture ID1458327252; the hosted tool refuses other identities. It is never read by the production publisher. The previous trust-only integration bootstrap is deliberately no longer an approval path. This milestone does not populate it or re-run hosted publication experiments.
+
+Revoking the last approved image set may produce an empty snapshot. This is allowed only when current protected policy explicitly suspends/delists every previous registry identity (matching repository, owner and project IDs). Removing approvals alone, missing rules or mismatched identities still fails the empty-state safety guard. Historical recovery points are preserved.

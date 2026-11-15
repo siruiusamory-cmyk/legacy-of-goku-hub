@@ -175,3 +175,25 @@ test('signed off-platform exports verify without GitHub and reject tampering', a
   await fs.writeFile(path.join(directory, 'assets', project.id, 'cover.webp'), 'changed');
   await assert.rejects(verifyExport(config, directory), /checksum/);
 });
+
+test('revoking the last artwork publishes an empty protected catalog only under explicit delisting policy',async t=>{
+ const s=await setup(t);const old=await protect(s,s.files);
+ const root=path.join(s.root,'moderation-root');await fs.mkdir(path.join(root,'records'),{recursive:true});
+ const policy={version:1,trusted_owner_ids:[],revoked_owner_ids:[],projects:[{repository_id:123,owner_id:99,project_id:project.id,decision:'delisted',content_digests:[],artwork_sets:[]}]};
+ await saveJSON(path.join(root,'policy/publishing.json'),policy);
+ const output=path.join(s.root,'removed');
+ const result=await publish({root,previous:s.snapshot,output,issues:[],api:{request:async()=>{throw Error('outage');}}});
+ assert.equal(result.catalog.projects.length,0);
+ const files=await payloadFiles(path.join(output,'snapshot'),path.join(output,'work/dist/catalog.json'));
+ assert.equal(JSON.parse(files.get('registry.json')).entries.length,0);
+ assert.equal([...files.keys()].some(n=>n.startsWith('assets/')),false);
+ for(const mutate of [p=>p.projects[0].decision='approved',p=>p.projects[0].project_id='wrong-project',p=>p.projects[0].owner_id=666,p=>p.projects=[]]){
+  const wrong=structuredClone(policy);mutate(wrong);
+  await assert.rejects(s.store.backup(files,provenance(2),privateKey,{policy:wrong}),/empty catalog/);
+ }
+ const point=await s.store.backup(files,provenance(2),privateKey,{policy});await s.store.anchor(point);
+ const latest=await s.store.latest();assert.equal(latest.point,point.point);
+ const {verifyPublicationFiles}=await import('../src/recovery.js');
+ await verifyPublicationFiles(latest,path.join(output,'work/dist'));
+ assert.equal(JSON.parse((await s.store.read(old)).files.get('registry.json')).entries.length,1);
+});

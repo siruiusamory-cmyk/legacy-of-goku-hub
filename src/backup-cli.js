@@ -81,7 +81,7 @@ async function main() {
     if (command === 'initialize' && !process.argv[3] && (await selectSnapshot(source, config.source_repository, process.env.GITHUB_RUN_ID))) throw Error('existing publication exists; supply an explicit reviewed export path for initialization');
     const provenance = {source_commit: revision, run_id: Number(process.env.GITHUB_RUN_ID), workflow: command === 'initialize' ? '.github/workflows/initialize-backup.yml' : '.github/workflows/catalog.yml', ref: `refs/heads/${config.default_branch}`, kind: command === 'initialize' ? 'initialization' : 'publication'};
     if (!process.env.BACKUP_SIGNING_KEY) throw Error('BACKUP_SIGNING_KEY required; never put it in files or arguments');
-    const recovered = await store.backup(await payloadFiles(snapshot, catalog), provenance, process.env.BACKUP_SIGNING_KEY, {initialize: command === 'initialize'});
+    const recovered = await store.backup(await payloadFiles(snapshot, catalog), provenance, process.env.BACKUP_SIGNING_KEY, {initialize: command === 'initialize', policy: await readJSON(path.join(root, 'policy/publishing.json'))});
     await saveJSON(path.join(root, '.generated/backup-receipt.json'), {point: recovered.point, snapshot_id: recovered.envelope.snapshot_id, commit: recovered.commit, reused: recovered.reused, verified: true});
     console.log(`backup: durably verified ${recovered.point}; reused=${recovered.reused}`);
   } else if (command === 'anchor' || command === 'verify-publication') {

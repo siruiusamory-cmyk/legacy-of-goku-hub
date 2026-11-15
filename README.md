@@ -151,3 +151,5 @@ Detail artwork uses a padding-trimmed display derivative scaled proportionally t
 All three disassembly detail images use source-hash-pinned logo crops, centered within the original unchanged frames.
 
 The rating selector shows only its heading and Dragon Balls. Accessible numeric names remain on the radio controls; selections remain local and reset on navigation.
+
+LOG-HUB-006 independent review correction: last-artwork removal may create an empty protected snapshot only under explicit identity-bound suspension/delisting policy; accidental empty resets remain blocked.

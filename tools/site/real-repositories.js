@@ -30,6 +30,7 @@ export async function makeNeutralPlaceholder() {
   return normalizeImage(await sharp(Buffer.from(svg)).png().toBuffer(),'cover');
 }
 export async function ingestRealRepositories(api, output) {
+  if (process.env.GITHUB_ACTIONS || process.env.CI) throw Error('real-repository artwork review is local-only');
   const plan=await readJSON('proposals/log-hub-004a/repositories.json');
   assert.deepEqual(plan.projects.map(p=>p.repository_id).sort((a,b)=>a-b),realRepositoryIds);
   const actor=await api.request('/user');
@@ -83,8 +84,8 @@ export async function ingestRealRepositories(api, output) {
     const id=`gh-${r.repository.id}`;
     const state={repository:r.repository,release:r.release,availability:r.repository.archived?'archived':'available',warning:null,last_updated:r.repository.updated_at,ownership:{claim:'unclaimed',representation_verified:false}};
     if (r.record) {
-      const candidate=path.join(output,'validation/candidates/assets',id,'cover.webp');
-      const destination=path.join(work,'assets',id);await fs.mkdir(destination,{recursive:true});await fs.copyFile(candidate,path.join(destination,'cover.webp'));
+      const {processImages}=await import('../../src/images.js');
+      await processImages(r.record,work,fetchImages);
       await saveJSON(path.join(work,'records',id+'.json'),r.record);await saveJSON(path.join(work,'state',id+'.json'),state);
     }
     sourceFacts.push({repository:r.repository.url,repository_id:r.repository.id,owner_id:r.repository.owner_id,default_branch:'master',commit:r.commit,release:null,manifest_discovery:'absent',guided_source:'local form event; no hosted issue created',manifest_proposal_valid:!!r.record,production_approved:false,artwork:r.plan.metadata.cover?{path:r.plan.metadata.cover,source_dimensions:[1800,450],normalized_dimensions:[640,360]}:{placeholder:true,reason:'No current suitable artwork established'}});

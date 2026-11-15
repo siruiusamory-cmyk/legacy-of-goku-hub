@@ -36,3 +36,9 @@ test('review staging refuses CI and paths in the public source tree',()=>{
  assert.throws(()=>reviewDestination(path.resolve('.review/private'),{}),/outside/);
  assert.equal(reviewDestination(path.join(os.tmpdir(),'private-review'),{}),path.join(os.tmpdir(),'private-review'));
 });
+
+test('real-repository preview cannot become a public CI artwork review channel',async()=>{
+ const {spawnSync}=await import('node:child_process');
+ const result=spawnSync(process.execPath,['tools/site/build.js','--real-preview','unused'],{encoding:'utf8',env:{...process.env,CI:'true'},windowsHide:true});
+ assert.notEqual(result.status,0);assert.match(result.stderr,/local-only/);
+});

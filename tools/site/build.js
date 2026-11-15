@@ -14,6 +14,7 @@ const root = fileURLToPath(new URL('../../',import.meta.url));
 process.chdir(root);
 const fixture = process.argv.includes('--fixture');
 const realPreview = process.argv.includes('--real-preview');
+if (realPreview && (process.env.GITHUB_ACTIONS || process.env.CI)) throw Error('real-repository preview is local-only; public CI previews must use synthetic fixtures');
 if (realPreview && (fixture || process.argv.includes('--snapshot'))) throw Error('real preview cannot be combined with fixture or production input');
 const empty = process.argv.includes('--empty');
 const unfeatured = process.argv.includes('--unfeatured');
