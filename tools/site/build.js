@@ -6,20 +6,28 @@ import {verifyExport} from '../../src/recovery.js';
 import {readJSON} from '../../src/records.js';
 import {validateSiteCatalog} from './catalog.js';
 import {fixtureInput} from './fixtures.js';
+import {copyRealPreview} from './real-preview.js';
 const root = fileURLToPath(new URL('../../',import.meta.url));
 process.chdir(root);
 const fixture = process.argv.includes('--fixture');
+const realPreview = process.argv.includes('--real-preview');
+if (realPreview && (fixture || process.argv.includes('--snapshot'))) throw Error('real preview cannot be combined with fixture or production input');
 const empty = process.argv.includes('--empty');
 const unfeatured = process.argv.includes('--unfeatured');
 if ((empty || unfeatured) && !fixture) throw Error('empty preview is test-only');
 const snapshot = process.argv[process.argv.indexOf('--snapshot')+1];
 const base = process.env.SITE_BASE || '/';
 if (!/^\/(?:[A-Za-z0-9_-]+\/)*$/.test(base)) throw Error('unsafe site base path');
-if (!fixture && (!process.argv.includes('--snapshot') || !snapshot)) throw Error('production site requires an explicitly selected signed recovery export');
+if (!fixture && !realPreview && (!process.argv.includes('--snapshot') || !snapshot)) throw Error('production site requires an explicitly selected signed recovery export');
 await fs.rm(path.join(root,'.site/input'),{recursive:true,force:true});
 await fs.mkdir(path.join(root,'.site/input/public'),{recursive:true});
 let catalog, provenance;
 if (fixture) ({catalog,provenance} = await fixtureInput(path.join(root,'.site/input'), empty, unfeatured));
+else if (realPreview) {
+  const source=process.argv[process.argv.indexOf('--real-preview')+1];
+  if (!source || source.startsWith('--')) throw Error('real preview requires an isolated input directory');
+  ({catalog,provenance}=await copyRealPreview(path.resolve(source),path.join(root,'.site/input')));
+}
 else {
   const config = await readJSON(path.join(root,'policy/recovery.json'));
   const recovered = await verifyExport(config,path.resolve(snapshot));
@@ -42,6 +50,6 @@ await fs.writeFile(path.join(root,'.site/input/public/catalog.json'),JSON.string
 await fs.writeFile(path.join(root,'.site/input/public/site-provenance.json'),JSON.stringify(provenance));
 const result = spawnSync(process.execPath,[path.join(root,'node_modules/astro/bin/astro.mjs'),'build','--root',path.join(root,'website')],{stdio:'inherit',env:{...process.env,SITE_BASE:base,SITE_INPUT:path.join(root,'.site/input')},windowsHide:true});
 if (result.status !== 0) process.exit(result.status || 1);
-const destination = path.join(root,fixture ? (empty ? '.site/empty-preview' : unfeatured ? '.site/unfeatured-preview' : '.site/preview') : '.site/production');
+const destination = path.join(root,realPreview?'.site/real-preview':fixture ? (empty ? '.site/empty-preview' : unfeatured ? '.site/unfeatured-preview' : '.site/preview') : '.site/production');
 await fs.rm(destination,{recursive:true,force:true});await fs.rename(path.join(root,'.site/output'),destination);
 console.log(`Static site built: ${destination}; purpose=${provenance.purpose}`);

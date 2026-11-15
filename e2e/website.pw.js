@@ -27,7 +27,7 @@ test('stable detail navigation, actual metadata and safe external actions', asyn
   await page.goto('/');await page.getByRole('link',{name:'View Project',exact:true}).click();
   await expect(page).toHaveURL(/\/projects\/fixture-0\/$/);
   await expect(page.getByRole('heading',{level:1})).toHaveText('Saiyan Legacy Reborn');
-  await expect(page.locator('.release-panel')).toContainText('fixture-v1');
+  await expect(page.locator('.project-information')).toContainText('fixture-v1');
   await expect(page.locator('.screenshot-gallery img')).toHaveCount(3);
   await expect(page.getByRole('link',{name:'View Repository',exact:true})).toHaveAttribute('href','https://github.com/fixture-owner/fixture-0');
   await expect(page.getByRole('link',{name:'Download on GitHub',exact:true})).toHaveAttribute('href',/github\.com\/fixture-owner\/fixture-0\/releases\/download\/fixture-v1\/fixture.zip$/);
@@ -47,7 +47,7 @@ test('seven-ball selection supports keyboard and pointer without persistence or 
 test('in-development detail omits unavailable release metadata and safely renders untrusted text', async ({page}) => {
   await page.goto('/projects/fixture-1/');
   await expect(page.locator('.release-panel')).toHaveCount(0);await expect(page.getByRole('link',{name:'Download on GitHub',exact:true})).toHaveCount(0);
-  await expect(page.getByText('No screenshots have been provided yet.')).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Screenshots',exact:true})).toHaveCount(0);
   await expect(page.locator('.community-rating')).toContainText('Not rated yet');
   await page.goto('/projects/fixture-6/');await expect(page.locator('.description-box')).toContainText('<img src=x onerror="window.fixtureInjected=true">');
   expect(await page.evaluate(()=>window.fixtureInjected)).toBeUndefined();await expect(page.locator('img[src="x"]')).toHaveCount(0);
@@ -104,4 +104,16 @@ test('populated catalog without a featured listing never claims to be empty', as
   await expect(page.locator('.project-card')).toHaveCount(7);
   await expect(page.locator('.spotlight-description')).toContainText('Browse community');
   await expect(page.locator('.spotlight-description')).not.toContainText('first community projects');
+});
+
+for (let i=0;i<7;i++) test(`detail information has one primary location for fixture ${i}`,async({page})=>{
+  await page.goto(`/projects/fixture-${i}/`);
+  await expect(page.locator('.detail-intro .detail-description')).toHaveCount(0);
+  await expect(page.locator('.description-box')).toHaveCount(1);
+  const labels=await page.locator('.project-information dt').allTextContents();
+  expect(labels.some(label=>['Game','Category','Status','Repository'].includes(label))).toBe(false);
+  const links=await page.locator('main a[href^="https://"]').evaluateAll(es=>es.map(e=>e.href.replace(/\/$/,'')));
+  expect(new Set(links).size).toBe(links.length);
+  if(i===0) await expect(page.getByRole('heading',{name:'Additional Links',exact:true})).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:'Screenshots',exact:true})).toHaveCount(i===0?1:0);
 });

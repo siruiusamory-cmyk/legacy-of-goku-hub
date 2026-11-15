@@ -6,6 +6,12 @@ Static catalog infrastructure for Legacy of Goku, Legacy of Goku II and Buu's Fu
 
 The existing Node 24, JSON Schema, GitHub release, Sharp image and deterministic catalog components remain in use. Legacy CLI tools and their regression tests are retained for migration, not the routine publishing path. Production has no community-approved records. Policy explicitly delists the isolated integration fixture; test data never becomes a community listing.
 
+## Isolated real-repository preview and detail cleanup
+
+LOG-HUB-004A adds a separately marked preview of the four owner repositories without approving them. Detail pages display the description once in About, identity badges once in the hero, release metadata in Project Details, and only distinct additional links. Empty galleries and release panels are omitted. Both decorative orange swooshes have been removed. Ratings remain an unsaved interaction preview.
+
+See [real-repository verification and screenshots](docs/frontend/real-repositories/README.md) for the exact inspected revisions, artwork constraint, local commands and approval boundaries. Production policies, signed recovery and deployment gates are unchanged.
+
 ## Run locally on Windows
 
 Install Node.js 24 LTS and Git, then use PowerShell:

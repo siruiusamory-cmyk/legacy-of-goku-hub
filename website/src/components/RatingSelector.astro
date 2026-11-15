@@ -1,7 +1,8 @@
 ---
 import Ball from './Ball.astro';
+const {category = 'rom-hack'} = Astro.props;
 ---
-<div class="rating-selector"><h2 class="panel-title">Rate this game</h2><p>Try the seven-Dragon-Ball scale.<br/>Preview only; your choice is not submitted or saved.</p>
+<div class="rating-selector"><h2 class="panel-title">{['tool','resource'].includes(category) ? 'Rate this project' : 'Rate this game'}</h2><p>Try the seven-Dragon-Ball scale.<br/>Preview only; your choice is not submitted or saved.</p>
 <fieldset><legend class="sr-only">Preview your rating from 1 to 7 Dragon Balls</legend><div class="rating-options">{Array.from({length:7},(_,i)=><label class="rating-option"><input type="radio" name="rating-preview" autocomplete="off" value={i+1}/><span class="rating-choice"><Ball number={i+1}/><strong aria-hidden="true">{i+1}</strong></span><span class="sr-only">{i+1} {i === 0 ? 'Dragon Ball' : 'Dragon Balls'}</span></label>)}</div></fieldset>
 <p class="rating-preview-result" aria-live="polite">No preview selected. Voting is not available.</p></div>
 <script>

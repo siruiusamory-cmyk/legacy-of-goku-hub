@@ -20,3 +20,5 @@ website/dist/
 website/.astro/
 playwright-report/
 test-results/
+
+test-results-real/

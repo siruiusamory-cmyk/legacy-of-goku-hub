@@ -1,5 +1,12 @@
 # Changelog
 
+## LOG-HUB-004A (isolated review candidate)
+
+- Added read-only ingestion and a clearly separated preview for four real owner repositories.
+- Kept obsolete DragonByte screenshots out of previews; its neutral placeholder is preview-only and production cover validation remains mandatory.
+- Consolidated detail descriptions, badges, release information and links; omitted empty galleries and removed the header/spotlight swoosh CSS.
+- Added real-repository and detail-consistency browser coverage; retained protected publishing and approval policy.
+
 ## LOG-HUB-003 (operational verification in progress)
 
 - Added signed, content-addressed recovery snapshots in a separate private GitHub repository.
