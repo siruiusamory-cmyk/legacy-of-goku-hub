@@ -4,6 +4,7 @@
   "required": ["version", "enabled"],
   "properties": {
     "version": {"const": 1}, "enabled": {"type": "boolean"},
+    "purpose": {"enum": ["production", "integration"]},
     "source_repository": {"type": "string", "maxLength": 150},
     "source_repository_id": {"type": "integer", "minimum": 1},
     "backup_repository": {"type": "string", "maxLength": 150},

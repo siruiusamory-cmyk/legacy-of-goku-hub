@@ -2,5 +2,7 @@
   "version": 1,
   "trusted_owner_ids": [],
   "revoked_owner_ids": [],
-  "projects": []
+  "projects": [
+    {"repository_id": 1458327252, "owner_id": 287528505, "decision": "delisted", "reason": "Isolated integration fixture; never a production community listing"}
+  ]
 }

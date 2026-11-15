@@ -42,6 +42,7 @@ export async function gitVault(directory, config) {
     }
     if (route === 'git/commits' && method === 'POST') return {sha: git(['commit-tree', body.tree, ...body.parents.flatMap(p => ['-p', p])], body.message + '\n').toString().trim()};
     if (route.startsWith('git/commits/')) {const sha = route.slice(12); const data = git(['cat-file', '-p', sha]).toString(); return {sha, tree: {sha: /^tree ([a-f0-9]{40})/m.exec(data)[1]}};}
+    if (route.startsWith('git/ref/')) {const ref = 'refs/' + route.slice(8); return {ref, object: {type: 'commit', sha: git(['rev-parse', ref]).toString().trim()}};}
     if (route === 'git/refs' && method === 'POST') {git(['update-ref', body.ref, body.sha, '0'.repeat(40)]); return {ref: body.ref, object: {sha: body.sha, type: 'commit'}};}
     throw new APIError('unsupported test GitHub operation', 404);
   }};

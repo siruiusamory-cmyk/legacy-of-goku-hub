@@ -8,5 +8,6 @@ report.json
 .feedback/
 .review/
 .bootstrap/
+.integration/
 recovery-export*/
 *.private-key.pem
