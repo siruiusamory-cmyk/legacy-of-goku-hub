@@ -172,3 +172,5 @@ Frontend CI uses the hosted runner's installed Chrome with sandboxing enabled; l
 [PR #24](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/pull/24) has passing hosted Node and browser checks. Owner review and deployment authorization remain pending.
 
 Detail artwork uses a padding-trimmed display derivative scaled proportionally to cover the original fixed portrait frame. Catalog covers and cards remain unchanged.
+
+All three disassembly detail images use source-hash-pinned logo crops, centered within the original unchanged frames.

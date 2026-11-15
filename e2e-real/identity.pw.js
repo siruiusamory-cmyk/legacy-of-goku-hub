@@ -2,8 +2,8 @@ import {test,expect} from '@playwright/test';
 import fs from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
 const phase=['before','refinement-before','refinement-after'].includes(process.env.IDENTITY_PHASE)?process.env.IDENTITY_PHASE:'after';
-test('visual identity matching real-page evidence',async({page},info)=>{
-  await page.context().route('**/*',r=>r.request().url().startsWith('http://127.0.0.1:4325/')?r.continue():r.abort());
+test('visual identity matching real-page evidence',async({page,baseURL},info)=>{
+  await page.context().route('**/*',r=>r.request().url().startsWith(baseURL+'/')?r.continue():r.abort());
   const directory=`docs/frontend/visual-identity/evidence/${phase}`;await fs.mkdir(directory,{recursive:true});
   const metrics=[];
   for(const [name,route] of [['homepage','/'],['detail','/projects/gh-1429374563/']])for(const [kind,width,height] of [['desktop',1448,1086],['mobile',390,844],['mobile-320',320,844],...(phase.startsWith('refinement-')?[['tablet',760,1086]]:[])]){
@@ -84,8 +84,9 @@ test('portrait frames have transparent corner surfaces and one complete centered
     await page.setViewportSize({width,height:844});await page.goto(route);
     const frame=page.locator(route==='/'?'.spotlight-inner':'.detail-art');
     if(route!=='/'){
+      expect(await frame.locator('img').evaluate(e=>getComputedStyle(e).objectPosition)).toBe('50% 50%');
       const fit=await frame.evaluate(e=>{const f=e.getBoundingClientRect(),image=e.querySelector('img'),i=image.getBoundingClientRect(),s=getComputedStyle(e);return {width:f.width-parseFloat(s.borderLeftWidth)-parseFloat(s.borderRightWidth)-i.width,height:f.height-parseFloat(s.borderTopWidth)-parseFloat(s.borderBottomWidth)-i.height,natural:image.naturalWidth/image.naturalHeight,frameHeight:f.height,frameWidth:f.width,slotWidth:parseFloat(getComputedStyle(e.closest('.detail-hero')).gridTemplateColumns),fit:getComputedStyle(image).objectFit};});
-      expect(Math.abs(fit.width)).toBeLessThan(.02);expect(Math.abs(fit.height)).toBeLessThan(.02);expect(fit.natural).toBeGreaterThan(3.8);if(width>900)expect(fit.frameWidth).toBeCloseTo(fit.slotWidth,1);expect(fit.fit).toBe('cover');if(width>580)expect(fit.frameHeight).toBe(276);else expect(fit.frameWidth/fit.frameHeight).toBeCloseTo(16/9,2);
+      expect(Math.abs(fit.width)).toBeLessThan(.02);expect(Math.abs(fit.height)).toBeLessThan(.02);expect(fit.natural).toBeCloseTo(314/159,3);if(width>900)expect(fit.frameWidth).toBeCloseTo(fit.slotWidth,1);expect(fit.fit).toBe('cover');if(width>580)expect(fit.frameHeight).toBe(276);else expect(fit.frameWidth/fit.frameHeight).toBeCloseTo(16/9,2);
     }
     if(route!=='/')for(const choice of await page.locator('.rating-choice').all()){
       const offset=await choice.evaluate(e=>{const r=e.getBoundingClientRect(),b=e.querySelector('.dragon-ball').getBoundingClientRect();return b.y+b.height/2-r.y-r.height/2;});

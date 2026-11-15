@@ -80,3 +80,5 @@
 - Restored original detail frame dimensions; remove normalization padding from a detail-only derivative and scale the complete banner to fill the frame interior.
 
 - Preserve banner proportions inside the unchanged detail frame using a logo-focused cover crop, replacing stretched fill sizing.
+
+- Centered the title-logo regions for all three disassembly detail images inside the original unchanged frames. Crop rectangles are pinned to source content hashes so updated artwork cannot receive stale crops.

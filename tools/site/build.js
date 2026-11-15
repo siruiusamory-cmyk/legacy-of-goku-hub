@@ -46,8 +46,9 @@ else {
 }
 await validateSiteCatalog(catalog);
 const artwork={};
+const artDirection=await readJSON('website/src/assets/art-direction.json');
 for(const project of catalog.projects){
-  const image=await detailImage(await fs.readFile(path.join(root,'.site/input/public',project.cover)));
+  const image=await detailImage(await fs.readFile(path.join(root,'.site/input/public',project.cover)),Object.hasOwn(artDirection,project.id)?artDirection[project.id]:undefined);
   const src=`assets/${project.id}/detail.webp`;
   await fs.writeFile(path.join(root,'.site/input/public',src),image.data);
   artwork[project.id]={src,width:image.width,height:image.height};
