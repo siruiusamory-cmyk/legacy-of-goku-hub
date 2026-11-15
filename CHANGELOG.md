@@ -26,3 +26,7 @@
 - Correct limited-token ruleset visibility in the hosted drill; retain explicit bypass rejection and owner-side verification.
 
 - Invalidate GitHub read caches after successful mutations, with a reproduced alert-cleanup regression.
+
+- Include the hidden candidate staging directory in Actions uploads while excluding the raw HTTP cache; real production failure stays fail-closed and opens a maintainer alert.
+
+- Keep the hidden-file setting on the upload action only.

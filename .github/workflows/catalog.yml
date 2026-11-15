@@ -60,6 +60,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: candidate
+          include-hidden-files: true
           path: |-
             .generated/
             !.generated/snapshot/github-cache.json
@@ -237,3 +238,4 @@ jobs:
     concurrency:
       group: loghub-operations-alert
       cancel-in-progress: false
+
