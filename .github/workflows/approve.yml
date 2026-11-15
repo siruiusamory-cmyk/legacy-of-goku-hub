@@ -1,0 +1,67 @@
+name: Stage project approval
+on:
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Validated submission issue number (moderator review required)
+        required: true
+        type: string
+permissions: {}
+concurrency:
+  group: catalog-writer
+  cancel-in-progress: false
+jobs:
+  stage:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    environment: moderation
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      branch: ${{ steps.pr.outputs.pull-request-number && format('approval/issue-{0}', inputs.issue_number) }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - run: npm ci --ignore-scripts
+      - run: npm test
+      - run: node src/cli.js stage
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+      - run: npm run validate
+      - uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676
+        id: pr
+        with:
+          token: ${{ github.token }}
+          branch: approval/issue-${{ inputs.issue_number }}
+          add-paths: |
+            records/
+            state/
+            assets/
+          commit-message: Stage validated project submission
+          title: 'Review project submission #${{ inputs.issue_number }}'
+          body: |
+            Staged from the current issue body and live GitHub data. Revalidated before staging.
+            Review ownership, rights, patch-only ROM hack distribution and all changed files.
+            Merge is the final approval and includes this listing in the next catalog build.
+            Automated checks do not establish malware safety. See the moderator checklist in README.md.
+  checks:
+    needs: stage
+    if: needs.stage.outputs.branch != ''
+    permissions:
+      actions: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$PR_BRANCH"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_BRANCH: ${{ needs.stage.outputs.branch }}

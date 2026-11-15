@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "enabled": true,
+  "source_repository": "siruiusamory-cmyk/legacy-of-goku-hub",
+  "source_repository_id": 1458311725,
+  "backup_repository": "siruiusamory-cmyk/legacy-of-goku-hub-backups",
+  "backup_repository_id": 1458311780,
+  "default_branch": "main",
+  "signing_key_id": "ed25519-2026-11",
+  "public_keys": {
+    "ed25519-2026-11": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA2es0lRLyAGqVYcelw0FC2RF9f8MqXzhXbn5B7QvNEzg=\n-----END PUBLIC KEY-----\n"
+  }
+}

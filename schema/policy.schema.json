@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object", "additionalProperties": false,
+  "required": ["version", "trusted_owner_ids", "revoked_owner_ids", "projects"],
+  "properties": {
+    "version": {"const": 1},
+    "trusted_owner_ids": {"$ref": "#/definitions/ids"},
+    "revoked_owner_ids": {"$ref": "#/definitions/ids"},
+    "projects": {"type": "array", "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repository_id", "owner_id", "decision"],
+      "properties": {
+        "repository_id": {"type": "integer", "minimum": 1},
+        "owner_id": {"type": "integer", "minimum": 1},
+        "decision": {"enum": ["approved", "review", "suspended", "delisted"]},
+        "representative_ids": {"$ref": "#/definitions/ids"},
+        "representation_verified": {"type": "boolean"},
+        "approved_issue": {"type": "integer", "minimum": 1},
+        "approved_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "approved_metadata_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "featured": {"type": "boolean"},
+        "reason": {"type": "string", "minLength": 1, "maxLength": 500}
+      },
+      "dependencies": {"approved_issue": ["approved_digest"], "approved_digest": ["approved_issue"]}
+    }}
+  },
+  "definitions": {"ids": {"type": "array", "uniqueItems": true, "items": {"type": "integer", "minimum": 1}}}
+}

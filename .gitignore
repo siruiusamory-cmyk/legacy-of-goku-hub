@@ -1,0 +1,12 @@
+node_modules/
+.cache/
+dist/
+.staging/
+report.json
+.generated/
+.previous/
+.feedback/
+.review/
+.bootstrap/
+recovery-export*/
+*.private-key.pem

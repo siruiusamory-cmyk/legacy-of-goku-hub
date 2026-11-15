@@ -1,0 +1,26 @@
+{
+  "name": "log-hub-pipeline",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test",
+    "validate": "node src/cli.js validate",
+    "build": "node src/cli.js build",
+    "refresh": "node src/cli.js refresh",
+    "publish:local": "node src/service-cli.js publish",
+    "backup": "node src/backup-cli.js backup",
+    "restore": "node src/backup-cli.js restore",
+    "backup:health": "node src/backup-cli.js health"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "sharp": "0.35.5"
+  },
+  "devDependencies": {
+    "yaml": "2.9.1"
+  }
+}
