@@ -18,11 +18,11 @@ test('four scoped identities have equivalent guided/manifest metadata; DragonByt
     assert.equal(p.metadata.status,'in-development');assert.ok(['tool','resource'].includes(p.metadata.category));assert.equal(p.metadata.screenshots.length,0);
   }
 });
-test('neutral placeholder is normalized, preview-only and no owner-wide trust or active approval is installed',async()=>{
+test('neutral placeholder is preview-only; DragonByte Z has no approval and owner-wide trust stays absent',async()=>{
   const image=await sharp(await makeNeutralPlaceholder()).metadata();assert.equal(image.format,'webp');assert.equal(image.width,640);assert.equal(image.height,360);
   assert.throws(()=>assertDeployable({purpose:'real-preview'}),/production/);
   const policy=JSON.parse(await fs.readFile('policy/publishing.json','utf8'));
-  assert.ok(!policy.trusted_owner_ids.includes(287528505));assert.ok(!policy.projects.some(p=>realRepositoryIds.includes(p.repository_id)));
+  assert.ok(!policy.trusted_owner_ids.includes(287528505));assert.ok(!policy.projects.some(p=>p.repository_id===1429329775&&p.decision==='approved'));
   assert.ok(plan.projects.filter(p=>p.metadata.cover).every(p=>p.metadata.cover==='docs/banner.png'));
 });
 test('real-preview reader rejects a wrong purpose and malformed catalog without treating preview as signed recovery',async t=>{
