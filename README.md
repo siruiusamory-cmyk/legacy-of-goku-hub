@@ -151,3 +151,5 @@ Legacy approved Git records can seed the new publisher after an explicit numeric
 Recomp.fyi research and explicit differences are recorded in [docs/RECOMP-RESEARCH.md](docs/RECOMP-RESEARCH.md). Zeroshot is optional development-time verification only, documented in [docs/ZEROSHOT-REVIEW.md](docs/ZEROSHOT-REVIEW.md). The finished publisher works without Codex, Zeroshot or any AI account.
 
 Hosted ruleset checks tolerate administrator-only field omission; the owner separately verifies the empty bypass list. No extra Actions permissions are granted.
+
+Successful API writes invalidate conditional-read caches so immediate notification cleanup reads current state.

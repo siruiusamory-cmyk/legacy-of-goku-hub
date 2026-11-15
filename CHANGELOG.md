@@ -24,3 +24,5 @@
 - Verified 47 local tests and obtained a scoped independent source review.
 
 - Correct limited-token ruleset visibility in the hosted drill; retain explicit bypass rejection and owner-side verification.
+
+- Invalidate GitHub read caches after successful mutations, with a reproduced alert-cleanup regression.
