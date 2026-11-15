@@ -35,6 +35,7 @@ test('stable detail navigation, actual metadata and safe external actions', asyn
 });
 test('seven-ball selection supports keyboard and pointer without persistence or voting', async ({page}) => {
   await page.goto('/projects/fixture-0/');
+  await expect(page.locator('.rating-choice strong')).toHaveCount(0);
   for (let number=1;number<=7;number++) await expect(page.locator(`.rating-options [data-ball="${number}"] polygon`)).toHaveCount(number);
   const requests=[];page.on('request',r=>{if(r.method()!=='GET')requests.push(r.url());});
   const first=page.getByRole('radio',{name:'1 Dragon Ball',exact:true});await first.focus();await page.keyboard.press('Space');await page.keyboard.press('ArrowRight');

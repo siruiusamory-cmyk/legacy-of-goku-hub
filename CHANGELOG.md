@@ -2,6 +2,10 @@
 
 ## LOG-HUB-004C (visual identity review candidate)
 
+- Added owner-selected per-game scenery rendered once without tiling, and removed redundant visible rating numbers while preserving accessible labels.
+- Refined hero-only scenery, frame hierarchy and integrated featured layout; replaced clipped summaries with complete first sentences and fixed narrow filter widths.
+- Added owner-requested Buu's Fury portrait borders, with source/crop integrity coverage and explicit unresolved redistribution status for game assets.
+
 - Added shared gold-edged frames, menu states, a grid rating panel and warm About reading surfaces.
 - Added credited LoG II Canyon scenery, following owner authorization, with preserved aspect ratio and integer desktop/mobile scaling.
 - Added a shared artwork fallback and regression coverage for missing assets and narrow-card containment.

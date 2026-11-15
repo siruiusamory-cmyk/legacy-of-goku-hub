@@ -8,7 +8,7 @@ The existing Node 24, JSON Schema, GitHub release, Sharp image and deterministic
 
 ## Legacy of Goku visual identity
 
-LOG-HUB-004C adds shared gold-edged menu framing, an authentic LoG II canyon backdrop at crisp native/mobile and 2x/desktop scale, compact featured-project presentation, and a reusable unavailable-artwork state. [Visual identity report and matching before/after evidence](docs/frontend/visual-identity/README.md) cover art credits, scaling, tokens, accessibility, performance and review boundaries. The candidate is not deployed or approved for merging.
+LOG-HUB-004C adds shared gold-edged menu framing, an authentic LoG II canyon backdrop at crisp native/mobile and 2x/desktop scale, compact featured-project presentation, and a reusable unavailable-artwork state. [Visual identity report and matching before/after evidence](docs/frontend/visual-identity/README.md) cover art credits, scaling, tokens, accessibility, performance and review boundaries. The final refinement confines game-specific Kame House, Goku's House and Snake Way scenery to the hero, uses Buu's Fury portrait framing for featured content, quiets secondary borders, preserves complete-sentence summaries and fixes narrow filters. See the [refinement report](docs/frontend/visual-identity/REFINEMENT.md) for provenance limits and independent review. The candidate is not deployed or approved for merging.
 
 ## Typography review
 

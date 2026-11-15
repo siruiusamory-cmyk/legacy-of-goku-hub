@@ -830,7 +830,8 @@ dd a svg {
 }
 .rating-selector fieldset {
   grid-column: 2;
-  grid-row: 1/3;
+  grid-row: 1/4;
+  align-self: center;
   border: 0;
   padding: 0;
   margin: 0;
@@ -857,6 +858,7 @@ dd a svg {
 .rating-choice {
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-direction: column;
   gap: 3px;
   padding: 5px 4px;
@@ -882,7 +884,7 @@ dd a svg {
   border-color: var(--ice);
 }
 .rating-selector .rating-preview-result {
-  grid-column: 1/-1;
+  grid-column: 1;
   margin-top: 8px;
   max-width: none;
   color: var(--muted);
