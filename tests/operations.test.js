@@ -46,3 +46,12 @@ test('all production alert writers share one non-cancelling GitHub job lock', as
   }
   assert.deepEqual(locks, [{group: 'loghub-operations-alert', 'cancel-in-progress': false}, {group: 'loghub-operations-alert', 'cancel-in-progress': false}]);
 });
+
+test('receipt coverage handles GitHub limited-token visibility without accepting explicit bypasses', async () => {
+  const {receiptRulesCoverNamespaces} = await import('../tools/receipt-rules.js');
+  const rules = {target: 'tag', enforcement: 'active', conditions: {ref_name: {include: ['refs/tags/loghub-anchor-v1/**', 'refs/tags/loghub-integration-anchor-v1/**'], exclude: []}}, rules: [{type: 'update'}, {type: 'deletion'}]};
+  assert.equal(receiptRulesCoverNamespaces(rules), true);
+  assert.equal(receiptRulesCoverNamespaces({...rules, bypass_actors: []}), true);
+  assert.equal(receiptRulesCoverNamespaces({...rules, bypass_actors: [{actor_id: 1}]}), false);
+  assert.equal(receiptRulesCoverNamespaces({...rules, enforcement: 'disabled'}), false);
+});
