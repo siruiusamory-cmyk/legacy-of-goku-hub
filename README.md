@@ -1,10 +1,16 @@
 # Legacy of Goku Hub
 
+LOG-HUB-005 final technical review found no blocking defect in the frontend stack. Controlled integration awaits the required GitHub CODEOWNER approval; no merge or deployment is implied.
+
 LOG-HUB-003 provides signed durable recovery in the private backup repository, immutable releases, and protected public hash receipts. The public source is [legacy-of-goku-hub](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub). See [operations](docs/OPERATIONS.md) for setup, monitoring, recovery and off-platform export, and [verification](VERIFICATION.md) for measured hosted results. All configured features use GitHub Free.
 
 Static catalog infrastructure for Legacy of Goku, Legacy of Goku II and Buu's Fury. Developers submit through a repository manifest or guided GitHub form. GitHub Actions validates, normalizes and publishes eligible listings as artifacts. An Astro static frontend is implemented for review; it is not publicly deployed. No CMS, dashboard, database, runtime AI service, monetization or production server is needed.
 
 The existing Node 24, JSON Schema, GitHub release, Sharp image and deterministic catalog components remain in use. Legacy CLI tools and their regression tests are retained for migration, not the routine publishing path. Production has no community-approved records. Policy explicitly delists the isolated integration fixture; test data never becomes a community listing.
+
+## Legacy of Goku visual identity
+
+LOG-HUB-004C adds shared gold-edged menu framing, an authentic LoG II canyon backdrop at crisp native/mobile and 2x/desktop scale, compact featured-project presentation, and a reusable unavailable-artwork state. [Visual identity report and matching before/after evidence](docs/frontend/visual-identity/README.md) cover art credits, scaling, tokens, accessibility, performance and review boundaries. The final refinement confines game-specific Kame House, Goku's House and Snake Way scenery to the hero, uses Buu's Fury portrait framing for featured content, quiets secondary borders, preserves complete-sentence summaries and fixes narrow filters. See the [refinement report](docs/frontend/visual-identity/REFINEMENT.md) for provenance limits and independent review. The candidate is not deployed or approved for merging.
 
 ## Typography review
 
@@ -166,3 +172,9 @@ The Astro implementation, honest empty state, stable project pages, responsive d
 Frontend CI uses the hosted runner's installed Chrome with sandboxing enabled; local Windows checks use project-local Chromium. Visual captures explicitly load and decode lazy images before inspecting them.
 
 [PR #24](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/pull/24) has passing hosted Node and browser checks. Owner review and deployment authorization remain pending.
+
+Detail artwork uses a padding-trimmed display derivative scaled proportionally to cover the original fixed portrait frame. Catalog covers and cards remain unchanged.
+
+All three disassembly detail images use source-hash-pinned logo crops, centered within the original unchanged frames.
+
+The rating selector shows only its heading and Dragon Balls. Accessible numeric names remain on the radio controls; selections remain local and reset on navigation.

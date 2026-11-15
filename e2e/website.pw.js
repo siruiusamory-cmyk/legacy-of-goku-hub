@@ -35,12 +35,13 @@ test('stable detail navigation, actual metadata and safe external actions', asyn
 });
 test('seven-ball selection supports keyboard and pointer without persistence or voting', async ({page}) => {
   await page.goto('/projects/fixture-0/');
+  await expect(page.locator('.rating-choice strong')).toHaveCount(0);
   for (let number=1;number<=7;number++) await expect(page.locator(`.rating-options [data-ball="${number}"] polygon`)).toHaveCount(number);
   const requests=[];page.on('request',r=>{if(r.method()!=='GET')requests.push(r.url());});
   const first=page.getByRole('radio',{name:'1 Dragon Ball',exact:true});await first.focus();await page.keyboard.press('Space');await page.keyboard.press('ArrowRight');
   await expect(page.getByRole('radio',{name:'2 Dragon Balls',exact:true})).toBeChecked();
   await page.getByRole('radio',{name:'7 Dragon Balls',exact:true}).check();
-  await expect(page.locator('.rating-preview-result')).toHaveText('Preview: 7 of 7 Dragon Balls. Not submitted or saved.');
+  await expect(page.locator('.rating-selector')).toHaveText('Rate this project');
   expect(requests).toEqual([]);expect(await page.evaluate(()=>Object.keys(localStorage))).toEqual([]);
   await page.reload();await expect(page.getByRole('radio',{checked:true})).toHaveCount(0);
 });
@@ -54,6 +55,7 @@ test('in-development detail omits unavailable release metadata and safely render
 });
 test('empty catalog is polished, honest, unrated and contains no synthetic projects', async ({page}) => {
   await page.goto('http://127.0.0.1:4322/');
+  expect(await (await page.request.get('http://127.0.0.1:4322/site-provenance.json')).json()).toMatchObject({purpose:'fixture'});
   await expect(page.getByRole('heading',{name:'The adventure starts here.'})).toBeVisible();
   await expect(page.getByRole('link',{name:'Submit your project'})).toHaveAttribute('href',/issues\/new\/choose$/);
   await expect(page.locator('.project-card')).toHaveCount(0);

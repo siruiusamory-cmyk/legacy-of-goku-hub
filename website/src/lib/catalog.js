@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 const input = process.env.SITE_INPUT;
 export const catalog = JSON.parse(await fs.readFile(path.join(input, 'catalog.json'), 'utf8'));
+export const artwork = JSON.parse(await fs.readFile(path.join(input, 'artwork.json'), 'utf8'));
 export const provenance = JSON.parse(await fs.readFile(path.join(input, 'provenance.json'), 'utf8'));
 export const base = import.meta.env.BASE_URL;
 export const href = relative => base + relative;

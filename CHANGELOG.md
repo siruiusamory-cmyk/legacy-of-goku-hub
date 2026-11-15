@@ -1,5 +1,21 @@
 # Changelog
 
+## LOG-HUB-005 (final review and integration gate)
+
+- Corrected the general frontend guide to describe the current self-hosted fonts and minimal rating selector following independent review. Runtime behavior is unchanged.
+- Integration remains gated on required GitHub CODEOWNER approval; no branch protection or deployment setting was changed.
+
+## LOG-HUB-004C (visual identity review candidate)
+
+- Added owner-selected per-game scenery rendered once without tiling, and removed redundant visible rating numbers while preserving accessible labels.
+- Refined hero-only scenery, frame hierarchy and integrated featured layout; replaced clipped summaries with complete first sentences and fixed narrow filter widths.
+- Added owner-requested Buu's Fury portrait borders, with source/crop integrity coverage and explicit unresolved redistribution status for game assets.
+
+- Added shared gold-edged frames, menu states, a grid rating panel and warm About reading surfaces.
+- Added credited LoG II Canyon scenery, following owner authorization, with preserved aspect ratio and integer desktop/mobile scaling.
+- Added a shared artwork fallback and regression coverage for missing assets and narrow-card containment.
+- Preserved typography, project metadata, artwork restrictions, publishing policy and recovery; no deployment or persistent voting added.
+
 ## LOG-HUB-004B (typography review candidate)
 
 - Refined heading tracking and mobile title/panel sizes; modestly enlarged branding with narrow-header regression checks and matching polish screenshots.
@@ -65,3 +81,11 @@
 - Make screenshot capture deterministic for offscreen lazy media in hosted Chrome; require successful decoding without altering production lazy loading.
 
 - Verify all 73 Node and 20 browser tests on hosted Linux with sandboxing enabled; retain normal PR approval and default-off deployment.
+
+- Restored original detail frame dimensions; remove normalization padding from a detail-only derivative and scale the complete banner to fill the frame interior.
+
+- Preserve banner proportions inside the unchanged detail frame using a logo-focused cover crop, replacing stretched fill sizing.
+
+- Centered the title-logo regions for all three disassembly detail images inside the original unchanged frames. Crop rectangles are pinned to source content hashes so updated artwork cannot receive stale crops.
+
+- Removed rating instructions, preview-status copy and text labels; centered Rate this project on the same desktop centerline as the balls while retaining accessible radio names and nonpersistent interaction.
