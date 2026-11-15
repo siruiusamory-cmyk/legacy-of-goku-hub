@@ -89,13 +89,13 @@ test('rendered screenshots and static performance evidence', async ({page, brows
   await fs.mkdir('test-results/evidence',{recursive:true});
   const metrics=[];
   for(const [name,route,width,height] of [['homepage-desktop','/',1448,1086],['detail-desktop','/projects/fixture-0/',1448,1086],['homepage-mobile','/',390,844],['detail-mobile','/projects/fixture-0/',390,844],['empty-desktop','http://127.0.0.1:4322/',1448,1086]]){
-    await page.setViewportSize({width,height});await page.goto(route,{waitUntil:'networkidle'});await page.locator('img').evaluateAll(es=>Promise.all(es.map(e=>e.decode().catch(()=>{}))));
+    await page.setViewportSize({width,height});await page.goto(route,{waitUntil:'networkidle'});await page.locator('img').evaluateAll(async es=>{es.forEach(e=>{e.loading='eager';});await Promise.all(es.map(e=>e.decode()));});
     const filename=`test-results/evidence/${name}.png`;await page.screenshot({path:filename,fullPage:name.includes('mobile')});await testInfo.attach(name,{path:filename,contentType:'image/png'});
     const data=await page.evaluate(()=>{const resources=performance.getEntriesByType('resource');return {domContentLoaded:performance.getEntriesByType('navigation')[0].domContentLoadedEventEnd,resources:resources.length,transferred:performance.getEntriesByType('navigation')[0].transferSize+resources.reduce((n,r)=>n+r.transferSize,0),scriptBytes:resources.filter(r=>r.initiatorType==='script').reduce((n,r)=>n+r.transferSize,0),external:resources.filter(r=>new URL(r.name).origin!==location.origin).map(r=>r.name)};});
     expect(data.external).toEqual([]);expect(data.scriptBytes).toBeLessThan(30000);expect(data.transferred).toBeLessThan(400000);metrics.push({name,...data});
   }
   const mobile=await browser.newContext({viewport:{width:430,height:764},deviceScaleFactor:941/430,isMobile:true,hasTouch:true});
-  await mobile.route('**/*',route=>route.request().url().startsWith('http://127.0.0.1:4321/')?route.continue():route.abort());const mp=await mobile.newPage();await mp.goto('http://127.0.0.1:4321/');await mp.locator('img').evaluateAll(es=>Promise.all(es.map(e=>e.decode().catch(()=>{}))));await mp.screenshot({path:'test-results/evidence/homepage-mobile-reference-resolution.png'});await mobile.close();
+  await mobile.route('**/*',route=>route.request().url().startsWith('http://127.0.0.1:4321/')?route.continue():route.abort());const mp=await mobile.newPage();await mp.goto('http://127.0.0.1:4321/');await mp.locator('img').evaluateAll(async es=>{es.forEach(e=>{e.loading='eager';});await Promise.all(es.map(e=>e.decode()));});await mp.screenshot({path:'test-results/evidence/homepage-mobile-reference-resolution.png'});await mobile.close();
   await fs.writeFile('test-results/evidence/performance.json',JSON.stringify(metrics,null,2));
 });
 
