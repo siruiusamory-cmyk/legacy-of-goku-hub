@@ -11,6 +11,8 @@ body:
         Inputs: static PNG/JPEG/WebP, <=5 MiB, <=20 MP, <=8192px per side.
         Claims are verified against GitHub numeric IDs, not this form's declarations.
         Repository control does not establish authority to represent the whole team.
+        Every first listing and all new or changed artwork require human approval, even for trusted owners.
+        Do not embed or attach candidate images here; use paths/URLs. See docs/moderation.md.
   - type: input
     id: repository
     attributes:

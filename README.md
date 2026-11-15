@@ -58,7 +58,7 @@ Unset `SNAPSHOT_DIR` only for a genuine first publication with no previous catal
 
 Keep the generated `###` field headings when editing an issue. Editing or closing/reopening it starts another synchronization; the last approved guided issue is retrieved directly even when closed. Intake scans at most the newest 200 open issues, so resolve spam promptly. Duplicate repository URLs, aliases and claims coalesce by numeric repository ID, not by user-supplied project identifiers. The public ID is generated as `gh-REPOSITORY_ID`; a migrated listing keeps its previous approved ID.
 
-Validation feedback appears in the issue and in the Actions `validation-report` artifact. A review outcome identifies the reason and submission digest where relevant. Fix mechanical errors by editing the issue or manifest. Review decisions go through administrator policy, not a self-declared checkbox or bot-applied label. The artifact is the publication for this milestone; no site is deployed.
+Validation feedback appears in the issue and in the Actions `validation-report` artifact. A review outcome identifies the reason and submission digest where relevant. Fix mechanical errors by editing the issue or manifest. Review decisions go through administrator policy, not a self-declared checkbox or bot-applied label. The artifact is the publication for this milestone; no site is deployed. Both Issue Forms explain mandatory review and ask submitters not to embed unapproved images.
 
 ## Manifest v1
 

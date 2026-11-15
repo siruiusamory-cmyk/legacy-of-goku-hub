@@ -7,8 +7,9 @@ body:
       value: |
         The bot reads .loghub.json from the default branch. Anyone may point to it;
         this does not give the submitter ownership of the listing.
-        Trusted repository owners publish automatically; new owners enter review.
-        Later manifest edits synchronize daily without another issue.
+        Every first listing needs human content approval, including trusted owners.
+        Later updates synchronize daily; all new or changed artwork waits for exact-content approval.
+        Do not embed or attach candidate images here. Supply repository paths only; see docs/moderation.md.
   - type: input
     id: repository
     attributes:
