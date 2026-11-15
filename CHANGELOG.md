@@ -30,3 +30,5 @@
 - Include the hidden candidate staging directory in Actions uploads while excluding the raw HTTP cache; real production failure stays fail-closed and opens a maintainer alert.
 
 - Keep the hidden-file setting on the upload action only.
+
+- Complete hosted manifest/guided registration and update verification, production publication, artifact-loss recovery, offline export/restore, alert lifecycle and backup health. Record actual failures and scoped independent review outcomes.
