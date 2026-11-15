@@ -46,3 +46,5 @@
 - Keep reference artwork, installed development skills and local previews out of production. No auto merge or public deployment.
 
 - Select preinstalled Chrome for Ubuntu browser CI after the downloaded Chromium sandbox was blocked by AppArmor; retain sandboxing and repository permission boundaries.
+
+- Make screenshot capture deterministic for offscreen lazy media in hosted Chrome; require successful decoding without altering production lazy loading.

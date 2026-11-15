@@ -123,3 +123,5 @@ Owner visual approval and production deployment remain pending. There are no app
 Skill versions, compatibility, reviewed install behavior and scoped use are recorded in [SKILLS.md](SKILLS.md).
 
 Hosted browser setup: the first Ubuntu run stopped before page tests because AppArmor denied the downloaded Chromium sandbox. CI now selects the runner's preinstalled Chrome through Playwright's supported channel setting; chromiumSandbox remains true. This follows Chromium's documented installed-Chrome profile and does not change kernel policy or disable sandboxing. Windows continues using the project-local pinned Chromium download.
+
+The next hosted run passed 19 functional/accessibility cases with sandboxed Chrome 157 but exposed a screenshot-only wait on offscreen lazy gallery images. The capture helper now explicitly requests every image before awaiting successful decoding. Production keeps lazy loading; broken images fail the test instead of being silently ignored. No test was skipped or weakened.
