@@ -22,3 +22,5 @@
 - Added repository manifests, guided forms, numeric-ID claims, explicit trust policy and automatic eligible-project synchronization.
 - Retained static catalog generation, GitHub-only releases, image normalization and failure retention.
 - Verified 47 local tests and obtained a scoped independent source review.
+
+- Correct limited-token ruleset visibility in the hosted drill; retain explicit bypass rejection and owner-side verification.

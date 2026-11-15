@@ -1,3 +1,4 @@
+import {receiptRulesCoverNamespaces} from './receipt-rules.js';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -104,8 +105,7 @@ if (command === 'after-artifact-loss') {
     let productionRulesVerified = false;
     for (const summary of rulesets.filter(r => r.target === 'tag' && r.enforcement === 'active')) {
       const rules = await api.request(`/repos/${source}/rulesets/${summary.id}`);
-      const refs = rules.conditions?.ref_name;
-      if (refs?.include.includes('refs/tags/loghub-anchor-v1/**') && refs.include.includes('refs/tags/loghub-integration-anchor-v1/**') && !refs.exclude.length && !rules.bypass_actors.length && ['update', 'deletion'].every(type => rules.rules.some(r => r.type === type))) productionRulesVerified = true;
+      if (receiptRulesCoverNamespaces(rules)) productionRulesVerified = true;
     }
     assert.equal(productionRulesVerified, true);
     await materialize(protectedPoint, path.join(work, 'restored'));
@@ -132,3 +132,4 @@ if (command === 'after-artifact-loss') {
     await api.request(`/repos/${source}/issues/${attacker.number}`, {method: 'PATCH', body: {state: 'closed'}});
   }
 }
+

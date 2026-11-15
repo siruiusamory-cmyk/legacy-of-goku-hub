@@ -149,3 +149,5 @@ Legacy approved Git records can seed the new publisher after an explicit numeric
 `npm test` includes the original regression coverage plus both new submission routes, root manifest restrictions, identity/claim authority, third-party approval binding, automatic maintenance, transfers, disputes, trust revocation, suspension/delisting, snapshot provenance, failure recovery and deterministic catalogs. See [VERIFICATION.md](VERIFICATION.md) for measured results and limits.
 
 Recomp.fyi research and explicit differences are recorded in [docs/RECOMP-RESEARCH.md](docs/RECOMP-RESEARCH.md). Zeroshot is optional development-time verification only, documented in [docs/ZEROSHOT-REVIEW.md](docs/ZEROSHOT-REVIEW.md). The finished publisher works without Codex, Zeroshot or any AI account.
+
+Hosted ruleset checks tolerate administrator-only field omission; the owner separately verifies the empty bypass list. No extra Actions permissions are granted.
