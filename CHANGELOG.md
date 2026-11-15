@@ -1,5 +1,13 @@
 # Changelog
 
+## LOG-HUB-006 (content moderation review candidate)
+
+- Require protected first-content approval and ordered raw/normalized artwork hash approvals for every owner.
+- Hold changed artwork without exposing candidate image bytes; retain approved listings.
+- Reapply current moderation to recovery/publication/site assets, add private local review tooling, and retire public artwork staging.
+- Bound issue intake and add rejected-issue/blocked-submitter policy controls with moderation regression coverage.
+- No listings approved, deployment enabled, dependencies added or protection changes.
+
 ## LOG-HUB-005 (final review and integration gate)
 
 - Corrected the general frontend guide to describe the current self-hosted fonts and minimal rating selector following independent review. Runtime behavior is unchanged.
