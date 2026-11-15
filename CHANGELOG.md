@@ -100,3 +100,5 @@
 - Removed rating instructions, preview-status copy and text labels; centered Rate this project on the same desktop centerline as the balls while retaining accessible radio names and nonpersistent interaction.
 
 LOG-HUB-006 independent review correction: last-artwork removal may create an empty protected snapshot only under explicit identity-bound suspension/delisting policy; accidental empty resets remain blocked.
+
+Use the Report project content Issue Form for inappropriate artwork or misleading information. Reports notify maintainers, carry no publication authority and do not automatically hide projects. Supply URLs and text only, not image attachments.

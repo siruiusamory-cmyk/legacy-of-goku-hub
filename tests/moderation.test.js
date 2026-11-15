@@ -42,3 +42,12 @@ test('real-repository preview cannot become a public CI artwork review channel',
  const result=spawnSync(process.execPath,['tools/site/build.js','--real-preview','unused'],{encoding:'utf8',env:{...process.env,CI:'true'},windowsHide:true});
  assert.notEqual(result.status,0);assert.match(result.stderr,/local-only/);
 });
+
+test('content reports notify humans without becoming submission or approval inputs',async()=>{
+ const YAML=(await import('yaml')).default;
+ const form=YAML.parse(await fs.readFile('.github/ISSUE_TEMPLATE/report.yml','utf8'));
+ assert.equal(form.title,'[Content report] ');
+ assert.ok(form.body.some(b=>b.id==='details'));
+ const ledger=await listSubmissions({request:async()=>[{number:1,title:form.title,body:'anything',labels:['approved']} ]},'owner/hub');
+ assert.equal(ledger.length,0);
+});

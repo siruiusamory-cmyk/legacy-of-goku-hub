@@ -153,3 +153,5 @@ All three disassembly detail images use source-hash-pinned logo crops, centered 
 The rating selector shows only its heading and Dragon Balls. Accessible numeric names remain on the radio controls; selections remain local and reset on navigation.
 
 LOG-HUB-006 independent review correction: last-artwork removal may create an empty protected snapshot only under explicit identity-bound suspension/delisting policy; accidental empty resets remain blocked.
+
+Use the Report project content Issue Form for inappropriate artwork or misleading information. Reports notify maintainers, carry no publication authority and do not automatically hide projects. Supply URLs and text only, not image attachments.
