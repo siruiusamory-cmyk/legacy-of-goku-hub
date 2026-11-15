@@ -55,3 +55,23 @@ test('receipt coverage handles GitHub limited-token visibility without accepting
   assert.equal(receiptRulesCoverNamespaces({...rules, bypass_actors: [{actor_id: 1}]}), false);
   assert.equal(receiptRulesCoverNamespaces({...rules, enforcement: 'disabled'}), false);
 });
+
+test('successful GitHub writes invalidate cached reads before notification cleanup', async () => {
+  const {GitHub} = await import('../src/github.js');
+  let exists = false; let state = 'open';
+  const endpoint = '/repos/owner/hub/issues?state=all&labels=loghub-operations-test&per_page=100';
+  const api = new GitHub({token: null, fetcher: async (url, options) => {
+    const route = new URL(url).pathname + new URL(url).search;
+    if (options.method === 'GET' && route === endpoint) {
+      if (options.headers['If-None-Match']) return new Response(null, {status: 304});
+      return Response.json(exists ? [{number: 1, title: '[Operations test] Controlled notification self-test', state}] : [], {headers: {etag: 'fixture'}});
+    }
+    if (route.includes('/labels/')) return Response.json({});
+    if (options.method === 'POST' && route.endsWith('/issues')) {exists = true; return Response.json({number: 1});}
+    if (options.method === 'PATCH') {state = JSON.parse(options.body).state; return Response.json({number: 1, state});}
+    throw Error('unexpected API route');
+  }});
+  await notifyOperations(api, 'owner/hub', {failed: true, runId: 123, selfTest: true});
+  await notifyOperations(api, 'owner/hub', {failed: false, runId: 123, selfTest: true});
+  assert.equal(state, 'closed');
+});

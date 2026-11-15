@@ -29,6 +29,7 @@ export class GitHub {
       const retry = response.headers.get('retry-after') || response.headers.get('x-ratelimit-reset');
       throw new APIError(`GitHub HTTP ${response.status}${retry ? `; rate limit/retry time ${retry}` : ''}; check public visibility or retry later`, response.status);
     }
+    if (method !== 'GET') this.cache = {};
     if (response.status === 204) return null;
     let data;
     try { data = JSON.parse((await boundedBody(response, 4 * 1024 * 1024)).toString('utf8')); }
@@ -109,3 +110,4 @@ export async function synchronize(api, record, previous) {
     return {...previous, availability: 'unavailable', warning: error.message};
   }
 }
+
