@@ -4,7 +4,7 @@
     "kind": "desktop",
     "width": 1448,
     "height": 1086,
-    "transferred": 229243,
+    "transferred": 228930,
     "scriptBytes": 2022,
     "external": []
   },
@@ -13,7 +13,7 @@
     "kind": "mobile",
     "width": 390,
     "height": 844,
-    "transferred": 229243,
+    "transferred": 228930,
     "scriptBytes": 2022,
     "external": []
   },
@@ -22,7 +22,7 @@
     "kind": "mobile-320",
     "width": 320,
     "height": 844,
-    "transferred": 229243,
+    "transferred": 228930,
     "scriptBytes": 2022,
     "external": []
   },
@@ -31,7 +31,7 @@
     "kind": "tablet",
     "width": 760,
     "height": 1086,
-    "transferred": 229243,
+    "transferred": 228930,
     "scriptBytes": 2022,
     "external": []
   },
@@ -40,8 +40,8 @@
     "kind": "desktop",
     "width": 1448,
     "height": 1086,
-    "transferred": 229314,
-    "scriptBytes": 1291,
+    "transferred": 228359,
+    "scriptBytes": 989,
     "external": []
   },
   {
@@ -49,8 +49,8 @@
     "kind": "mobile",
     "width": 390,
     "height": 844,
-    "transferred": 229314,
-    "scriptBytes": 1291,
+    "transferred": 228359,
+    "scriptBytes": 989,
     "external": []
   },
   {
@@ -58,8 +58,8 @@
     "kind": "mobile-320",
     "width": 320,
     "height": 844,
-    "transferred": 229314,
-    "scriptBytes": 1291,
+    "transferred": 228359,
+    "scriptBytes": 989,
     "external": []
   },
   {
@@ -67,8 +67,8 @@
     "kind": "tablet",
     "width": 760,
     "height": 1086,
-    "transferred": 229314,
-    "scriptBytes": 1291,
+    "transferred": 228359,
+    "scriptBytes": 989,
     "external": []
   }
 ]

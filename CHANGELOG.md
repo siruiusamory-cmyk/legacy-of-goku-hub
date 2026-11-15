@@ -82,3 +82,5 @@
 - Preserve banner proportions inside the unchanged detail frame using a logo-focused cover crop, replacing stretched fill sizing.
 
 - Centered the title-logo regions for all three disassembly detail images inside the original unchanged frames. Crop rectangles are pinned to source content hashes so updated artwork cannot receive stale crops.
+
+- Removed rating instructions, preview-status copy and text labels; centered Rate this project on the same desktop centerline as the balls while retaining accessible radio names and nonpersistent interaction.

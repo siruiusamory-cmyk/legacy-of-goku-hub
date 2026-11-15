@@ -41,7 +41,7 @@ test('seven-ball selection supports keyboard and pointer without persistence or 
   const first=page.getByRole('radio',{name:'1 Dragon Ball',exact:true});await first.focus();await page.keyboard.press('Space');await page.keyboard.press('ArrowRight');
   await expect(page.getByRole('radio',{name:'2 Dragon Balls',exact:true})).toBeChecked();
   await page.getByRole('radio',{name:'7 Dragon Balls',exact:true}).check();
-  await expect(page.locator('.rating-preview-result')).toHaveText('Preview: 7 of 7 Dragon Balls. Not submitted or saved.');
+  await expect(page.locator('.rating-selector')).toHaveText('Rate this project');
   expect(requests).toEqual([]);expect(await page.evaluate(()=>Object.keys(localStorage))).toEqual([]);
   await page.reload();await expect(page.getByRole('radio',{checked:true})).toHaveCount(0);
 });

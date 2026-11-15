@@ -174,3 +174,5 @@ Frontend CI uses the hosted runner's installed Chrome with sandboxing enabled; l
 Detail artwork uses a padding-trimmed display derivative scaled proportionally to cover the original fixed portrait frame. Catalog covers and cards remain unchanged.
 
 All three disassembly detail images use source-hash-pinned logo crops, centered within the original unchanged frames.
+
+The rating selector shows only its heading and Dragon Balls. Accessible numeric names remain on the radio controls; selections remain local and reset on navigation.
