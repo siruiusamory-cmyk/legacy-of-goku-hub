@@ -1,5 +1,12 @@
 # Changelog
 
+## LOG-HUB-004C (visual identity review candidate)
+
+- Added shared gold-edged frames, menu states, a grid rating panel and warm About reading surfaces.
+- Added credited LoG II Canyon scenery, following owner authorization, with preserved aspect ratio and integer desktop/mobile scaling.
+- Added a shared artwork fallback and regression coverage for missing assets and narrow-card containment.
+- Preserved typography, project metadata, artwork restrictions, publishing policy and recovery; no deployment or persistent voting added.
+
 ## LOG-HUB-004B (typography review candidate)
 
 - Refined heading tracking and mobile title/panel sizes; modestly enlarged branding with narrow-header regression checks and matching polish screenshots.

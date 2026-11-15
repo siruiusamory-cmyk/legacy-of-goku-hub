@@ -3,10 +3,11 @@ import {href, projectURL, rating} from '../lib/catalog.js';
 import Badges from './Badges.astro';
 import Rating from './Rating.astro';
 import Icon from './Icon.astro';
+import ProjectArtwork from './ProjectArtwork.astro';
 const {project} = Astro.props;
 ---
 <article class="project-card" data-id={project.id} data-search={project.search_text} data-game={project.game} data-category={project.category} data-status={project.status} data-name={project.title.toLowerCase()} data-release={project.release?.release_date || ''} data-updated={project.last_updated}>
-  <a class="card-art" href={projectURL(project)} tabindex="-1" aria-hidden="true"><img src={href(project.cover)} alt="" width="640" height="360" loading="lazy" decoding="async"/></a>
+  <a class="card-art" href={projectURL(project)} tabindex="-1" aria-hidden="true"><ProjectArtwork src={href(project.cover)}/></a>
   <div class="card-content"><h3><a href={projectURL(project)}>{project.title}</a></h3><p class="developer">by {project.developer}</p>
     <div class="card-meta"><Badges project={project}/><div class="card-actions"><a class="icon-button" href={project.repository} aria-label={`View ${project.title} repository`} rel="noopener noreferrer"><Icon name="github"/></a>{project.release && project.availability === 'available' && <a class="icon-button" href={project.release.download_url} aria-label={`Download ${project.title} from GitHub`} rel="noopener noreferrer"><Icon name="download"/></a>}</div></div>
     <Rating {...rating(project)} compact/>

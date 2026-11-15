@@ -1,0 +1,18 @@
+{
+  "assets": [
+    {
+      "file": "log2-canyon.png",
+      "game": "Dragon Ball Z: The Legacy of Goku II",
+      "title": "Canyon",
+      "contributor": "Son Gohan",
+      "page": "https://spritedatabase.net/file/2915",
+      "url": "https://spritedatabase.net/files/gba/978/Background/canyon.png",
+      "bytes": 22755,
+      "width": 256,
+      "height": 256,
+      "sha256": "d5da6a978d43536d84e0235b621e633c07c630605cdf2eca8285d1ee87a39ec2",
+      "use": "Ambient decorative scenery only; owner-authorized game asset use in LOG-HUB-004C",
+      "processing": "Unmodified source PNG; CSS pixelated integer scaling at 1x mobile and 2x desktop"
+    }
+  ]
+}

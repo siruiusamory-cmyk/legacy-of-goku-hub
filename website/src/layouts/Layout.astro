@@ -2,14 +2,16 @@
 import {href, sourceURL, submitURL, provenance} from '../lib/catalog.js';
 import Ball from '../components/Ball.astro';
 import Icon from '../components/Icon.astro';
+import Scenery from '../components/Scenery.astro';
 import '../styles/tokens.css';
 import '../styles/site.css';
 import '../styles/typography.css';
+import '../styles/identity.css';
 const {title = 'Legacy of Goku Hub', description = 'Community ROM hacks, fan projects and tools for the Legacy of Goku series.'} = Astro.props;
 ---
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content={description}/><meta name="color-scheme" content="dark"/><meta name="theme-color" content="#202040"/><title>{title}</title></head>
-<body><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="header-inner"><a class="brand" href={href('')} aria-label="Legacy of Goku Hub home"><Ball number={4}/><span>Legacy of Goku <em>Hub</em></span></a>
+<body><Scenery/><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="header-inner"><a class="brand" href={href('')} aria-label="Legacy of Goku Hub home"><Ball number={4}/><span>Legacy of Goku <em>Hub</em></span></a>
   <nav class="desktop-nav" aria-label="Main navigation"><a class="active" href={href('#directory')}>Projects</a><a href={submitURL}>Submit</a><a href={sourceURL}><Icon name="github"/> GitHub</a></nav>
   <details class="mobile-nav"><summary aria-label="Open navigation"><Icon name="menu"/></summary><nav aria-label="Mobile navigation"><a href={href('#directory')}>Projects</a><a href={submitURL}>Submit a project</a><a href={sourceURL}>GitHub</a></nav></details>
 </div></header>{provenance.purpose === 'real-preview' && <aside class="preview-notice" role="note">Isolated real-repository preview. Not approved for the public catalog. These listings are tools and development resources, not playable ROM hacks.</aside>}<slot/><footer class="site-footer"><p>A community home for the Legacy of Goku series.</p><a href={submitURL}>Submit a project</a><a href={sourceURL}>Contribute on GitHub</a><p>Fan projects. No ROMs hosted.</p>{provenance.purpose === 'fixture' && <strong class="fixture-notice">ISOLATED DESIGN FIXTURES · Not community listings</strong>}</footer>

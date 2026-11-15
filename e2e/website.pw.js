@@ -54,6 +54,7 @@ test('in-development detail omits unavailable release metadata and safely render
 });
 test('empty catalog is polished, honest, unrated and contains no synthetic projects', async ({page}) => {
   await page.goto('http://127.0.0.1:4322/');
+  expect(await (await page.request.get('http://127.0.0.1:4322/site-provenance.json')).json()).toMatchObject({purpose:'fixture'});
   await expect(page.getByRole('heading',{name:'The adventure starts here.'})).toBeVisible();
   await expect(page.getByRole('link',{name:'Submit your project'})).toHaveAttribute('href',/issues\/new\/choose$/);
   await expect(page.locator('.project-card')).toHaveCount(0);

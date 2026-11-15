@@ -6,6 +6,10 @@ Static catalog infrastructure for Legacy of Goku, Legacy of Goku II and Buu's Fu
 
 The existing Node 24, JSON Schema, GitHub release, Sharp image and deterministic catalog components remain in use. Legacy CLI tools and their regression tests are retained for migration, not the routine publishing path. Production has no community-approved records. Policy explicitly delists the isolated integration fixture; test data never becomes a community listing.
 
+## Legacy of Goku visual identity
+
+LOG-HUB-004C adds shared gold-edged menu framing, an authentic LoG II canyon backdrop at crisp native/mobile and 2x/desktop scale, compact featured-project presentation, and a reusable unavailable-artwork state. [Visual identity report and matching before/after evidence](docs/frontend/visual-identity/README.md) cover art credits, scaling, tokens, accessibility, performance and review boundaries. The candidate is not deployed or approved for merging.
+
 ## Typography review
 
 LOG-HUB-004B self-hosts Latin Barlow Condensed 700 upright/italic and Inter 400/600 WOFF2 styles with SIL OFL licenses. Final polish modestly enlarges the wordmark and opens heading spacing, with additional 320px/390px evidence. It preserves the real-repository preview and detail cleanup. [Typography tokens, licensing and matching before/after screenshots](docs/frontend/typography/README.md) are available for owner review; no typography approval or deployment is implied.
