@@ -6,6 +6,8 @@ Hosted CI and the initial signed, immutable recovery point have passed. Operatio
 
 The first hosted manifest registration and automatic-release-update scenarios have passed, including actual artifact deletion followed by recovery from the private vault. Current operational work adds guided-route and protection/notification checks before enabling production.
 
+The hosted guided submission scenario has also passed. Direct denial probes verify that immutable private recovery tags and protected public test receipts cannot be force-updated/deleted; the final pass checks actual integration receipts and the matching production ruleset.
+
 Static catalog infrastructure for Legacy of Goku, Legacy of Goku II and Buu's Fury. Developers submit through a repository manifest or guided GitHub form. GitHub Actions validates, normalizes and publishes eligible listings as artifacts. No frontend, CMS, dashboard, database, AI service, monetization or production server is needed.
 
 The existing Node 24, JSON Schema, GitHub release, Sharp image and deterministic catalog components remain in use. Legacy CLI tools and their regression tests are retained for migration, not the routine publishing path. Production policy and records are empty: test fixtures are not community-approved projects.

@@ -37,6 +37,8 @@ Every failed protected publication is an Actions failure and must not be describ
 
 An isolated notification job also opens/reuses a `loghub-operations` issue mentioning the repository owner when backup/publication or health fails. Repeated failures add comments instead of new issues. Only a successful final publication closes it automatically; a cancelled run or an unrelated healthy check cannot clear a publication failure. Operational issue events are excluded from catalog synchronization to avoid alert-triggered retry loops. A controlled hosted alert self-test is explicitly labeled as a test and is closed after verification.
 
+All production notification writers share the same non-cancelling GitHub job-concurrency lock and perform a fresh lookup after acquiring it. Controlled tests use a different issue title and label (`loghub-operations-test`) and can only close their own test issue, never a real incident.
+
 An old immutable recovery commit is healthy when daily unchanged-state verification succeeds. Its creation age alone is not a stale-backup signal. The monitor checks successful verification activity, not unnecessary daily duplicate commits.
 
 ## Restore and off-platform export (Windows)

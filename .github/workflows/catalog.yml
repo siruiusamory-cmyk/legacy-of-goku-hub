@@ -234,3 +234,6 @@ jobs:
           OPERATION_FAILED: ${{ needs.synchronize.result == 'failure' ||
             needs.backup.result == 'failure' || needs.anchor.result == 'failure'
             || needs.publish.result == 'failure' }}
+    concurrency:
+      group: loghub-operations-alert
+      cancel-in-progress: false

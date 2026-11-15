@@ -14,6 +14,8 @@
 - Added isolated live-GitHub fixture scenarios, purpose-separated integration recovery and offline signed-export verification.
 - Hosted manifest registration and automatic-update tests passed, with recovery after actual Actions state-artifact deletion.
 - Added direct immutable/protected-tag denial probes and deduplicated owner issue alerts for backup/publication failures.
+- Hosted guided submission and protection-denial checks passed; cancelled one prematurely sequenced test and reran after verifying the fixture prerequisite.
+- Independent review reproduced alert self-test interference and concurrent issue creation; isolated test alerts and serialized all production writers with regressions.
 
 ## Self-service milestone
 

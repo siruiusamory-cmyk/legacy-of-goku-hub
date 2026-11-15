@@ -62,3 +62,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           OPERATION_FAILED: ${{ needs.health.result == 'failure' }}
+    concurrency:
+      group: loghub-operations-alert
+      cancel-in-progress: false

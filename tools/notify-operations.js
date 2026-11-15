@@ -6,7 +6,8 @@ import {repoSlug} from '../src/records.js';
 export async function notifyOperations(api, repository, {failed, runId, selfTest = false}) {
   repoSlug('https://github.com/' + repository);
   if (!/^[1-9][0-9]*$/.test(String(runId))) throw Error('invalid operations notification context');
-  const label = 'loghub-operations'; const title = '[Operations] Backup or publication needs attention';
+  const label = selfTest ? 'loghub-operations-test' : 'loghub-operations';
+  const title = selfTest ? '[Operations test] Controlled notification self-test' : '[Operations] Backup or publication needs attention';
   const issues = await api.request(`/repos/${repository}/issues?state=all&labels=${label}&per_page=100`);
   if (!Array.isArray(issues)) throw Error('invalid operations issue list');
   let issue = issues.find(i => i.title === title && !i.pull_request);
