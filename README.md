@@ -1,16 +1,10 @@
 # LoG Hub self-service pipeline
 
-LOG-HUB-003 adds signed durable recovery in the private backup repository, free immutable releases, and protected public hash receipts. Production publication is gated on a verified backup. See [the maintainer guide](docs/OPERATIONS.md) for the current operational contract; the older artifact-only recovery description below is superseded.
-
-Hosted CI and the initial signed, immutable recovery point have passed. Operational integration tests use a separate, explicitly excluded fixture repository and purpose-bound test recovery namespace, never the production catalog.
-
-The first hosted manifest registration and automatic-release-update scenarios have passed, including actual artifact deletion followed by recovery from the private vault. Current operational work adds guided-route and protection/notification checks before enabling production.
-
-The hosted guided submission scenario has also passed. Direct denial probes verify that immutable private recovery tags and protected public test receipts cannot be force-updated/deleted; the final pass checks actual integration receipts and the matching production ruleset.
+LOG-HUB-003 provides signed durable recovery in the private backup repository, immutable releases, and protected public hash receipts. The public source is [legacy-of-goku-hub](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub). See [operations](docs/OPERATIONS.md) for setup, monitoring, recovery and off-platform export, and [verification](VERIFICATION.md) for measured hosted results. All configured features use GitHub Free.
 
 Static catalog infrastructure for Legacy of Goku, Legacy of Goku II and Buu's Fury. Developers submit through a repository manifest or guided GitHub form. GitHub Actions validates, normalizes and publishes eligible listings as artifacts. No frontend, CMS, dashboard, database, AI service, monetization or production server is needed.
 
-The existing Node 24, JSON Schema, GitHub release, Sharp image and deterministic catalog components remain in use. Legacy CLI tools and their regression tests are retained for migration, not the routine publishing path. Production policy and records are empty: test fixtures are not community-approved projects.
+The existing Node 24, JSON Schema, GitHub release, Sharp image and deterministic catalog components remain in use. Legacy CLI tools and their regression tests are retained for migration, not the routine publishing path. Production has no community-approved records. Policy explicitly delists the isolated integration fixture; test data never becomes a community listing.
 
 ## Run locally on Windows
 
@@ -30,8 +24,9 @@ The last two commands validate/build Git-backed migration records offline. To ex
 ```powershell
 $env:GITHUB_REPOSITORY = 'YOUR-ORG/YOUR-HUB'
 # Optional GH_TOKEN: read-only contents/issues access for public metadata.
-# Restore the previous catalog-state artifact first, if this hub has published before:
-$env:SNAPSHOT_DIR = 'C:\path\to\extracted\catalog-state'
+# Restore the signed durable vault first using the read-only credentials in docs/OPERATIONS.md:
+node src/backup-cli.js restore .previous
+$env:SNAPSHOT_DIR = '.previous'
 npm.cmd run publish:local
 Get-Content .generated\report.json
 Get-Content .generated\work\dist\catalog.json
@@ -120,27 +115,22 @@ The generated contract remains [schema/catalog.schema.json](schema/catalog.schem
 
 ## GitHub setup and publishing
 
-No external settings have been changed. A GitHub administrator must:
+The public source, private recovery vault, Issues, CODEOWNERS, protected source receipts and narrowly scoped backup App are configured. The [maintainer guide](docs/OPERATIONS.md) describes the exact authority and recovery boundaries. Source policy changes use protected PRs and the required `test` check. Default Actions token permissions are read-only; only the receipt job receives source contents write.
 
-1. Create/push this repository with default branch `main`, and enable Issues and Actions. If using a different default branch, update the push filters in CI and catalog workflows.
-2. Protect the production branch with reviews and the `test` check. Add actual administrator handles to CODEOWNERS for `policy/`, source, schemas, lockfile, `.github/`, migration records/state/assets. Do not grant a direct-push bypass to the bot.
-3. Keep default token permissions read-only. The publisher requests only `contents: read`, `issues: read`, `actions: read`. A separate feedback job can write issue comments; it cannot change repository content. Artifact upload uses the normal Actions artifact mechanism.
-4. Permit the 90-day artifact retention used here, or adjust it to your organization limit. Preserve periodic backups of the **catalog-state** artifact; it contains the last valid project records, API snapshots, claim provenance and normalized assets. It is generated data, not an administrator policy source.
-5. Run **Synchronize and publish catalog** once, inspect all artifacts, then exercise a real approved submission before opening the service publicly.
+One serialized publishing workflow runs on submission issue changes, default-branch merges, a daily 07:23 UTC schedule, and manual dispatch. It restores signed durable state, reapplies current administrator policy, synchronizes eligible repositories and builds a candidate. Only after a verified private immutable snapshot and protected public receipt exist does final verification permit publication. A backup failure retains the previous verified point and blocks publication.
 
-One serialized publishing workflow runs on issue changes, policy/code merges, a daily schedule (07:23 UTC), and manual dispatch. It checks out **only the hub's default branch**. It reads open and closed form issues as the input ledger, evaluates current policy, resolves repository identities and synchronizes eligible manifests/releases. It never restores PR artifacts or executes submitted code.
+Published secondary artifacts retain for 30 days:
 
-Before rebuilding, the workflow selects a completed run of this exact publishing workflow on the hub's default branch, from the same repository identity and an allowed event, whose **publisher job** succeeded and uploaded both catalog and state. Feedback-comment failure cannot discard a successful publication. It restores only that run's `catalog-state`. An expired/missing snapshot from a known successful publication is a hard failure, not permission to publish an empty replacement. Corrupted snapshots also fail closed. Individual external-resource errors retain prior data; a failed build/upload does not replace the last successful artifact. Current policy is always re-applied, including revocations and removals. A bounded ETag cache travels with the snapshot for conditional API requests; it never authorizes a project.
+- **catalog**: JSON and normalized assets for future site consumption.
+- **catalog-state**: convenient snapshot; durable recovery does not depend on its retention.
+- **validation-report**: actionable submission/review/retained reasons.
+- **protected-backup-receipt**: the verified private point reference.
 
-Each completed publication uploads:
+Raw HTTP caches and administrator policy are excluded from recovery snapshots. GitHub-only bounded conditional requests remain available within a run. Restored policy is always the current protected source policy. Missing/corrupted newest recovery points block normal publication pending exact administrator rollback approval.
 
-- **catalog**: static JSON and normalized website-ready images.
-- **catalog-state**: recovery snapshot for the next run; keep an off-platform backup if you need recovery beyond GitHub retention.
-- **validation-report**: published/review/retained outcomes and actionable reasons/digests.
+A daily health workflow checks signed recovery and a successful publication within 48 hours; failures create an owner-mention operations issue. GitHub Actions concurrency may coalesce pending runs, so individual notification delivery is not a guaranteed external monitoring service. No monitor can run during a complete GitHub outage.
 
-There are no daily metadata PRs or runtime AI agents. GitHub Artifacts require GitHub access for downloads and are not a public hosting endpoint; a future website can consume the catalog through a separate authorized deployment milestone.
-
-If Actions is disabled for longer than artifact retention, restore a saved snapshot before restarting. The publisher refuses to silently start over from an expired known publication. The bounded ledger currently handles 1000 issues; reaching the cap fails explicitly and requires a reviewed migration/archive strategy. It does not silently drop older sources.
+Artifacts require GitHub download access and are not a public website endpoint. There is no frontend deployment, daily update PR, runtime AI agent or persistent server. The input ledger is capped at 1000 issues and fails explicitly at capacity.
 
 ## Migration and verification
 
@@ -150,6 +140,3 @@ Legacy approved Git records can seed the new publisher after an explicit numeric
 
 Recomp.fyi research and explicit differences are recorded in [docs/RECOMP-RESEARCH.md](docs/RECOMP-RESEARCH.md). Zeroshot is optional development-time verification only, documented in [docs/ZEROSHOT-REVIEW.md](docs/ZEROSHOT-REVIEW.md). The finished publisher works without Codex, Zeroshot or any AI account.
 
-Hosted ruleset checks tolerate administrator-only field omission; the owner separately verifies the empty bypass list. No extra Actions permissions are granted.
-
-Successful API writes invalidate conditional-read caches so immediate notification cleanup reads current state.

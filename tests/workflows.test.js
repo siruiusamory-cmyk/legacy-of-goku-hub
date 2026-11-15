@@ -41,3 +41,10 @@ test('archived legacy issue form preserves the exact parser heading and JSON fie
   assert.equal(field.attributes.render, 'json');
   assert.doesNotThrow(() => JSON.parse(field.attributes.value));
 });
+
+test('candidate artifact includes its hidden staging directory while excluding HTTP cache', async () => {
+  const workflow = YAML.parse(await fs.readFile(new URL('catalog.yml', directory), 'utf8'));
+  const upload = workflow.jobs.synchronize.steps.find(s => s.with?.name === 'candidate');
+  assert.equal(upload.with['include-hidden-files'], true);
+  assert.equal(upload.with.path.trim(), '.generated/\n!.generated/snapshot/github-cache.json');
+});
