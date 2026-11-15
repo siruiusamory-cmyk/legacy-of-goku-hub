@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 const root = path.resolve(process.env.SITE_SERVE_DIR || '.site/preview');
 const base = process.env.SITE_BASE || '/';
-const types = {'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.webp':'image/webp','.json':'application/json'};
+const types = {'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.webp':'image/webp','.woff2':'font/woff2','.json':'application/json'};
 const server = http.createServer(async (request,response) => {
   try {
     const url = new URL(request.url,'http://127.0.0.1');

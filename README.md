@@ -6,6 +6,10 @@ Static catalog infrastructure for Legacy of Goku, Legacy of Goku II and Buu's Fu
 
 The existing Node 24, JSON Schema, GitHub release, Sharp image and deterministic catalog components remain in use. Legacy CLI tools and their regression tests are retained for migration, not the routine publishing path. Production has no community-approved records. Policy explicitly delists the isolated integration fixture; test data never becomes a community listing.
 
+## Typography review
+
+LOG-HUB-004B self-hosts Latin Barlow Condensed 700 upright/italic and Inter 400/600 WOFF2 styles with SIL OFL licenses. It preserves the real-repository preview and detail cleanup. [Typography tokens, licensing and matching before/after screenshots](docs/frontend/typography/README.md) are available for owner review; no typography approval or deployment is implied.
+
 ## Isolated real-repository preview and detail cleanup
 
 LOG-HUB-004A adds a separately marked preview of the four owner repositories without approving them. Detail pages display the description once in About, identity badges once in the hero, release metadata in Project Details, and only distinct additional links. Empty galleries and release panels are omitted. Both decorative orange swooshes have been removed. Ratings remain an unsaved interaction preview.
