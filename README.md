@@ -7,6 +7,8 @@ Private administrator dashboard: [owner workflow, authentication research and au
 
 The listing manager loads approved source metadata even for withdrawn managed listings. Withdrawn legacy listings can be restored through protected review before their catalog metadata is edited.
 
+[Administrator verification and independent review resolutions](docs/launch/ADMIN-REVIEW.md) describe the isolated evidence and remaining activation checks.
+
 ![License MIT](https://img.shields.io/badge/license-MIT-blue) ![Platform Claude Code](https://img.shields.io/badge/platform-Claude%20Code-d4a017) ![Submission routes 4](https://img.shields.io/badge/submission%20routes-4-555)
 
 ## Contents

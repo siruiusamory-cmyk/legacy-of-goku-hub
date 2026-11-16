@@ -5,6 +5,7 @@
 - Add an Access-protected, default-off browser inbox, visual normalized-artwork review, public/private notes, history, exact approvals, protected publication PR preparation and verified deployment status.
 - Add stable-identity catalog editing, claim evidence, suspend/delist/restore review and expiring/revocable sessions with CSRF protection.
 - Load approved metadata for withdrawn managed listings; require restoration before editing a withdrawn legacy catalog record.
+- Document the single independent review's three repaired findings and the isolated browser/security verification limits.
 - Keep unapproved material in private D1/processor memory, preserve signed publication governance and anonymous public services, and require separate owner authorization for merge and production activation.
 
 ## LOG-HUB-012: universal project submissions
