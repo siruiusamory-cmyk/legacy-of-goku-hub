@@ -1,6 +1,6 @@
 # LoG Hub operations : LOG-HUB-003
 
-Current launch guidance: [readiness report](launch/README.md), [maintainer moderation checklist](launch/MODERATION-CHECKLIST.md) and [deployment/rollback checklist](launch/DEPLOYMENT.md). Pages remains disabled. Catalog artifacts and the implemented static frontend do not imply a deployed website.
+Current launch guidance: [Cloudflare Pages Free setup](launch/CLOUDFLARE.md), [maintainer moderation checklist](launch/MODERATION-CHECKLIST.md) and [deployment/rollback checklist](launch/DEPLOYMENT.md). Intended URL is https://loghub.pages.dev/ at `/`; GitHub Pages remains disabled and no website is deployed. Backup-health monitors signed catalog publication, not Cloudflare availability; deployment failures require checking the deploy job/Actions notifications and the live URL after authorized uploads.
 
 Source: https://github.com/siruiusamory-cmyk/legacy-of-goku-hub (public).
 Recovery vault: https://github.com/siruiusamory-cmyk/legacy-of-goku-hub-backups (private).

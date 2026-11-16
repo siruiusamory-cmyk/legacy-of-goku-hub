@@ -105,14 +105,14 @@ The bounded [independent review](REVIEW.md) inspected code, all original mockups
 
 The existing catalog workflow retains its protected synchronize/backup/receipt/publish stages. An appended read-only website job runs **after successful catalog publication**, exports the newest protected recovery point using a backup App token reduced to read, verifies/builds the static site and uploads a separate `website` artifact. It checks the source revision again. It neither replaces catalog recovery nor receives a production signing key.
 
-A separate Pages job has source read plus `pages:write` and `id-token:write`, no checkout and no backup credentials. It requires the protected default branch, `SITE_DEPLOYMENT_ENABLED=true`, the `github-pages` environment and a fresh source-head match. Fixture provenance is rejected before Pages artifact creation. The enable variable has not been set and Pages settings have not been changed.
+A separate default-off Cloudflare Pages Direct Upload job downloads the exact same-run immutable website artifact and verifies the upstream inventory digest, root-path provenance and current build/policy. It requires protected main, successful publish/website jobs, `SITE_DEPLOYMENT_ENABLED=true` and the `cloudflare-pages` environment. It has source/actions read only, no GitHub Pages write or backup credentials; Cloudflare secrets are confined to deployment. The exact project/subdomain/production branch is checked before upload. [Current host setup](../launch/CLOUDFLARE.md).
 
 Before first public deployment, the owner must:
 
 1. Use the current [deployment checklist](../launch/DEPLOYMENT.md), review the exact launch revision and passing checks, and obtain owner authorization. Observed protection requires PRs/strict `test` but zero human approving reviews and no enforced CODEOWNER review; this does not replace required human content inspection. Do not bypass or alter protection.
-2. Configure repository Settings -> Pages -> Source: GitHub Actions.
-3. Configure the `github-pages` environment's deployment branch restriction to protected main and any desired initial human approval. Permanent per-run approvals would intentionally prevent fully automatic updates, so choose that policy explicitly.
-4. After frontend approval/merge, set repository variable `SITE_DEPLOYMENT_ENABLED=true` and dispatch the catalog workflow. Inspect the deployed result and Actions receipt. No paid plan is required for the public repository.
+2. Configure the exact Free Cloudflare Direct Upload project `loghub` with `loghub.pages.dev`/main. No alternate URL, Git integration, domain purchase or paid feature. Keep GitHub Pages disabled.
+3. Configure `cloudflare-pages` environment restrictions and scoped secrets as described in the checklist. Do not expose Cloudflare credentials to builds or PRs.
+4. Only after a separate explicit owner go decision, enable the deployment variable and dispatch the existing workflow on protected main. No public upload was performed during preparation.
 
 No remote merge, Pages enablement, repository security weakening or public deployment was performed for this milestone. End-to-end Pages hosting remains unverified until that authorization step. Browser CI runs on the review PR with read-only permissions, no backup/App secrets and no privileged workflow_run/pull_request_target bridge.
 

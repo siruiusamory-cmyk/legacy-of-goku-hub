@@ -1,5 +1,7 @@
 # LOG-HUB-008: launch readiness
 
+Host decision superseded by LOG-HUB-010: [Cloudflare Pages Free / loghub.pages.dev owner setup](CLOUDFLARE.md) and [current deployment/rollback procedure](DEPLOYMENT.md). This historical report's GitHub Pages URL/activation references are not current instructions. LOG-HUB-009 subsequently approved and published the three resources; website deployment still needs separate authorization.
+
 Assessment: **READY for the owner to review a launch plan; BLOCKED for public launch.** Technical baseline is healthy. Public launch is a separate decision, and no real candidate has been approved. This report does not authorize deployment, Pages activation, policy changes or listing publication.
 
 Prepared November 15, 2026 against main `8157622a08e71364dda986277dd27336ed27f91a`.
