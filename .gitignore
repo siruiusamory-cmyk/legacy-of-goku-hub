@@ -24,3 +24,5 @@ test-results/
 test-results-real/
 ratings/.dev.vars
 ratings/.wrangler/
+admin/.dev.vars
+admin/.wrangler/

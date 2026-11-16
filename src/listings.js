@@ -34,14 +34,15 @@ async function sourceBytes(ref, dir, fetcher) {
   if (!response.ok) throw Error(`image: HTTP ${response.status}; check public pinned URL`);
   return boundedBody(response, MAX_IMAGE_BYTES);
 }
-export async function inspectListingImages(record, dir, fetcher = fetch) {
-  const outputs = []; const artwork = [];
+export async function inspectListingImages(record, dir, fetcher = fetch, capture = false) {
+  const outputs = []; const artwork = []; const inputs = [];
   for (const [i, ref] of [record.cover, ...(record.screenshots || [])].entries()) {
     const bytes = await sourceBytes(ref, dir, fetcher);
+    if (capture) inputs.push(bytes);
     const normalized = await normalizeImage(bytes, i === 0 ? 'cover' : 'screenshot');
     outputs.push(normalized); artwork.push({source_sha256: imageHash(bytes), sha256: imageHash(normalized)});
   }
-  return {outputs, artwork};
+  return {outputs, artwork, ...(capture ? {inputs} : {})};
 }
 function fromManifest(listing, manifest) {
   const metadata = checkManifest(manifest.metadata);
@@ -51,7 +52,7 @@ function fromManifest(listing, manifest) {
   for (const link of record.links || []) publicURL(link.url, 'links');
   return validateListing(record);
 }
-export async function evaluateListing({listing, dir, rule, prior, api, fetcher = fetch}) {
+export async function evaluateListing({listing, dir, rule, prior, api, fetcher = fetch, captureImages = false}) {
   let record = listing; let host; let repository; let release = null; let manifested = false; let metadataDigest; let transferred = false;
   if (listing.source.type === 'github') {
     repository = await repositoryInfo(api, {repository: listing.source.url});
@@ -72,7 +73,7 @@ export async function evaluateListing({listing, dir, rule, prior, api, fetcher =
     }
   }
   if (manifested && prior && SENSITIVE.some(key => prior.record[key] !== record[key]) && rule?.approved_metadata_digest !== metadataDigest) throw Error(`sensitive attribution/game/category change requires review; metadata digest ${metadataDigest}`);
-  const inspected = await inspectListingImages(record, dir, fetcher);
+  const inspected = await inspectListingImages(record, dir, fetcher, captureImages);
   const initialDigest = listingDigest(record, host && {id: host.id, owner_id: host.owner_id});
   const localFields = value => { const copy = {...value}; for (const key of MANIFEST_FIELDS) delete copy[key]; return digest(copy); };
   const contentApproved = manifested && prior && !transferred && localFields(record) === localFields(prior.record) ? prior.moderation.initial_content_digest : initialDigest;
