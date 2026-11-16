@@ -1,5 +1,9 @@
 # Changelog
 
+## Discord community navigation
+
+- Add the owner-provided Hub Discord invite immediately after GitHub in the desktop header and to mobile navigation, with an accessible inline Discord icon. No tracking or dependencies; deployment requires owner approval.
+
 ## LOG-HUB-010: Cloudflare Pages launch preparation
 
 - Replace the disabled GitHub Pages target with pinned Cloudflare Pages Direct Upload for loghub.pages.dev at `/`, preserving verified catalog publication and all three approved resources.
@@ -123,4 +127,3 @@ Use the Report project content Issue Form for inappropriate artwork or misleadin
 # LOG-HUB-008: rating disclosure
 
 - Label the existing seven-ball selector as an unsaved preview; no public votes or ratings service are implied.
-
