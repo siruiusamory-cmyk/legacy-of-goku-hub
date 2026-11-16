@@ -16,3 +16,5 @@ export const formatDate = value => new Intl.DateTimeFormat('en-US', {month: 'sho
 export const formatSize = size => size < 1048576 ? `${(size / 1024).toFixed(1)} KB` : `${(size / 1048576).toFixed(1)} MB`;
 
 export const featuredLabel = project => project.category === 'tool' ? 'Featured Tool' : project.category === 'resource' ? 'Featured Resource' : 'Featured Game';
+
+export const discordURL = 'https://discord.gg/P8qC69G3sU';
