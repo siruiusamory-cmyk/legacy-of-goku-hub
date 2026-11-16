@@ -15,6 +15,21 @@ const main = 'a'.repeat(40);
 async function setup(t) { const x = await fixture(); const original = globalThis.fetch; globalThis.fetch = x.fetcher; t.after(() => { globalThis.fetch = original; x.db.close(); }); return x; }
 const data = async res => { assert.equal(res.ok, true, await res.clone().text()); return res.json(); };
 
+test('Workers-compatible fetch rejects certificate and GitHub redirects without following them', async t => {
+  const x = await setup(t);
+  globalThis.fetch = async (url, opts) => {
+    if (String(url).endsWith('/cdn-cgi/access/certs')) { assert.equal(opts.redirect, 'manual'); return new Response(null, {status: 302, headers: {Location: 'https://untrusted.example/certs'}}); }
+    return x.fetcher(url, opts);
+  };
+  const denied = await x.call('/api/login', {}); assert.equal(denied.status, 503); assert.equal((await denied.json()).error, 'Identity service unavailable');
+  globalThis.fetch = x.fetcher; await x.login();
+  globalThis.fetch = async (url, opts) => {
+    if (String(url).includes('api.github.com/')) { assert.equal(opts.redirect, 'manual'); return new Response(null, {status: 302, headers: {Location: 'https://untrusted.example/github'}}); }
+    return x.fetcher(url, opts);
+  };
+  const github = await x.call('/api/catalog'); assert.equal(github.status, 503); assert.equal((await github.json()).error, 'GitHub request failed; retry later');
+});
+
 test('Access signature, issuer, audience, allowlist, expiry, CSRF, revocation and default-off gate', async t => {
   const x = await setup(t);
   assert.equal((await x.call('/api/queue', undefined, {'Cf-Access-Jwt-Assertion': ''})).status, 401);

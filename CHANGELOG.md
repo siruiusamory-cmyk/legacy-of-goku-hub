@@ -1,5 +1,10 @@
 # Changelog
 
+## LOG-HUB-013 activation runtime compatibility
+
+- Use manual redirect handling for administrator certificate, GitHub, catalog and deployment-manifest requests because Cloudflare Workers rejects the Node-supported `redirect: error` setting. Redirect responses remain rejected; authentication and publication checks fail closed.
+- Make the isolated Worker test fetcher enforce the real runtime's accepted redirect modes and cover redirected certificate/GitHub responses.
+
 ## LOG-HUB-013: private administrator dashboard (activation pending)
 
 - Add an Access-protected, default-off browser inbox, visual normalized-artwork review, public/private notes, history, exact approvals, protected publication PR preparation and verified deployment status.

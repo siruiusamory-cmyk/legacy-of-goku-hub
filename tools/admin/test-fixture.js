@@ -18,6 +18,7 @@ export async function fixture() {
   const state = {projects: [], pr: null, runs: [], jobs: [], manifest: {}, dispatched: [], assets: []};
   env.ASSETS = {fetch: async req => { const name = new URL(req.url).pathname === '/' ? 'index.html' : new URL(req.url).pathname.slice(1); if (!['index.html', 'admin.js', 'admin.css'].includes(name)) return new Response('Not found', {status: 404}); const bytes = await fs.readFile(new URL('../../admin/public/' + name, import.meta.url)); return new Response(bytes, {headers: {'Content-Type': name.endsWith('html') ? 'text/html' : name.endsWith('js') ? 'application/javascript' : 'text/css'}}); }};
   const fetcher = async (url, opts = {}) => {
+    if (opts.redirect !== undefined && !['follow', 'manual'].includes(opts.redirect)) throw TypeError('Cloudflare Workers supports only follow or manual redirects');
     const address = String(url);
     if (address === issuer + '/cdn-cgi/access/certs') return Response.json({keys: [jwk]});
     if (address.endsWith('/catalog.json')) return Response.json({projects: state.projects});

@@ -11,7 +11,7 @@ const review = row => row && ({...row, payload: JSON.parse(row.payload), package
 const history = (env, user, action, submission = null, id = null, pub = '', priv = '') => sql(env, 'INSERT INTO admin_history(submission_id,review_id,actor,action,public_note,private_note,created) VALUES(?,?,?,?,?,?,?)', submission, id, user, action, pub, priv, seconds());
 async function github(env, path, method = 'GET', data, missing = false) {
   check(env.GH_DISPATCH_TOKEN && /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(env.SOURCE_REPO), 503, 'GitHub connection is not configured');
-  const response = await fetch(`https://api.github.com/repos/${env.SOURCE_REPO}${path}`, {method, headers: {Authorization: 'Bearer ' + env.GH_DISPATCH_TOKEN, Accept: 'application/vnd.github+json', 'User-Agent': 'loghub-admin', 'X-GitHub-Api-Version': '2022-11-28', ...(data ? {'Content-Type': 'application/json'} : {})}, body: data ? JSON.stringify(data) : undefined, redirect: 'error', signal: AbortSignal.timeout(10000)});
+  const response = await fetch(`https://api.github.com/repos/${env.SOURCE_REPO}${path}`, {method, headers: {Authorization: 'Bearer ' + env.GH_DISPATCH_TOKEN, Accept: 'application/vnd.github+json', 'User-Agent': 'loghub-admin', 'X-GitHub-Api-Version': '2022-11-28', ...(data ? {'Content-Type': 'application/json'} : {})}, body: data ? JSON.stringify(data) : undefined, redirect: 'manual', signal: AbortSignal.timeout(10000)});
   if (missing && response.status === 404) return null;
   check(response.ok, 503, 'GitHub request failed; retry later');
   return response.status === 204 ? null : response.json();
@@ -20,7 +20,7 @@ async function dispatch(env, id, action) {
   await github(env, '/actions/workflows/admin-review.yml/dispatches', 'POST', {ref: 'main', inputs: {review: id, action}});
 }
 async function catalog(env) {
-  const response = await fetch(env.SITE_ORIGIN + '/catalog.json', {redirect: 'error', signal: AbortSignal.timeout(6000), cache: 'no-store'});
+  const response = await fetch(env.SITE_ORIGIN + '/catalog.json', {redirect: 'manual', signal: AbortSignal.timeout(6000), cache: 'no-store'});
   check(response.ok, 503, 'Catalog unavailable');
   const data = await response.json(); check(Array.isArray(data.projects), 503); return data.projects;
 }
@@ -40,7 +40,7 @@ async function publication(env, row) {
   const result = {status: pr.merged ? 'awaiting-deployment' : pr.state, url: pr.html_url, required_checks: [...new Set([...(required.contexts || []), ...(required.checks || []).map(c => c.context)])], strict: required.strict, checks: checks.check_runs.map(c => ({name: c.name, status: c.status, conclusion: c.conclusion, url: c.html_url})), combined: combined.state};
   if (!pr.merged) return result;
   const runs = await github(env, '/actions/workflows/catalog.yml/runs?branch=main&status=success&per_page=20');
-  const manifestResponse = await fetch(env.SITE_ORIGIN + '/deployment-manifest.json', {cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(6000)});
+  const manifestResponse = await fetch(env.SITE_ORIGIN + '/deployment-manifest.json', {cache: 'no-store', redirect: 'manual', signal: AbortSignal.timeout(6000)});
   if (!manifestResponse.ok) return result;
   const manifest = await manifestResponse.json();
   const run = runs.workflow_runs.find(r => r.head_sha === manifest.build_commit && r.event !== 'pull_request');
