@@ -10,13 +10,16 @@ page.on('pageerror',e=>errors.push(e.message));
 await context.route('**/*',route=>{const url=route.request().url();network.push(url);return url.startsWith(site+'/')||url.startsWith(api+'/')?route.continue():route.abort();});
 try{
  for(const [i,id] of ids.entries()){
-  await page.setViewportSize({width:i===0?390:1448,height:1000});await page.goto(site+'/projects/'+id+'/',{waitUntil:'networkidle'});
+  await page.setViewportSize({width:i===0?390:1448,height:1000});
+  if(i===0){let release;await page.route(api+'/projects/'+id,async route=>{await new Promise(resolve=>{release=resolve;});await route.continue();});await page.goto(site+'/projects/'+id+'/',{waitUntil:'domcontentloaded'});await expect(page.getByRole('radio').first()).toBeDisabled();await expect(page.getByRole('status')).toHaveText('Loading ratings...');await expect.poll(()=>!!release).toBeTruthy();release();await page.waitForLoadState('networkidle');await page.unroute(api+'/projects/'+id);}
+  else await page.goto(site+'/projects/'+id+'/',{waitUntil:'networkidle'});
   await expect(page.getByRole('radio')).toHaveCount(7);await expect(page.getByRole('button',{name:/sign in/i})).toHaveCount(0);
   await page.getByRole('radio',{name:'7 Dragon Balls',exact:true}).check();await expect(page.getByRole('status')).toHaveText('Rating saved: 7 out of 7.');
   await expect(page.locator('[data-ratings-project] .rating-value')).toHaveText('7.0 / 7 (1 ratings)');
   await fs.mkdir('.review/011',{recursive:true});await page.screenshot({path:'.review/011/rating-saved-'+id+'.png',fullPage:true});
   const home=await context.newPage();await home.goto(site+'/',{waitUntil:'networkidle'});await expect(home.locator(`.project-card[data-id="${id}"] .rating-value`)).toHaveText('7.0 / 7 (1 ratings)');await home.close();
-  await page.reload({waitUntil:'networkidle'});await expect(page.getByRole('radio',{name:'7 Dragon Balls',exact:true})).toBeChecked();await expect(page.getByRole('status')).toHaveText('Your saved rating: 7 out of 7.');
+  if(i===0){let release;await page.route(api+'/projects/'+id+'/mine',async route=>{await new Promise(resolve=>{release=resolve;});await route.continue();});await page.reload({waitUntil:'domcontentloaded'});await expect.poll(()=>!!release).toBeTruthy();await expect(page.getByRole('radio').first()).toBeDisabled();release();await page.waitForLoadState('networkidle');await page.unroute(api+'/projects/'+id+'/mine');}else await page.reload({waitUntil:'networkidle'});
+  await expect(page.getByRole('radio',{name:'7 Dragon Balls',exact:true})).toBeChecked();await expect(page.getByRole('status')).toHaveText('Your saved rating: 7 out of 7.');
   await page.getByRole('radio',{name:'3 Dragon Balls',exact:true}).check();await expect(page.getByRole('status')).toHaveText('Rating saved: 3 out of 7.');await page.reload({waitUntil:'networkidle'});await expect(page.getByRole('radio',{name:'3 Dragon Balls',exact:true})).toBeChecked();
   const a11y=await new AxeBuilder({page}).include('.detail-rating').analyze();assert.deepEqual(a11y.violations,[]);
   await page.getByRole('button',{name:'Remove my rating',exact:true}).click();await expect(page.getByRole('status')).toHaveText('Your rating was removed.');await expect(page.locator('[data-ratings-project] .rating-value')).toHaveText('Not rated yet');await page.reload({waitUntil:'networkidle'});await expect(page.locator('input:checked')).toHaveCount(0);

@@ -165,3 +165,5 @@ Use the Report project content Issue Form for inappropriate artwork or misleadin
 LOG-HUB-011 anonymous ratings implementation and its separate activation gate: [ratings operations](docs/launch/RATINGS.md). The live interface remains preview-only until explicitly authorized.
 
 Anonymous ratings checks and activation limits are recorded in [ratings verification](docs/launch/RATINGS-VERIFICATION.md); the runtime remains isolated from signed static publication.
+
+The [bounded ratings review](docs/launch/RATINGS-REVIEW.md) records the independent findings and their regression-tested fixes; no production ratings activation has occurred.

@@ -11,7 +11,7 @@ export async function recoverySQL(snapshot,ledger,catalog,time=Math.floor(Date.n
  for(const vote of snapshot.votes){
   if(!/^gh-[0-9]+$/.test(vote.project_id)||!validHash(vote.credential_hash)||!Number.isInteger(vote.score)||vote.score<1||vote.score>7||![0,1].includes(vote.excluded))throw Error('Invalid vote');const key=vote.project_id+':'+vote.credential_hash;if(seen.has(key))throw Error('Duplicate vote');seen.add(key);
   if(!ids.has(vote.project_id)||ledger.erasures.some(e=>e.credential_hash===vote.credential_hash&&(e.project_id==='*'||e.project_id===vote.project_id)&&e.erased_at>=snapshot.exported_at))continue;
-  const excluded=ledger.excluded_credentials.some(e=>e.credential_hash===vote.credential_hash)?1:vote.excluded;
+  const excluded=ledger.excluded_credentials.some(e=>e.credential_hash===vote.credential_hash)?1:0;
   rows.push(`INSERT INTO votes VALUES('${vote.project_id}','${vote.credential_hash}',${vote.score},${excluded});`);
  }
  for(const row of ledger.excluded_credentials)rows.push(`INSERT OR IGNORE INTO excluded_credentials VALUES('${row.credential_hash}','recovered-exclusion');`);

@@ -22,14 +22,16 @@ async function start(api){
  }
  function unavailable(id){document.querySelectorAll('[data-ratings-project]').forEach(el=>{if(el.dataset.ratingsProject===id){el.querySelector('.rating-value').textContent='Ratings unavailable';el.setAttribute('aria-label','Community ratings unavailable');el.querySelectorAll('.dragon-ball').forEach(ball=>ball.classList.add('muted'));}});}
  async function refresh(id){try{display(id,await request('/projects/'+id));}catch{unavailable(id);}}
- const ids=[...new Set([...document.querySelectorAll('[data-ratings-project]')].map(el=>el.dataset.ratingsProject))];await Promise.all(ids.map(refresh));if(!selector)return;
- const id=selector.dataset.ratingSelector;let saved=null,busy=false,queued=null;
+ const ids=[...new Set([...document.querySelectorAll('[data-ratings-project]')].map(el=>el.dataset.ratingsProject))];const aggregates=Promise.all(ids.map(refresh));if(!selector){await aggregates;return;}
+ const id=selector.dataset.ratingSelector;let saved=null,busy=false,queued=null,readVersion=0;
  const remove=document.querySelector('[data-rating-delete]');
  function selected(score){selector.querySelectorAll('input').forEach(el=>el.checked=Number(el.value)===score);}
  async function mine(){
-  try{identity=null;if(!credential()){saved=null;selected(null);remove.disabled=true;say('Choose a Dragon Ball to save a rating.');return;}
-   const data=await request('/projects/'+id+'/mine','GET',undefined,true);display(id,data);saved=data.score;selected(saved);remove.disabled=saved===null;say(data.excluded?'Your rating is excluded from community aggregates.':saved?`Your saved rating: ${saved} out of 7.`:'Choose a Dragon Ball to save a rating.');
-  }catch(error){selected(null);remove.disabled=true;say(error.message);unavailable(id);}
+  const version=++readVersion;selector.querySelectorAll('input').forEach(el=>el.disabled=true);remove.disabled=true;document.querySelector('[data-rating-erase]').disabled=true;
+  try{identity=null;if(!credential()){saved=null;selected(null);say('Choose a Dragon Ball to save a rating.');return;}
+   const data=await request('/projects/'+id+'/mine','GET',undefined,true);if(version!==readVersion||busy)return;display(id,data);saved=data.score;selected(saved);say(data.excluded?'Your rating is excluded from community aggregates.':saved?`Your saved rating: ${saved} out of 7.`:'Choose a Dragon Ball to save a rating.');
+  }catch(error){if(version===readVersion&&!busy){saved=null;selected(null);say(error.message);unavailable(id);}}
+  finally{if(version===readVersion&&!busy){selector.querySelectorAll('input').forEach(el=>el.disabled=false);remove.disabled=saved===null;document.querySelector('[data-rating-erase]').disabled=false;}}
  }
  async function save(score){
   queued=score;if(busy)return;busy=true;remove.disabled=true;
@@ -41,5 +43,5 @@ async function start(api){
  document.querySelector('[data-rating-erase]').onclick=async()=>{if(busy||!confirm('Remove all ratings made with this browser identity?'))return;busy=true;selector.querySelectorAll('input').forEach(el=>el.disabled=true);try{await request('/identity','DELETE',undefined,true);saved=null;selected(null);remove.disabled=true;await refresh(id);say('All ratings made with this browser identity were removed.');}catch(error){say(error.message);}finally{busy=false;selector.querySelectorAll('input').forEach(el=>el.disabled=false);}};
  window.addEventListener('storage',event=>{if(event.key===storage&&!busy)mine();});
  window.addEventListener('pageshow',event=>{if(event.persisted&&!busy)mine();});
- await mine();
+ await aggregates;await mine();
 }
