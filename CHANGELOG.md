@@ -1,5 +1,11 @@
 # Changelog
 
+## LOG-HUB-011: anonymous community ratings preparation
+
+- Add a separate default-off Cloudflare Worker/D1 API with hashed browser-local credentials, atomic 1–7 votes, genuine aggregates, rate limits and fraud exclusions. No sign-in or account is required.
+- Connect the existing Dragon Ball controls to anonymous autosave, reload, change and removal behind an explicit activation gate. Preserve the exact preview disclosure when disabled.
+- Add focused backend/browser/accessibility checks, privacy guidance and deletion-aware private export/recovery. Production activation remains a separate owner decision; the live static directory and signed publication safeguards remain unchanged.
+
 ## Discord community navigation
 
 - Add the owner-provided Hub Discord invite immediately after GitHub in the desktop header and to mobile navigation, with an accessible inline Discord icon. No tracking or dependencies; deployment requires owner approval.
@@ -127,3 +133,17 @@ Use the Report project content Issue Form for inappropriate artwork or misleadin
 # LOG-HUB-008: rating disclosure
 
 - Label the existing seven-ball selector as an unsaved preview; no public votes or ratings service are implied.
+
+
+LOG-HUB-011 validation: add atomic fraud-exclusion/appeal triggers and deletion-aware recovery import checks; production voting stays disabled.
+
+LOG-HUB-011 review fixes: prevent early selections during initialization, preserve successful appeals during recovery, and document explicit workers.dev activation.
+
+LOG-HUB-011 final checks: retain original aggregate typography and cover network-wide abuse limits, quota failures and isolated local D1 recovery import; keep autosave actions within the existing selector panel.
+
+
+LOG-HUB-011 owner UI refinement: remove panel copy and buttons; activating the selected ball by click or keyboard Space removes a vote, with accessible feedback and privacy outside the panel.
+
+
+LOG-HUB-011 authorized rollout: allocate the isolated ratings database and workers.dev origin; keep backend voting disabled until secret, schema and API checks pass.
+

@@ -162,4 +162,18 @@ LOG-HUB-006 independent review correction: last-artwork removal may create an em
 
 Use the Report project content Issue Form for inappropriate artwork or misleading information. Reports notify maintainers, carry no publication authority and do not automatically hide projects. Supply URLs and text only, not image attachments.
 
+LOG-HUB-011 anonymous ratings implementation and its separate activation gate: [ratings operations](docs/launch/RATINGS.md). The live interface remains preview-only until explicitly authorized.
+
+Anonymous ratings checks and activation limits are recorded in [ratings verification](docs/launch/RATINGS-VERIFICATION.md); the runtime remains isolated from signed static publication.
+
+The [bounded ratings review](docs/launch/RATINGS-REVIEW.md) records the independent findings and their regression-tested fixes; no production ratings activation has occurred.
+
+Ratings verification also covers network-wide anonymous abuse limits, oversized input and database quota failures; existing community-average typography is retained, with autosave feedback and removal controls inside the existing selector panel.
+
+
+The ratings panel uses only the two labels and Dragon Ball rows; activate the selected ball again by click or keyboard Space to remove your vote. Privacy details are linked outside the panel.
+
 Community: [Legacy of Goku Fan Server](https://discord.gg/P8qC69G3sU), using the owner-supplied Hub invite. Server administrators can inspect that code under Server Settings > Invites. Public validation confirms no expiry; unlimited-use configuration requires administrator confirmation. Discord icon: [Simple Icons](https://github.com/simple-icons/simple-icons/blob/develop/icons/discord.svg), CC0; Discord is a trademark of Discord Inc.
+
+Owner-authorized ratings rollout uses a separate Free Worker/D1 service; the source runtime remains default-off, and the protected website workflow retains artifact verification.
+
