@@ -20,9 +20,9 @@ async function limit(env,key,maximum){
 async function catalog(env){
  const response=await fetch(env.SITE_ORIGIN+'/catalog.json',{redirect:'manual',signal:AbortSignal.timeout(8000),headers:{'Cache-Control':'no-cache'}});
  if(!response.ok)fail(503,'Catalog unavailable');const data=await response.json();
- if(!Array.isArray(data.projects)||data.projects.some(p=>!/^gh-[0-9]+$/.test(p.id)))fail(503,'Catalog unavailable');return data.projects;
+ if(!Array.isArray(data.projects)||data.projects.some(p=>!/^(?:gh-[0-9]+|ext-[a-z0-9]{12})$/.test(p.id)))fail(503,'Catalog unavailable');return data.projects;
 }
-async function approved(env,id){if(!/^gh-[0-9]+$/.test(id))fail(404,'Project unavailable');if(!(await catalog(env)).some(p=>p.id===id&&p.availability==='available'))fail(404,'Project unavailable');}
+async function approved(env,id){if(!/^(?:gh-[0-9]+|ext-[a-z0-9]{12})$/.test(id))fail(404,'Project unavailable');if(!(await catalog(env)).some(p=>p.id===id&&p.availability==='available'))fail(404,'Project unavailable');}
 async function aggregate(env,id){const row=await sql(env,'SELECT total,count FROM totals WHERE project_id=?',id).first();const count=row?.count||0;return {count,average:count?row.total/count:null};}
 function credential(request){const raw=request.headers.get('Authorization')?.match(/^Bearer ([A-Za-z0-9_-]{43})$/)?.[1];if(!raw)fail(401,'Browser voting credential required');return digest(raw);}
 export async function handle(request,env){
@@ -37,7 +37,7 @@ export async function handle(request,env){
    const hash=await credential(request);await limit(env,'write:'+ip,30);
    await env.DB.batch([sql(env,'INSERT INTO erasures VALUES(?,?,?,?) ON CONFLICT(credential_hash,project_id) DO UPDATE SET erased_at=excluded.erased_at,expires=excluded.expires',hash,'*',now(),now()+604800),sql(env,'DELETE FROM votes WHERE credential_hash=?',hash)]);return json(env,{deleted:true});
   }
-  const match=/^\/projects\/(gh-[0-9]+)(\/mine)?$/.exec(url.pathname);if(!match)fail(404,'Not found');
+  const match=/^\/projects\/(gh-[0-9]+|ext-[a-z0-9]{12})(\/mine)?$/.exec(url.pathname);if(!match)fail(404,'Not found');
   const [,id,mine]=match;await approved(env,id);
   if(!mine&&request.method==='GET')return json(env,await aggregate(env,id));if(!mine)fail(405,'Method not allowed');
   const hash=await credential(request);

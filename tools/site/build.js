@@ -9,7 +9,7 @@ import {fixtureInput} from './fixtures.js';
 import {copyRealPreview} from './real-preview.js';
 import {detailImage} from './artwork.js';
 import {readSnapshot} from '../../src/publishing.js';
-import {entryApproved, verifyEntryArtwork, policyCheck} from '../../src/moderation.js';
+import {entryApproved, verifyEntryArtwork, policyCheck, ruleFor} from '../../src/moderation.js';
 const root = fileURLToPath(new URL('../../',import.meta.url));
 process.chdir(root);
 const fixture = process.argv.includes('--fixture');
@@ -18,7 +18,8 @@ if (realPreview && (process.env.GITHUB_ACTIONS || process.env.CI)) throw Error('
 if (realPreview && (fixture || process.argv.includes('--snapshot'))) throw Error('real preview cannot be combined with fixture or production input');
 const empty = process.argv.includes('--empty');
 const unfeatured = process.argv.includes('--unfeatured');
-if ((empty || unfeatured) && !fixture) throw Error('empty preview is test-only');
+const external = process.argv.includes('--external');
+if ((empty || unfeatured || external) && !fixture) throw Error('empty preview is test-only');
 const snapshot = process.argv[process.argv.indexOf('--snapshot')+1];
 const base = process.env.SITE_BASE || '/';
 if (!/^\/(?:[A-Za-z0-9_-]+\/)*$/.test(base)) throw Error('unsafe site base path');
@@ -26,7 +27,7 @@ if (!fixture && !realPreview && (!process.argv.includes('--snapshot') || !snapsh
 await fs.rm(path.join(root,'.site/input'),{recursive:true,force:true});
 await fs.mkdir(path.join(root,'.site/input/public'),{recursive:true});
 let catalog, provenance;
-if (fixture) ({catalog,provenance} = await fixtureInput(path.join(root,'.site/input'), empty, unfeatured));
+if (fixture) ({catalog,provenance} = await fixtureInput(path.join(root,'.site/input'), empty, unfeatured, external));
 else if (realPreview) {
   const source=process.argv[process.argv.indexOf('--real-preview')+1];
   if (!source || source.startsWith('--')) throw Error('real preview requires an isolated input directory');
@@ -40,13 +41,12 @@ else {
   const entries = await readSnapshot(path.resolve(snapshot));
   const eligible = new Set();
   for (const entry of entries) {
-    const rule = policy.projects.find(p=>p.repository_id===entry.repository_id);
+    const rule = ruleFor(policy,entry);
     if (entryApproved(entry,policy) && !['suspended','delisted'].includes(rule.decision) && !policy.revoked_owner_ids.includes(entry.owner_id)) {
-      await verifyEntryArtwork(entry); eligible.add(entry.repository_id);
+      await verifyEntryArtwork(entry); eligible.add(entry.id);
     }
   }
-  const excluded = new Set(catalog.projects.filter(p=>!eligible.has(p.repository_id)).map(p=>p.repository_id));
-  catalog.projects = catalog.projects.filter(p=>!excluded.has(p.repository_id));
+  catalog.projects = catalog.projects.filter(p=>eligible.has(p.id));
   const ids = new Set(catalog.projects.map(p=>p.id));
   for (const key of Object.keys(catalog.sort)) catalog.sort[key] = catalog.sort[key].filter(id=>ids.has(id));
   for (const p of catalog.projects) for (const image of [p.cover,...p.screenshots]) {
@@ -70,8 +70,8 @@ await fs.writeFile(path.join(root,'.site/input/catalog.json'),JSON.stringify(cat
 await fs.writeFile(path.join(root,'.site/input/provenance.json'),JSON.stringify(provenance));
 await fs.writeFile(path.join(root,'.site/input/public/catalog.json'),JSON.stringify(catalog));
 await fs.writeFile(path.join(root,'.site/input/public/site-provenance.json'),JSON.stringify(provenance));
-const result = spawnSync(process.execPath,[path.join(root,'node_modules/astro/bin/astro.mjs'),'build','--root',path.join(root,'website')],{stdio:'inherit',env:{...process.env,SITE_BASE:base,SITE_INPUT:path.join(root,'.site/input')},windowsHide:true});
+const result = spawnSync(process.execPath,[path.join(root,'node_modules/astro/bin/astro.mjs'),'build','--root',path.join(root,'website')],{stdio:'inherit',env:{...process.env,SITE_BASE:base,SITE_INPUT:path.join(root,'.site/input'),...(external?{PUBLIC_INTAKE_ENABLED:'true',PUBLIC_INTAKE_API:'http://127.0.0.1:4399',PUBLIC_TURNSTILE_SITE_KEY:'fixture-site-key'}:{})},windowsHide:true});
 if (result.status !== 0) process.exit(result.status || 1);
-const destination = path.join(root,realPreview?'.site/real-preview':fixture ? (empty ? '.site/empty-preview' : unfeatured ? '.site/unfeatured-preview' : '.site/preview') : '.site/production');
+const destination = path.join(root,realPreview?'.site/real-preview':fixture ? (empty ? '.site/empty-preview' : external ? '.site/external-preview' : unfeatured ? '.site/unfeatured-preview' : '.site/preview') : '.site/production');
 await fs.rm(destination,{recursive:true,force:true});await fs.rename(path.join(root,'.site/output'),destination);
 console.log(`Static site built: ${destination}; purpose=${provenance.purpose}`);

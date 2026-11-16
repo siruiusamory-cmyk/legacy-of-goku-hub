@@ -49,9 +49,9 @@ export async function payloadFiles(snapshot, catalogFile) {
   keys(registry, ['version', 'entries'], 'registry');
   for (const entry of registry.entries || []) {
     keys(entry, ['id', 'repository_id', 'owner_id', 'source', 'moderation'], 'registration');
-    keys(entry.source, ['method', 'issue', 'user_id', 'digest'], 'source');
+    keys(entry.source, ['method', 'issue', 'user_id', 'digest', 'type', 'manifest', 'claim_digest'], 'source');
     for (const name of ['issue', 'user_id']) if (entry.source[name] != null && (!Number.isSafeInteger(entry.source[name]) || entry.source[name] <= 0)) throw Error('invalid recovery source identity');
-    if (entry.source.digest != null && !HEX.test(entry.source.digest)) throw Error('invalid source digest');
+    for (const name of ['digest', 'claim_digest']) if (entry.source[name] != null && !HEX.test(entry.source[name])) throw Error('invalid source digest');
   }
   const entries = await readSnapshot(snapshot);
   const files = new Map([['registry.json', registryBytes], ['catalog.json', await regularFile(catalogFile)]]);
@@ -59,8 +59,9 @@ export async function payloadFiles(snapshot, catalogFile) {
   if (!checkCatalog(catalog)) throw Error('invalid recovery catalog schema');
   for (const entry of entries) {
     const {record, state} = entry;
-    keys(state, ['repository', 'release', 'availability', 'warning', 'ownership', 'last_updated'], 'state');
-    keys(state.repository, ['id', 'url', 'owner', 'owner_type', 'owner_id', 'archived', 'updated_at'], 'repository');
+    keys(state, ['kind', 'host', 'repository', 'release', 'availability', 'warning', 'ownership', 'last_updated'], 'state');
+    if (state.host) keys(state.host, ['id', 'owner_id'], 'host');
+    if (state.repository) keys(state.repository, ['id', 'url', 'owner', 'owner_type', 'owner_id', 'archived', 'updated_at'], 'repository');
     if (state.release) keys(state.release, ['version', 'download_url', 'file_name', 'file_size', 'release_date', 'updated_at', 'sha256'], 'release');
     if (state.ownership) keys(state.ownership, ['claim', 'representation_verified'], 'ownership');
     for (const name of [`records/${entry.id}.json`, `state/${entry.id}.json`, `assets/${entry.id}/cover.webp`, ...(record.screenshots || []).map((_, i) => `assets/${entry.id}/screenshot-${i + 1}.webp`)]) files.set(name, await regularFile(path.join(snapshot, name)));

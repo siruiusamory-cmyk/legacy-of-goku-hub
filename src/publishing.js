@@ -1,9 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import {readJSON, saveJSON, loadRecords, validateRecord} from './records.js';
+import {readJSON, saveJSON, loadRecords, validateRecord, validateAnyRecord} from './records.js';
 import {repositoryInfo, releaseInfo} from './github.js';
 import {inspectImages, writeImages} from './images.js';
 import {policyCheck, contentDigest, artworkApproved, entryApproved, verifyEntryArtwork} from './moderation.js';
+import {evaluateListing, loadListings} from './listings.js';
+import {projectKeys} from './urlkey.js';
 export {policyCheck} from './moderation.js';
 import {buildCatalog, validateState} from './catalog.js';
 import {checkDownload} from './pipeline.js';
@@ -16,11 +18,14 @@ export async function readSnapshot(root) {
   if (registry.version !== 1 || !Array.isArray(registry.entries) || registry.entries.length > 1000) throw Error('invalid snapshot registry');
   const ids = new Set(); const names = new Set(); const entries = [];
   for (const entry of registry.entries) {
-    if (!positive(entry.repository_id) || !positive(entry.owner_id) || ids.has(entry.repository_id) || names.has(entry.id) || !/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(entry.id) || entry.id.length > 64 || !['manifest', 'guided', 'legacy'].includes(entry.source?.method)) throw Error('invalid or duplicate snapshot identity');
-    ids.add(entry.repository_id); names.add(entry.id);
-    const record = validateRecord(await readJSON(path.join(root, 'records', entry.id + '.json')));
+    const external = entry.repository_id === undefined;
+    if (names.has(entry.id) || !/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(entry.id) || entry.id.length > 64 || !['manifest', 'guided', 'legacy', 'listing'].includes(entry.source?.method)) throw Error('invalid or duplicate snapshot identity');
+    if (external ? entry.source.method !== 'listing' || entry.owner_id !== undefined : !positive(entry.repository_id) || !positive(entry.owner_id) || ids.has(entry.repository_id)) throw Error('invalid or duplicate snapshot identity');
+    if (!external) ids.add(entry.repository_id);
+    names.add(entry.id);
+    const record = validateAnyRecord(await readJSON(path.join(root, 'records', entry.id + '.json')));
     const state = await readJSON(path.join(root, 'state', entry.id + '.json')); await validateState(state);
-    if (record.id !== entry.id || state.repository.id !== entry.repository_id || state.repository.owner_id !== entry.owner_id) throw Error('snapshot identity mismatch');
+    if (record.id !== entry.id || (external ? Boolean(state.repository) : state.repository?.id !== entry.repository_id || state.repository.owner_id !== entry.owner_id)) throw Error('snapshot identity mismatch');
     entries.push({...entry, record, state, files: root});
   }
   return entries;
@@ -47,7 +52,9 @@ export async function listSubmissions(api, hub) {
 export async function publish({root, previous, output, api, issues, fetcher = fetch}) {
   const policy = policyCheck(await readJSON(path.join(root, 'policy/publishing.json')));
   await fs.mkdir(output, {recursive: false});
-  const entries = new Map((await readSnapshot(previous)).map(e => [e.repository_id, e]));
+  const prior = await readSnapshot(previous);
+  const entries = new Map(prior.filter(e => e.source.method !== 'listing').map(e => [e.repository_id, e]));
+  const listingPrior = new Map(prior.filter(e => e.source.method === 'listing').map(e => [e.id, e]));
   const report = [];
   const rules = new Map(policy.projects.map(p => [p.repository_id, p]));
   for (const record of await loadRecords(root)) {
@@ -77,9 +84,24 @@ export async function publish({root, previous, output, api, issues, fetcher = fe
   const snapshot = path.join(output, 'snapshot'); const work = path.join(output, 'work');
   await fs.mkdir(path.join(work, 'records'), {recursive: true});
   await fs.mkdir(path.join(snapshot, 'records'), {recursive: true});
-  const saved = [];
+  const saved = []; const claimed = new Set();
+  const listings = await loadListings(root);
+  const listedIds = new Set([...listingPrior.keys(), ...listings.map(l => l.listing.id)]);
+  const persist = async (entry, visible) => {
+    if (entry.files !== snapshot) await copyProject(entry.files, snapshot, entry.record);
+    await saveJSON(path.join(snapshot, 'records', entry.id + '.json'), entry.record);
+    await saveJSON(path.join(snapshot, 'state', entry.id + '.json'), entry.state);
+    const {record, state, files, ...registration} = entry; saved.push(registration);
+    if (visible) {
+      await copyProject(snapshot, work, record);
+      await saveJSON(path.join(work, 'records', entry.id + '.json'), record);
+      await saveJSON(path.join(work, 'state', entry.id + '.json'), state);
+      for (const key of projectKeys({repository: state.repository?.url, source: record.source})) claimed.add(key);
+    }
+  };
   for (const repositoryId of [...new Set([...entries.keys(), ...grouped.keys()])].sort((a, b) => a - b)) {
     const prior = entries.get(repositoryId); const group = grouped.get(repositoryId); const rule = rules.get(repositoryId);
+    if (!prior && listedIds.has('gh-' + repositoryId)) { report.push({repository_id: repositoryId, issues: (group?.candidates || []).map(c => c.number), outcome: 'review', reason: 'this repository already has an approved listing; submission is a duplicate'}); continue; }
     let entry = prior; let visible = false;
     if (entry && !entryApproved(entry, policy)) { entry = undefined; report.push({repository_id: repositoryId, outcome: 'review', reason: 'restored/legacy content needs current exact-content and artwork approval'}); }
     if (entry) { await verifyEntryArtwork(entry); visible = !policy.revoked_owner_ids.includes(entry.owner_id) && !['suspended', 'delisted'].includes(rule?.decision); }
@@ -145,15 +167,37 @@ export async function publish({root, previous, output, api, issues, fetcher = fe
       if (entry && visible) entry = {...entry, state: {...entry.state, availability: 'unavailable', warning: error.message}};
     }
     if (!entry) continue;
-    if (entry.files !== snapshot) await copyProject(entry.files, snapshot, entry.record);
-    await saveJSON(path.join(snapshot, 'records', entry.id + '.json'), entry.record);
-    await saveJSON(path.join(snapshot, 'state', entry.id + '.json'), entry.state);
-    const {record, state, files, ...registration} = entry; saved.push(registration);
-    if (visible) {
-      await copyProject(snapshot, work, record);
-      await saveJSON(path.join(work, 'records', entry.id + '.json'), record);
-      await saveJSON(path.join(work, 'state', entry.id + '.json'), state);
+    await persist(entry, visible);
+  }
+  const listingRules = new Map((policy.external_projects || []).map(p => [p.project_id, p]));
+  for (const id of [...listedIds].sort()) {
+    const found = listings.find(l => l.listing.id === id); const rule = listingRules.get(id); const before = listingPrior.get(id);
+    let entry = before; let visible = false;
+    try {
+      if (entry && !entryApproved(entry, policy)) { entry = undefined; report.push({project_id: id, outcome: 'review', reason: 'restored content needs current exact-content and artwork approval'}); }
+      if (entry) { await verifyEntryArtwork(entry); visible = !policy.revoked_owner_ids.includes(entry.owner_id) && !['suspended', 'delisted'].includes(rule?.decision); }
+      if (!found) throw Error('listing file missing; saved listing retained');
+      if (!rule) throw Error('awaiting administrator approval; nothing is published');
+      if (['suspended', 'delisted'].includes(rule.decision)) { visible = false; throw Error(`policy: ${rule.decision}; ${rule.reason || 'administrator decision'}`); }
+      if (rule.decision === 'review') throw Error('project explicitly held for review; snapshot frozen');
+      const done = await evaluateListing({listing: found.listing, dir: found.dir, rule, prior: before, api, fetcher});
+      if (done.repository_id !== undefined && entries.has(done.repository_id)) throw Error('this repository already has an approved listing; duplicate');
+      const collision = projectKeys({repository: done.state.repository?.url, source: done.record.source}).find(key => claimed.has(key));
+      if (collision) throw Error(`duplicate project address ${collision}; one listing per project`);
+      if (!artworkApproved(rule, id, done.inspected.artwork) || !rule.content_digests?.includes(done.contentApproved)) {
+        report.push({project_id: id, outcome: 'review', content_digest: done.initialDigest, artwork: done.inspected.artwork, reason: 'explicit content and exact artwork-set approval required; review locally with tools/moderation-review.js; no image bytes staged'});
+        throw Error('content/artwork pending administrator review; last approved listing retained');
+      }
+      await writeImages(done.record, snapshot, done.inspected.outputs);
+      entry = {id, ...(done.repository_id !== undefined ? {repository_id: done.repository_id, owner_id: done.owner_id} : {}), moderation: {initial_content_digest: done.contentApproved, artwork: done.inspected.artwork},
+        source: {method: 'listing', type: done.record.source.type, ...(done.manifested ? {manifest: true} : {}), ...(done.claimDigest ? {claim_digest: done.claimDigest} : {})}, record: rule.featured ? {...done.record, featured: true} : done.record, state: done.state, files: snapshot};
+      visible = !policy.revoked_owner_ids.includes(entry.owner_id);
+      report.push({project_id: id, outcome: 'published', claim: done.ownership.claim});
+    } catch (error) {
+      if (!report.some(r => r.project_id === id && r.outcome === 'review')) report.push({project_id: id, outcome: visible ? 'retained' : 'review', reason: error.message});
+      if (entry && visible) entry = {...entry, state: {...entry.state, availability: 'unavailable', warning: error.message}};
     }
+    if (entry) await persist(entry, visible);
   }
   await saveJSON(path.join(snapshot, 'registry.json'), {version: 1, entries: saved});
   const catalog = await buildCatalog(work);

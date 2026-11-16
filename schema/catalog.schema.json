@@ -34,7 +34,8 @@
     },
     "project": {
       "type": "object", "additionalProperties": false,
-      "required": ["id", "title", "developer", "description", "game", "category", "status", "featured", "repository", "repository_id", "archived", "availability", "warning", "cover", "screenshots", "release", "last_updated", "search_text"],
+      "anyOf": [{"required": ["repository", "repository_id", "archived"]}, {"required": ["source"]}],
+      "required": ["id", "title", "developer", "description", "game", "category", "status", "featured", "availability", "warning", "cover", "screenshots", "release", "last_updated", "search_text"],
       "properties": {
         "id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$", "maxLength": 64},
         "title": {"type": "string", "minLength": 1, "maxLength": 100},
@@ -45,7 +46,9 @@
         "status": {"enum": ["in-development", "released", "on-hold", "discontinued"]},
         "featured": {"type": "boolean"},
         "links": {"type": "array", "maxItems": 6, "items": {"type": "object", "additionalProperties": false, "required": ["label", "url"], "properties": {"label": {"type": "string"}, "url": {"type": "string"}}}},
-        "ownership": {"type": "object", "additionalProperties": false, "required": ["claim", "representation_verified"], "properties": {"claim": {"enum": ["unclaimed", "repository-controlled", "verified-representative"]}, "representation_verified": {"type": "boolean"}}},
+        "ownership": {"type": "object", "additionalProperties": false, "required": ["claim", "representation_verified"], "properties": {"claim": {"enum": ["unclaimed", "repository-controlled", "verified-representative", "verified-claim"]}, "representation_verified": {"type": "boolean"}}},
+        "source": {"type": "object", "additionalProperties": false, "required": ["type"], "properties": {"type": {"enum": ["github", "git", "website", "forum", "platform", "none"]}, "url": {"type": "string", "maxLength": 500}, "also_known_at": {"type": "array", "maxItems": 8, "items": {"type": "string", "maxLength": 500}}}},
+        "distribution": {"type": "object", "additionalProperties": false, "required": ["label", "url", "kind"], "properties": {"label": {"type": "string", "maxLength": 32}, "url": {"type": "string", "maxLength": 500}, "kind": {"enum": ["patch", "page"]}}},
         "repository": {"type": "string", "pattern": "^https://github\\.com/"},
         "repository_id": {"type": "integer", "minimum": 1},
         "archived": {"type": "boolean"},

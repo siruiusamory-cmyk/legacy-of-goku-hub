@@ -5,6 +5,10 @@ import {readJSON, repoSlug, validateRecord} from './records.js';
 const schema = await readJSON(new URL('../schema/manifest.schema.json', import.meta.url));
 const validate = new Ajv({allErrors: true}).compile(schema);
 export const digest = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+export function checkManifest(metadata) {
+  if (!validate(metadata)) throw Error('manifest: ' + validate.errors.map(e => `${e.instancePath || '/'} ${e.message}`).join('; '));
+  return metadata;
+}
 export function fields(body) {
   if (typeof body !== 'string' || body.length > 16000) throw Error('form: maximum 16000 characters');
   const result = Object.create(null);

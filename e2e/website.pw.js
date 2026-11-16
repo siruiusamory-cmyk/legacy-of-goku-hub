@@ -57,7 +57,7 @@ test('empty catalog is polished, honest, unrated and contains no synthetic proje
   await page.goto('http://127.0.0.1:4322/');
   expect(await (await page.request.get('http://127.0.0.1:4322/site-provenance.json')).json()).toMatchObject({purpose:'fixture'});
   await expect(page.getByRole('heading',{name:'The adventure starts here.'})).toBeVisible();
-  await expect(page.getByRole('link',{name:'Submit your project'})).toHaveAttribute('href',/issues\/new\/choose$/);
+  await expect(page.getByRole('link',{name:'Submit your project'})).toHaveAttribute('href','/submit/');
   await expect(page.locator('.project-card')).toHaveCount(0);
   await expect(page.getByRole('heading',{level:1})).toContainText('A new home');
 });

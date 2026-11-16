@@ -21,6 +21,7 @@ jobs:
       - run: npm run site:fixture
       - run: node tools/site/build.js --fixture --empty
       - run: node tools/site/build.js --fixture --unfeatured
+      - run: node tools/site/build.js --fixture --external
       - run: npm run test:browser
         env:
           PLAYWRIGHT_CHANNEL: chrome

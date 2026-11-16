@@ -1,0 +1,29 @@
+{
+  "name": "loghub-intake",
+  "main": "worker.js",
+  "compatibility_date": "2026-07-02",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": false
+  },
+  "vars": {
+    "INTAKE_ENABLED": "false",
+    "SITE_ORIGIN": "https://loghub.pages.dev",
+    "API_ORIGIN": "https://loghub-intake.siruiusamory.workers.dev",
+    "MAX_PENDING": "300"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "loghub-intake",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "17 * * * *"
+    ]
+  }
+}

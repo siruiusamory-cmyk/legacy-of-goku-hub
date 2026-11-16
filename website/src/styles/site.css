@@ -1662,3 +1662,14 @@ h1,h2,h3,.developer,.detail-developer,.spotlight-description,.detail-intro {
 [data-category="resource"] .detail-art {object-fit: contain;}
 
 .detail-columns {align-items: start;}
+
+.detail-feedback {
+  margin: 14px 0 0;
+  font-size: var(--text-small);
+}
+.detail-feedback a {
+  text-decoration: underline;
+}
+.external-note {
+  border-style: dashed;
+}
