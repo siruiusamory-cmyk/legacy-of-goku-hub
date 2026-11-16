@@ -22,7 +22,7 @@ try{
   await expect(page.getByRole('radio',{name:'7 Dragon Balls',exact:true})).toBeChecked();await expect(page.getByRole('status')).toHaveText('Your saved rating: 7 out of 7.');
   await page.getByRole('radio',{name:'3 Dragon Balls',exact:true}).check();await expect(page.getByRole('status')).toHaveText('Rating saved: 3 out of 7.');await page.reload({waitUntil:'networkidle'});await expect(page.getByRole('radio',{name:'3 Dragon Balls',exact:true})).toBeChecked();
   const a11y=await new AxeBuilder({page}).include('.detail-rating').analyze();assert.deepEqual(a11y.violations,[]);
-  await page.getByRole('radio',{name:'3 Dragon Balls',exact:true}).click();await expect(page.getByRole('status')).toHaveText('Your rating was removed.');await expect(page.locator('[data-ratings-project] .rating-value')).toHaveText('Not rated yet');await page.reload({waitUntil:'networkidle'});await expect(page.locator('input:checked')).toHaveCount(0);
+  if(i===0){await page.getByRole('radio',{name:'3 Dragon Balls',exact:true}).focus();await page.getByRole('radio',{name:'3 Dragon Balls',exact:true}).press('Space');}else await page.getByRole('radio',{name:'3 Dragon Balls',exact:true}).click();await expect(page.getByRole('status')).toHaveText('Your rating was removed.');await expect(page.locator('[data-ratings-project] .rating-value')).toHaveText('Not rated yet');await page.reload({waitUntil:'networkidle'});await expect(page.locator('input:checked')).toHaveCount(0);
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  }
  const token=await page.evaluate(()=>localStorage.getItem('loghub-anonymous-rating-credential'));assert.match(token,/^[A-Za-z0-9_-]{43}$/);
@@ -34,3 +34,4 @@ try{
  await fs.mkdir('.review/011',{recursive:true});await page.screenshot({path:'.review/011/browser-error.png',fullPage:true});await fs.writeFile('.review/011/BROWSER.json',JSON.stringify({status:'PASS',backend:'Actual local Wrangler 4.105.0/workerd and D1; no mocked votes',ids,save_reload_change_remove:true,anonymous:true,accessibility_violations:0,backend_failure_unavailable:true,credential_not_returned_by_public_api:true,production_contacted:false},null,2));
  console.log('PASS: anonymous browser save/reload/change/remove across all three IDs; accessibility and unavailable states.');
 }finally{await context.close();await browser.close();}
+

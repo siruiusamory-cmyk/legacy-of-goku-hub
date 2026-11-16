@@ -174,3 +174,5 @@ Ratings verification also covers network-wide anonymous abuse limits, oversized 
 The ratings panel uses only the two labels and Dragon Ball rows; activate the selected ball again to remove your vote. Privacy details are linked outside the panel.
 
 Community: [Legacy of Goku Fan Server](https://discord.gg/P8qC69G3sU), using the owner-supplied Hub invite. Server administrators can inspect that code under Server Settings > Invites. Public validation confirms no expiry; unlimited-use configuration requires administrator confirmation. Discord icon: [Simple Icons](https://github.com/simple-icons/simple-icons/blob/develop/icons/discord.svg), CC0; Discord is a trademark of Discord Inc.
+
+Owner-authorized ratings rollout uses a separate Free Worker/D1 service; the source runtime remains default-off, and the protected website workflow retains artifact verification.

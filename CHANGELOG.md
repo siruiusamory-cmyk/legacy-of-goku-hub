@@ -144,3 +144,5 @@ LOG-HUB-011 final checks: retain original aggregate typography and cover network
 
 LOG-HUB-011 owner UI refinement: remove panel copy and buttons; activating the selected ball removes a vote, with accessible feedback and privacy outside the panel.
 
+
+LOG-HUB-011 authorized rollout: allocate the isolated ratings database and workers.dev origin; keep backend voting disabled until secret, schema and API checks pass.

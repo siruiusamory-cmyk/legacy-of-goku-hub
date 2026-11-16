@@ -1,6 +1,6 @@
 # LOG-HUB-011 verification
 
-Status: implementation prepared; production activation remains owner-gated. Latest owner decision is anonymous voting, superseding the earlier OAuth proposal. No sign-in code, app credential or account workflow is required.
+Status: implementation verified; the owner has now authorized merge/deployment, pending successful production checks. Latest owner decision is anonymous voting, superseding the earlier OAuth proposal. No sign-in code, app credential or account workflow is required.
 
 - Thirteen focused backend/recovery tests pass: three approved IDs, anonymous save/read/edit/delete, concurrent upserts and averages, credential isolation, invalid inputs, Origin/CORS, identity-wide removal, fraud exclusion/appeal/recreation, removed projects, database constraints, abuse limits and unavailable-state handling.
 - Eight connected workflow/artifact tests pass (21 combined): signed static transfer inventory, stale-source/policy rejection, root-only/static-only artifacts, exact Cloudflare target and immutable Actions/permissions boundaries.
@@ -9,7 +9,8 @@ Status: implementation prepared; production activation remains owner-gated. Late
 - Local Wrangler private export helper, fresh SQLite recovery import, and actual isolated local D1 SQL import pass. Recovery excludes a later-erased identity, restores another as excluded, recomputes eligible totals and preserves unexpired deletion markers. Remote database restore is deliberately not exercised before authorization.
 - One bounded read-only Zeroshot review completed: 01a1e286-0b16-71a0-9aaf-4985d302de62. Its two original correctness blockers and one advisory were resolved with targeted regressions; see [original findings and resolutions](RATINGS-REVIEW.md). No independent post-fix PASS is claimed.
 
-Local detailed evidence lives in ignored .review/011/BROWSER.json, RECOVERY.json and screenshots; it includes no raw browser credential. No new production database/API, paid feature, catalog data, moderation policy or backup change was made. The existing live directory remains available and preview-only. A public live anonymous rating is not claimed before owner activation.
+Local detailed evidence lives in ignored .review/011/BROWSER.json, RECOVERY.json and screenshots; it includes no raw browser credential. Owner-authorized production provisioning has allocated the ratings database and applied its three migrations; API voting remains gated during rollout. No paid feature, catalog data, moderation policy or backup change is made. The existing live directory remains available and preview-only. A public live anonymous rating is not claimed before owner activation.
+
 
 
 

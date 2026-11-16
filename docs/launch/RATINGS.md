@@ -1,6 +1,6 @@
 # Anonymous community ratings (LOG-HUB-011)
 
-Owner's anonymous-voting decision supersedes the earlier GitHub-auth proposal and LOG-HUB-008 recommendation. No OAuth, sign-in, account, email or identity-provider credentials are needed. Production activation is NOT authorized by this implementation.
+Owner's anonymous-voting decision supersedes the earlier GitHub-auth proposal and LOG-HUB-008 recommendation. No OAuth, sign-in, account, email or identity-provider credentials are needed. Production activation required a separate owner decision. The owner authorized merge and deployment after the simplified panel was verified; the operations below remain mandatory.
 
 ## Design and boundaries
 
@@ -8,7 +8,7 @@ The existing seven-ball selector automatically PUTs an integer 1-7. The detail p
 
 A separate Worker serves JSON only on its own workers.dev origin. Exact-origin CORS and Origin checks protect writes; no credentialed cookies or third-party-cookie dependency exists. A bearer credential is required to inspect/change/remove that identity's vote. Public aggregate requests return only count and average. The API fetches the current published site's catalog with redirects rejected before every project operation; only available approved published gh-numeric IDs are accepted. Catalog failure rejects requests. Removed projects disappear from the API immediately on the next fetched catalog, and a ten-minute cron purges their rows. Short source-publication/network races cannot provide atomic cross-service moderation. Stop the API if immediate withdrawal is required.
 
-Static Pages builds and uploads retain their signed recovery/current-policy/same-run immutable-artifact checks; no Worker/Function/database binding enters that artifact. Worker code/config/migrations are separate and never uploaded by the Pages workflow. The catalog workflow only passes two default-off PUBLIC_ variables for a later explicitly authorized UI activation. Worker observability is off. No production runtime, database, paid plan or credential was created by this PR.
+Static Pages builds and uploads retain their signed recovery/current-policy/same-run immutable-artifact checks; no Worker/Function/database binding enters that artifact. Worker code/config/migrations are separate and never uploaded by the Pages workflow. The catalog workflow only passes two default-off PUBLIC_ variables for a later explicitly authorized UI activation. Worker observability is off. Production provisioning is separate from static publication and requires the recorded owner authorization; no paid plan or feature is selected.
 
 ## Schema and API
 
@@ -69,12 +69,13 @@ The helper validates inputs, excludes removed projects, reapplies later deletion
 ## Production activation gate - separate owner decision
 
 1. Review the PR, bounded Zeroshot findings and green hosted checks; merge only after owner review. The live site continues preview voting meanwhile. No need to disable existing static publication or signed recovery.
-2. Owner authorizes production Worker/D1 creation and activation separately. Confirm Workers Free/$0. Create exactly one ratings database and a separate loghub-ratings Worker, using pinned Wrangler on reviewed protected main. Replace the all-zero database ID only with the actual allocated ID. Only after authorization set workers_dev=true (the template deliberately disables it), and configure the exact allocated workers.dev API_ORIGIN and SITE_ORIGIN=https://loghub.pages.dev. Do not proxy/intercept Pages, add Pages Functions, change DNS, or share Pages/backup credentials.
+2. Owner authorizes production Worker/D1 creation and activation separately. Confirm Workers Free/$0. Create exactly one ratings database and a separate loghub-ratings Worker, using pinned Wrangler on reviewed protected main. The authorized production database is loghub-ratings (a90fe4fa-dc7f-4b9a-8d26-51c2e968f72c). Retain its identity; never silently replace it. The owner-authorized config now enables workers_dev at https://loghub-ratings.siruiusamory.workers.dev; backend RATINGS_ENABLED remains false by default. SITE_ORIGIN remains https://loghub.pages.dev. Do not proxy/intercept Pages, add Pages Functions, change DNS, or share Pages/backup credentials.
 3. Store a random RATE_SALT as a Worker secret using secure stdin. No GitHub OAuth credentials needed. Any deployment token must be account-scoped Workers Scripts Edit/D1 Edit in a separately restricted environment, never the Pages deployment job. Owner dashboard authentication may be necessary. No Worker credential or database ID is guessed.
 4. Apply migrations with the backend RATINGS_ENABLED=false. Deploy reviewed Worker separately; observability remains off, no paid resources. Reconfirm CORS, catalog identity, aggregate endpoint, quota plan and rejection when gated off.
 5. After explicit production voting approval, set backend RATINGS_ENABLED=true, verify unauthenticated aggregates and an authorized real anonymous test save/change/remove. Then set repository RATINGS_API_ORIGIN to the verified HTTPS Worker origin and RATINGS_ENABLED=true. Dispatch existing protected catalog.yml: signed publication and SAME sealed static artifact checks still apply. API/website toggles are separate; a failed API is never displayed as a submitted vote.
 6. Verify real public desktop/mobile selection autosaves, reload persistence, edit/removal, card averages, all three IDs, privacy and errors. Do not count test votes in launch statistics: remove them. Record runtime version/database/migration and site workflow IDs. Only then declare live ratings.
 7. Emergency: backend RATINGS_ENABLED=false stops API activity and shows unavailable where the enabled UI is deployed. Set repository RATINGS_ENABLED=false and republish through protected catalog.yml to restore the EXACT Preview only disclosure. Neither gate changes or unpublishes the directory. Never roll back its moderation policy or signed backup to repair ratings.
+
 
 
 

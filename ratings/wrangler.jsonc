@@ -2,14 +2,27 @@
   "name": "loghub-ratings",
   "main": "worker.js",
   "compatibility_date": "2026-07-02",
-  "workers_dev": false,
+  "workers_dev": true,
   "preview_urls": false,
-  "observability": {"enabled": false},
+  "observability": {
+    "enabled": false
+  },
   "vars": {
     "RATINGS_ENABLED": "false",
     "SITE_ORIGIN": "https://loghub.pages.dev",
-    "API_ORIGIN": "https://ratings-not-configured.invalid"
+    "API_ORIGIN": "https://loghub-ratings.siruiusamory.workers.dev"
   },
-  "d1_databases": [{"binding": "DB", "database_name": "loghub-ratings", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations"}],
-  "triggers": {"crons": ["*/10 * * * *"]}
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "loghub-ratings",
+      "database_id": "a90fe4fa-dc7f-4b9a-8d26-51c2e968f72c",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "*/10 * * * *"
+    ]
+  }
 }
