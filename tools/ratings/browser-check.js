@@ -13,7 +13,7 @@ try{
   await page.setViewportSize({width:i===0?390:1448,height:1000});
   if(i===0){let release;await page.route(api+'/projects/'+id,async route=>{await new Promise(resolve=>{release=resolve;});await route.continue();});await page.goto(site+'/projects/'+id+'/',{waitUntil:'domcontentloaded'});await expect(page.getByRole('radio').first()).toBeDisabled();await expect(page.getByRole('status')).toHaveText('Loading ratings...');await expect.poll(()=>!!release).toBeTruthy();release();await page.waitForLoadState('networkidle');await page.unroute(api+'/projects/'+id);}
   else await page.goto(site+'/projects/'+id+'/',{waitUntil:'networkidle'});
-  await expect(page.getByRole('radio')).toHaveCount(7);await expect(page.getByRole('button',{name:/sign in/i})).toHaveCount(0);
+  await expect(page.getByRole('radio')).toHaveCount(7);await expect(page.locator('.detail-rating button')).toHaveCount(0);await expect(page.locator('.detail-rating a')).toHaveCount(0);await expect(page.getByRole('heading',{name:'Your Rating',exact:true})).toBeVisible();await expect(page.locator('[data-rating-status]')).toHaveClass('sr-only');
   await page.getByRole('radio',{name:'7 Dragon Balls',exact:true}).check();await expect(page.getByRole('status')).toHaveText('Rating saved: 7 out of 7.');
   await expect(page.locator('[data-ratings-project] .rating-value')).toHaveText('7.0 / 7 (1 ratings)');
   await fs.mkdir('.review/011',{recursive:true});await page.screenshot({path:'.review/011/rating-saved-'+id+'.png',fullPage:true});
@@ -22,7 +22,7 @@ try{
   await expect(page.getByRole('radio',{name:'7 Dragon Balls',exact:true})).toBeChecked();await expect(page.getByRole('status')).toHaveText('Your saved rating: 7 out of 7.');
   await page.getByRole('radio',{name:'3 Dragon Balls',exact:true}).check();await expect(page.getByRole('status')).toHaveText('Rating saved: 3 out of 7.');await page.reload({waitUntil:'networkidle'});await expect(page.getByRole('radio',{name:'3 Dragon Balls',exact:true})).toBeChecked();
   const a11y=await new AxeBuilder({page}).include('.detail-rating').analyze();assert.deepEqual(a11y.violations,[]);
-  await page.getByRole('button',{name:'Remove my rating',exact:true}).click();await expect(page.getByRole('status')).toHaveText('Your rating was removed.');await expect(page.locator('[data-ratings-project] .rating-value')).toHaveText('Not rated yet');await page.reload({waitUntil:'networkidle'});await expect(page.locator('input:checked')).toHaveCount(0);
+  await page.getByRole('radio',{name:'3 Dragon Balls',exact:true}).click();await expect(page.getByRole('status')).toHaveText('Your rating was removed.');await expect(page.locator('[data-ratings-project] .rating-value')).toHaveText('Not rated yet');await page.reload({waitUntil:'networkidle'});await expect(page.locator('input:checked')).toHaveCount(0);
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  }
  const token=await page.evaluate(()=>localStorage.getItem('loghub-anonymous-rating-credential'));assert.match(token,/^[A-Za-z0-9_-]{43}$/);

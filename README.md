@@ -170,3 +170,5 @@ The [bounded ratings review](docs/launch/RATINGS-REVIEW.md) records the independ
 
 Ratings verification also covers network-wide anonymous abuse limits, oversized input and database quota failures; existing community-average typography is retained, with autosave feedback and removal controls inside the existing selector panel.
 
+
+The ratings panel uses only the two labels and Dragon Ball rows; activate the selected ball again to remove your vote. Privacy details are linked outside the panel.
