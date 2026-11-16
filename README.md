@@ -1,4 +1,23 @@
+<!-- TODO: add docs/banner.png (900px wide) and social-preview asset -->
 # Legacy of Goku Hub
+
+**A community catalog for Legacy of Goku projects, open to everyone.**
+
+![License MIT](https://img.shields.io/badge/license-MIT-blue) ![Platform Claude Code](https://img.shields.io/badge/platform-Claude%20Code-d4a017) ![Submission routes 4](https://img.shields.io/badge/submission%20routes-4-555)
+
+## Contents
+
+- [Submit a project](#submit-a-project-no-account-needed)
+- [Legacy of Goku visual identity](#legacy-of-goku-visual-identity)
+- [Run locally on Windows](#run-locally-on-windows)
+- [Submit without editing hub source](#submit-without-editing-hub-source)
+- [Manifest v1](#manifest-v1)
+
+<!-- TODO: add demo GIF of the /submit/ flow -->
+
+## Submit a project (no account needed)
+
+LOG-HUB-012 adds a native **/submit/** page: paste an address, name the project, describe it, review, send. No GitHub account, repository, public source or registration is required, and projects with no repository get a hub-assigned `ext-` ID. Add, Suggest, Correct and Claim are separate actions; a suggestion never grants ownership. Links say what they are: View Repository, Visit Project, Download Patch (approved distributions only). Submissions stay off until the owner activates them. Details: [submissions guide](docs/launch/SUBMISSIONS.md).
 
 LOG-HUB-010 prepares **Cloudflare Pages Free**, project `loghub`, exact URL **https://loghub.pages.dev/** and root base `/`. [Owner setup](docs/launch/CLOUDFLARE.md) and [deployment/rollback checklist](docs/launch/DEPLOYMENT.md) supersede the earlier GitHub Pages target. Deployment stays disabled; no account/project/credential setup or public upload has been performed. No alternate URL, domain purchase or paid service is authorized.
 

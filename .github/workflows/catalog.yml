@@ -272,6 +272,9 @@ jobs:
           SITE_BASE: /
           PUBLIC_RATINGS_ENABLED: ${{ vars.RATINGS_ENABLED }}
           PUBLIC_RATINGS_API: ${{ vars.RATINGS_API_ORIGIN }}
+          PUBLIC_INTAKE_ENABLED: ${{ vars.INTAKE_ENABLED }}
+          PUBLIC_INTAKE_API: ${{ vars.INTAKE_API_ORIGIN }}
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
       - run: node src/backup-cli.js config
         env:
           GH_TOKEN: ${{ github.token }}

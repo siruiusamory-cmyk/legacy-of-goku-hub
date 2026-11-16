@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import Ajv from 'ajv';
+import {isListing, validateListing} from './listing-schema.js';
 
 const schema = JSON.parse(await fs.readFile(new URL('../schema/project.schema.json', import.meta.url)));
 const check = new Ajv({allErrors: true}).compile(schema);
@@ -46,11 +47,16 @@ export function parseIssue(body) {
   if (!match || (body.match(/```json/g) || []).length !== 1) throw Error('Project record: supply exactly one fenced JSON object');
   return JSON.parse(match[1]);
 }
+export function validateAnyRecord(record, existing = []) {
+  if (!isListing(record)) return validateRecord(record, existing.filter(p => !isListing(p)));
+  if (existing.some(p => p.id === record.id)) throw Error('duplicate project ID');
+  return validateListing(record);
+}
 export async function loadRecords(root) {
   const names = (await fs.readdir(path.join(root, 'records'))).filter(n => n.endsWith('.json')).sort();
   const records = [];
   for (const name of names) {
-    const record = validateRecord(await readJSON(path.join(root, 'records', name)), records);
+    const record = validateAnyRecord(await readJSON(path.join(root, 'records', name)), records);
     if (name !== `${record.id}.json`) throw Error(`record filename must be ${record.id}.json`);
     records.push(record);
   }
