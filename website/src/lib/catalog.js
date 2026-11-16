@@ -19,3 +19,6 @@ export const featuredLabel = project => project.category === 'tool' ? 'Featured 
 export const ratingsAPI = import.meta.env.PUBLIC_RATINGS_ENABLED === 'true' ? import.meta.env.PUBLIC_RATINGS_API : '';
 if (import.meta.env.PUBLIC_RATINGS_ENABLED === 'true' && !ratingsAPI) throw Error('Enabled ratings requires an API origin');
 if (ratingsAPI && (!/^https:\/\/[a-z0-9.-]+$/.test(ratingsAPI) && !/^http:\/\/127\.0\.0\.1:[0-9]+$/.test(ratingsAPI))) throw Error('Ratings requires an explicit API origin');
+
+
+export const discordURL = 'https://discord.gg/P8qC69G3sU';

@@ -6,6 +6,10 @@
 - Connect the existing Dragon Ball controls to anonymous autosave, reload, change and removal behind an explicit activation gate. Preserve the exact preview disclosure when disabled.
 - Add focused backend/browser/accessibility checks, privacy guidance and deletion-aware private export/recovery. Production activation remains a separate owner decision; the live static directory and signed publication safeguards remain unchanged.
 
+## Discord community navigation
+
+- Add the owner-provided Hub Discord invite immediately after GitHub in the desktop header and to mobile navigation, with an accessible inline Discord icon. No tracking or dependencies; deployment requires owner approval.
+
 ## LOG-HUB-010: Cloudflare Pages launch preparation
 
 - Replace the disabled GitHub Pages target with pinned Cloudflare Pages Direct Upload for loghub.pages.dev at `/`, preserving verified catalog publication and all three approved resources.
@@ -139,3 +143,4 @@ LOG-HUB-011 final checks: retain original aggregate typography and cover network
 
 
 LOG-HUB-011 owner UI refinement: remove panel copy and buttons; activating the selected ball removes a vote, with accessible feedback and privacy outside the panel.
+
