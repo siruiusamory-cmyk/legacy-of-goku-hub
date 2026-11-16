@@ -16,3 +16,6 @@ export const formatDate = value => new Intl.DateTimeFormat('en-US', {month: 'sho
 export const formatSize = size => size < 1048576 ? `${(size / 1024).toFixed(1)} KB` : `${(size / 1048576).toFixed(1)} MB`;
 
 export const featuredLabel = project => project.category === 'tool' ? 'Featured Tool' : project.category === 'resource' ? 'Featured Resource' : 'Featured Game';
+export const ratingsAPI = import.meta.env.PUBLIC_RATINGS_ENABLED === 'true' ? import.meta.env.PUBLIC_RATINGS_API : '';
+if (import.meta.env.PUBLIC_RATINGS_ENABLED === 'true' && !ratingsAPI) throw Error('Enabled ratings requires an API origin');
+if (ratingsAPI && (!/^https:\/\/[a-z0-9.-]+$/.test(ratingsAPI) && !/^http:\/\/127\.0\.0\.1:[0-9]+$/.test(ratingsAPI))) throw Error('Ratings requires an explicit API origin');

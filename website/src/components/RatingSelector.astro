@@ -1,12 +1,11 @@
 ---
 import Ball from './Ball.astro';
+import {ratingsAPI,href} from '../lib/catalog.js';
+const {projectId} = Astro.props;
 ---
-<div class="rating-selector"><h2 class="panel-title" id="rating-selector-title">Preview only · not saved</h2>
+<div class="rating-selector" data-rating-selector={ratingsAPI ? projectId : undefined}><h2 class="panel-title" id="rating-selector-title">{ratingsAPI ? 'Your rating' : 'Preview only · not saved'}</h2>
 <fieldset aria-labelledby="rating-selector-title"><div class="rating-options">{Array.from({length:7},(_,i)=><label class="rating-option"><input type="radio" name="rating-preview" autocomplete="off" value={i+1} aria-label={`${i+1} ${i === 0 ? 'Dragon Ball' : 'Dragon Balls'}`}/><span class="rating-choice"><Ball number={i+1}/></span></label>)}</div></fieldset></div>
+{ratingsAPI && <div class="rating-actions"><p role="status" aria-live="polite" data-rating-status>Choose a Dragon Ball to save a rating.</p><button class="button secondary" data-rating-delete disabled>Remove my rating</button><p>Your rating is saved to this browser identity. Clearing browser data loses access to previous ratings and may let you vote again.</p><a href={href('ratings-privacy/')}>Ratings privacy</a><button class="button secondary" data-rating-erase>Remove all my browser ratings</button></div>}
 <script>
-  document.querySelectorAll('.rating-selector').forEach(selector => {
-    window.addEventListener('pageshow', () => {
-      selector.querySelectorAll('input').forEach(input => {input.checked = false;});
-    });
-  });
+ document.querySelectorAll('.rating-selector').forEach(selector=>{if(selector.hasAttribute('data-rating-selector'))return;window.addEventListener('pageshow',()=>selector.querySelectorAll('input').forEach(input=>{input.checked=false;}));});
 </script>

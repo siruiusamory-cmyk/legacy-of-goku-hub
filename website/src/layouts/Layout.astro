@@ -1,5 +1,5 @@
 ---
-import {href, sourceURL, submitURL, provenance} from '../lib/catalog.js';
+import {href, sourceURL, submitURL, provenance, ratingsAPI} from '../lib/catalog.js';
 import Ball from '../components/Ball.astro';
 import Icon from '../components/Icon.astro';
 import Scenery from '../components/Scenery.astro';
@@ -15,4 +15,6 @@ const {title = 'Legacy of Goku Hub', description = 'Community ROM hacks, fan pro
   <nav class="desktop-nav" aria-label="Main navigation"><a class="active" href={href('#directory')}>Projects</a><a href={submitURL}>Submit</a><a href={sourceURL}><Icon name="github"/> GitHub</a></nav>
   <details class="mobile-nav"><summary aria-label="Open navigation"><Icon name="menu"/></summary><nav aria-label="Mobile navigation"><a href={href('#directory')}>Projects</a><a href={submitURL}>Submit a project</a><a href={sourceURL}>GitHub</a></nav></details>
 </div></header>{provenance.purpose === 'real-preview' && <aside class="preview-notice" role="note">Isolated real-repository preview. Not approved for the public catalog. These listings are tools and development resources, not playable ROM hacks.</aside>}<slot/><footer class="site-footer"><p>A community home for the Legacy of Goku series.</p><a href={submitURL}>Submit a project</a><a href={sourceURL}>Contribute on GitHub</a><p>Fan projects. No ROMs hosted.</p>{provenance.purpose === 'fixture' && <strong class="fixture-notice">ISOLATED DESIGN FIXTURES · Not community listings</strong>}</footer>
+{ratingsAPI && <div data-ratings-api={ratingsAPI} hidden></div>}
+<script>import '../lib/ratings-client.js';</script>
 </body></html>

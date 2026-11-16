@@ -10,6 +10,6 @@ const {project} = Astro.props;
   <a class="card-art" href={projectURL(project)} tabindex="-1" aria-hidden="true"><ProjectArtwork src={href(project.cover)}/></a>
   <div class="card-content"><h3><a href={projectURL(project)}>{project.title}</a></h3><p class="developer">by {project.developer}</p>
     <div class="card-meta"><Badges project={project}/><div class="card-actions"><a class="icon-button" href={project.repository} aria-label={`View ${project.title} repository`} rel="noopener noreferrer"><Icon name="github"/></a>{project.release && project.availability === 'available' && <a class="icon-button" href={project.release.download_url} aria-label={`Download ${project.title} from GitHub`} rel="noopener noreferrer"><Icon name="download"/></a>}</div></div>
-    <Rating {...rating(project)} compact/>
+    <Rating {...rating(project)} projectId={project.id} compact/>
   </div>
 </article>

@@ -270,6 +270,8 @@ jobs:
       - run: npm run site:build -- --snapshot .previous
         env:
           SITE_BASE: /
+          PUBLIC_RATINGS_ENABLED: ${{ vars.RATINGS_ENABLED }}
+          PUBLIC_RATINGS_API: ${{ vars.RATINGS_API_ORIGIN }}
       - run: node src/backup-cli.js config
         env:
           GH_TOKEN: ${{ github.token }}

@@ -161,3 +161,5 @@ The rating selector shows only its heading and Dragon Balls. Accessible numeric 
 LOG-HUB-006 independent review correction: last-artwork removal may create an empty protected snapshot only under explicit identity-bound suspension/delisting policy; accidental empty resets remain blocked.
 
 Use the Report project content Issue Form for inappropriate artwork or misleading information. Reports notify maintainers, carry no publication authority and do not automatically hide projects. Supply URLs and text only, not image attachments.
+
+LOG-HUB-011 anonymous ratings implementation and its separate activation gate: [ratings operations](docs/launch/RATINGS.md). The live interface remains preview-only until explicitly authorized.
