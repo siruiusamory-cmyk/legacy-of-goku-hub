@@ -1,5 +1,7 @@
 # LOG-HUB-008: launch readiness
 
+Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake` and `ratings` custom subdomains. See [domain migration](DOMAIN-MIGRATION.md). Earlier activation instructions and hostname references below are historical; production is already enabled.
+
 Host decision superseded by LOG-HUB-010: [Cloudflare Pages Free / loghub.pages.dev owner setup](CLOUDFLARE.md) and [current deployment/rollback procedure](DEPLOYMENT.md). This historical report's GitHub Pages URL/activation references are not current instructions. LOG-HUB-009 subsequently approved and published the three resources; website deployment still needs separate authorization.
 
 Assessment: **READY for the owner to review a launch plan; BLOCKED for public launch.** Technical baseline is healthy. Public launch is a separate decision, and no real candidate has been approved. This report does not authorize deployment, Pages activation, policy changes or listing publication.

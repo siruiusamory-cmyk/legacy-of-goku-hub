@@ -1,5 +1,7 @@
 # Cloudflare Pages deployment and rollback checklist
 
+Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake` and `ratings` custom subdomains. See [domain migration](DOMAIN-MIGRATION.md). Earlier activation instructions and hostname references below are historical; production is already enabled.
+
 LOG-HUB-010 supersedes the GitHub Pages plan. Host: **Cloudflare Pages Free**, project **loghub**, exact URL **https://loghub.pages.dev/**, base **/**, budget **$0**. No custom domain, paid feature, Workers/Functions, database, analytics or persistent ratings. Deployment is disabled; this checklist is not authorization.
 
 ## Before first live upload

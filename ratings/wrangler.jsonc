@@ -2,15 +2,16 @@
   "name": "loghub-ratings",
   "main": "worker.js",
   "compatibility_date": "2026-07-02",
-  "workers_dev": true,
+  "workers_dev": false,
+  "routes": [{"pattern": "ratings.legacyofgokuhub.com", "custom_domain": true}],
   "preview_urls": false,
   "observability": {
     "enabled": false
   },
   "vars": {
     "RATINGS_ENABLED": "false",
-    "SITE_ORIGIN": "https://loghub.pages.dev",
-    "API_ORIGIN": "https://loghub-ratings.siruiusamory.workers.dev"
+    "SITE_ORIGIN": "https://legacyofgokuhub.com",
+    "API_ORIGIN": "https://ratings.legacyofgokuhub.com"
   },
   "d1_databases": [
     {

@@ -16,6 +16,18 @@ test('sealed artifact survives transfer; modified, added or missing output bytes
     const directory=await artifact(t);const digest=await sealArtifact(directory,commit);await verifyArtifact(directory,commit,digest);await mutation(directory);await assert.rejects(verifyArtifact(directory,commit,digest),/inventory/);
   }
 });
+test('permanent domain configurations retain disabled defaults and original D1 identities',async()=>{
+  for(const [service,id] of [['admin','7f30d601-b245-4384-95de-792b0b5ed48f'],['intake','7f30d601-b245-4384-95de-792b0b5ed48f'],['ratings','a90fe4fa-dc7f-4b9a-8d26-51c2e968f72c']]){
+    const config=JSON.parse(await fs.readFile(`${service}/wrangler.jsonc`,'utf8'));
+    assert.equal(config.vars[service.toUpperCase()+'_ENABLED'],'false');
+    assert.equal(config.vars.SITE_ORIGIN,'https://legacyofgokuhub.com');
+    assert.equal(config.vars[service==='admin'?'ADMIN_ORIGIN':'API_ORIGIN'],`https://${service}.legacyofgokuhub.com`);
+    assert.equal(config.d1_databases[0].database_id,id);
+    assert.equal(config.workers_dev,false);
+    assert.equal(config.preview_urls,false);
+    assert.deepEqual(config.routes,[{pattern:`${service}.legacyofgokuhub.com`,custom_domain:true}]);
+  }
+});
 test('manifest substitution, stale build rollback and revoked-policy replay are rejected',async t=>{
   const directory=await artifact(t);const digest=await sealArtifact(directory,commit);
   await assert.rejects(verifyArtifact(directory,'c'.repeat(40),digest),/Stale/);

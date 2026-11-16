@@ -21,7 +21,7 @@ const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const ALLOWED = /^(?:cover|screenshot-[1-6])\.(?:png|jpg|jpeg|webp)$/;
 const EDITABLE = ['title', 'developer', 'description', 'game', 'category', 'status', 'distribution', 'links'];
 
-export async function preparePackage({row, root = ROOT, api = new GitHub(), fetcher = safeFetcher(), site = 'https://loghub.pages.dev', base}) {
+export async function preparePackage({row, root = ROOT, api = new GitHub(), fetcher = safeFetcher(), site = 'https://legacyofgokuhub.com', base}) {
   const policy = await readJSON(path.join(root, 'policy/publishing.json'));
   const originalPolicy = structuredClone(policy);
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'loghub-admin-'));

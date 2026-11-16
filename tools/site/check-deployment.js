@@ -34,7 +34,7 @@ export async function sealArtifact(directory, buildCommit) {
   const provenance = JSON.parse(await fs.readFile(path.join(directory, 'site-provenance.json'))); assertDeployable(provenance);
   const files = await inventory(directory);
   if (!files.some(f=>f.path==='index.html') || !files.some(f=>f.path==='404.html') || !files.some(f=>f.path==='catalog.json')) throw Error('Incomplete static artifact');
-  const manifest = {version: 1, build_commit: buildCommit, policy_sha256: hash(await fs.readFile(policyFile)), target: 'https://loghub.pages.dev/', files};
+  const manifest = {version: 1, build_commit: buildCommit, policy_sha256: hash(await fs.readFile(policyFile)), target: 'https://legacyofgokuhub.com/', files};
   const bytes = JSON.stringify(manifest) + '\n';
   if (Buffer.byteLength(bytes) > 25 * 1024 * 1024) throw Error('Deployment manifest exceeds Free asset limit');
   await fs.writeFile(path.join(directory, manifestName), bytes, {flag: 'wx'});
@@ -45,7 +45,7 @@ export async function verifyArtifact(directory, buildCommit, expectedDigest) {
   const bytes = await fs.readFile(path.join(directory, manifestName));
   if (hash(bytes) !== expectedDigest) throw Error('Deployment artifact manifest changed');
   const manifest = JSON.parse(bytes);
-  if (manifest.version !== 1 || manifest.target !== 'https://loghub.pages.dev/' || !/^[a-f0-9]{40}$/.test(buildCommit || '') || manifest.build_commit !== buildCommit || manifest.policy_sha256 !== hash(await fs.readFile(policyFile))) throw Error('Stale artifact or policy; rebuild from current protected main instead of replaying a rollback');
+  if (manifest.version !== 1 || manifest.target !== 'https://legacyofgokuhub.com/' || !/^[a-f0-9]{40}$/.test(buildCommit || '') || manifest.build_commit !== buildCommit || manifest.policy_sha256 !== hash(await fs.readFile(policyFile))) throw Error('Stale artifact or policy; rebuild from current protected main instead of replaying a rollback');
   assertDeployable(JSON.parse(await fs.readFile(path.join(directory, 'site-provenance.json'))));
   if (JSON.stringify(await inventory(directory)) !== JSON.stringify(manifest.files)) throw Error('Deployment artifact file inventory changed');
   return manifest;

@@ -1,5 +1,7 @@
 # Anonymous community ratings (LOG-HUB-011)
 
+Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake` and `ratings` custom subdomains. See [domain migration](DOMAIN-MIGRATION.md). Earlier activation instructions and hostname references below are historical; production is already enabled.
+
 Owner's anonymous-voting decision supersedes the earlier GitHub-auth proposal and LOG-HUB-008 recommendation. No OAuth, sign-in, account, email or identity-provider credentials are needed. Production activation required a separate owner decision. The owner authorized merge and deployment after the simplified panel was verified; the operations below remain mandatory.
 
 ## Design and boundaries

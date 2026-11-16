@@ -24,7 +24,7 @@ async function setup(t, overrides = {}) {
   const state = {human: true, projects: [{id: 'ext-abcdefghijkl', title: 'Existing Hack', source: {type: 'forum', url: 'https://forum.example.org/threads/existing.5/'}}], siteDown: false};
   const original = globalThis.fetch;
   globalThis.fetch = async (url, options) => {
-    if (String(url).startsWith('https://challenges.cloudflare.com/')) return Response.json({success: state.human});
+    if (String(url).startsWith('https://challenges.cloudflare.com/')) return Response.json({success: state.human, hostname: Object.hasOwn(state, 'hostname') ? state.hostname : new URL(env.SITE_ORIGIN).hostname});
     if (url === origin + '/catalog.json') { if (state.siteDown) throw Error('offline'); return Response.json({projects: state.projects}); }
     throw Error('unexpected request ' + url);
   };
@@ -58,6 +58,16 @@ test('validation returns field errors and stores nothing', async t => {
     assert.ok(Object.keys((await response.json()).errors).length > 0);
   }
   assert.equal(x.db.prepare('SELECT count(*) n FROM submissions').get().n, 0);
+});
+test('Turnstile tokens from the old domain or a missing hostname create no submission', async t => {
+  const x = await setup(t);
+  for (const hostname of ['loghub.pages.dev', undefined]) {
+    x.state.hostname = hostname;
+    assert.equal((await x.call('/submissions', 'POST', suggestion())).status, 400);
+    assert.equal(x.db.prepare('SELECT count(*) n FROM submissions').get().n, 0);
+  }
+  x.state.hostname = new URL(x.env.SITE_ORIGIN).hostname;
+  assert.equal((await x.call('/submissions', 'POST', suggestion())).status, 201);
 });
 
 test('already listed projects are reported instead of queued, including address variants', async t => {

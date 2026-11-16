@@ -1,5 +1,7 @@
 # LOG-HUB-010: Cloudflare Pages Free preparation
 
+Current target (LOG-HUB-014): https://legacyofgokuhub.com/ on the existing `loghub` Direct Upload project. The managed `loghub.pages.dev` identity remains a project guard, not the advertised address. See [domain migration](DOMAIN-MIGRATION.md). Earlier setup instructions below are historical.
+
 Owner decision: project `loghub`, **https://loghub.pages.dev/**, root base `/`, **$0** hosting, no purchased domain/paid feature. GitHub retains intake, moderation, catalog publication, signed backups and protected receipts. Cloudflare receives only the verified static artifact. This PR does not authorize deployment.
 
 ## Verified requirements (November 15, 2026 Pacific)

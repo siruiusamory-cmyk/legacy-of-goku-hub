@@ -1,0 +1,21 @@
+# Permanent domain migration (LOG-HUB-014)
+
+Owner authorized production migration and immediate permanent redirects after verification. Target: https://legacyofgokuhub.com/, `/submit/`, `/submit/status/`; services: https://admin.legacyofgokuhub.com/, https://intake.legacyofgokuhub.com/, https://ratings.legacyofgokuhub.com/. No visitor receipt/localStorage migration is required.
+
+Reuse Pages `loghub` (ID `2af72b3b-c252-44c1-be79-81a29b34aa68`), existing Workers, Turnstile widget, GitHub environments and D1 databases. The managed `loghub.pages.dev` identity remains in the authenticated project lookup to prevent uploading to a replacement project. Artifact target and canonical metadata use the permanent domain.
+
+## Safe cutover
+
+1. Confirm zone `08442844cdd950127ecb6b5ca64a8f7b` belongs to existing account `ff3bf4332547a755ec1c5a344ab15f33`, active on Free. Attach apex and www to existing Pages; create proxied CNAME records to `loghub.pages.dev` without replacing conflicting records silently. Bind intake and ratings custom domains to existing Workers. Cloudflare manages HTTPS certificates.
+2. Cover the new administrator hostname and `/processor/*` with the existing Access applications before binding the admin custom domain. During transition retain the original hostname in each application's exact destination list. Preserve app IDs/audiences, issuer, sole owner email policy, 30-minute sessions, HttpOnly/Lax Access cookie and dedicated processor service-token policy. Inner administrator cookie remains host-only Secure/HttpOnly/Strict; users sign in afresh at the new hostname.
+3. Authorize the apex on the existing Turnstile widget. Preserve widget ID, secret, action and all other security settings. Worker verification derives the exact expected hostname from `SITE_ORIGIN`.
+4. Snapshot both D1 databases privately and compare table counts/content hashes before and after. No schema migration or database replacement is needed. Preserve rating salts, signing records and all secret bindings.
+5. Review and merge through protected main. Update repository `INTAKE_API_ORIGIN`, `RATINGS_API_ORIGIN` and protected `admin-processing` environment `ADMIN_API`. Deploy reviewed Worker configurations with explicit `INTAKE_ENABLED=true`, `RATINGS_ENABLED=true`, `ADMIN_ENABLED=true` overrides. Checked-in defaults intentionally remain false. Preserve existing secrets and D1 bindings. Verify the new Access edge and processor service authentication before switching `ADMIN_ORIGIN`. Its exact-origin guard makes the old dashboard stop working after that switch; retain the prior runtime configuration for immediate rollback until the new dashboard is demonstrated.
+6. Use the established signed catalog workflow for Pages. Verify assets, all three stable project IDs, canonical metadata, exact-origin CORS, Turnstile, authenticated dashboard/APIs, publication verification, CSRF, expiry/logout and protected processing. Use existing isolation for destructive tests; never create fictional production records.
+7. Immediately enable an account-level Bulk Redirect list/rule for `loghub.pages.dev/` and `www.legacyofgokuhub.com/` to `https://legacyofgokuhub.com/`, status 301, subpath matching, preserve path suffix and query string. Match only those source hosts; never the apex. Test `/`, nested paths and query strings at both sources and ensure the apex stays 200. Retire old public Worker endpoints after custom-domain verification; configurations set `workers_dev=false` and disable preview URLs.
+
+[Cloudflare's supported Pages redirect procedure](https://developers.cloudflare.com/pages/how-to/redirect-to-custom-domain/) uses **account-level Bulk Redirects**, including the managed pages.dev hostname. A zone-level rule on the purchased domain cannot control pages.dev. Keep Pages static-only artifact guards; no Functions or proxy Worker is needed.
+
+## Evidence
+
+Migration is in progress. Sanitized live preflight and domain binding responses are stored locally in `.review/014-PREFLIGHT.json` and `.review/014-DOMAIN-BINDINGS.json` in the original working directory. Final evidence must include merged PR/commit, signed deployment Actions run, Pages/Worker deployment IDs, DNS/TLS/redirect probes, authenticated/API results and private D1 comparison digests. Do not declare completion until the live cutover and redirects pass.

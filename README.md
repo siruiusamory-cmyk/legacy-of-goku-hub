@@ -25,9 +25,9 @@ Administrator server requests use Cloudflare Workers-supported manual redirects 
 
 ## Submit a project (no account needed)
 
-LOG-HUB-012 adds a native **/submit/** page: paste an address, name the project, describe it, review, send. No GitHub account, repository, public source or registration is required, and projects with no repository get a hub-assigned `ext-` ID. Add, Suggest, Correct and Claim are separate actions; a suggestion never grants ownership. Links say what they are: View Repository, Visit Project, Download Patch (approved distributions only). Submissions are live at https://loghub.pages.dev/submit/ behind a human check and moderator review. Details: [submissions guide](docs/launch/SUBMISSIONS.md).
+LOG-HUB-012 adds a native **/submit/** page: paste an address, name the project, describe it, review, send. No GitHub account, repository, public source or registration is required, and projects with no repository get a hub-assigned `ext-` ID. Add, Suggest, Correct and Claim are separate actions; a suggestion never grants ownership. Links say what they are: View Repository, Visit Project, Download Patch (approved distributions only). Submissions are live at https://legacyofgokuhub.com/submit/ behind a human check and moderator review. Details: [submissions guide](docs/launch/SUBMISSIONS.md).
 
-The site is live on **Cloudflare Pages Free** at **https://loghub.pages.dev/** (project `loghub`, base `/`). Protected GitHub Actions publishes signed, moderated static artifacts. See [Cloudflare configuration](docs/launch/CLOUDFLARE.md) and [deployment/rollback procedures](docs/launch/DEPLOYMENT.md). No paid services or custom domain are required.
+The site is live on **Cloudflare Pages Free** at **https://legacyofgokuhub.com/** (project `loghub`, base `/`). Protected GitHub Actions publishes signed, moderated static artifacts. See [Cloudflare configuration](docs/launch/CLOUDFLARE.md) and [deployment/rollback procedures](docs/launch/DEPLOYMENT.md). The permanent domain is `legacyofgokuhub.com`; hosting remains Free.
 
 Anonymous seven-Dragon-Ball ratings are live through a separate Cloudflare Worker and D1 database. Ratings require no visitor account; see [ratings operations](docs/launch/RATINGS.md).
 

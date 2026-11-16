@@ -8,9 +8,10 @@ import '../styles/site.css';
 import '../styles/typography.css';
 import '../styles/identity.css';
 const {title = 'Legacy of Goku Hub', description = 'Community ROM hacks, fan projects and tools for the Legacy of Goku series.', game} = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content={description}/><meta name="color-scheme" content="dark"/><meta name="theme-color" content="#202040"/><title>{title}</title></head>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content={description}/><link rel="canonical" href={canonical}/><meta property="og:url" content={canonical}/><meta name="color-scheme" content="dark"/><meta name="theme-color" content="#202040"/><title>{title}</title></head>
 <body><Scenery game={game}/><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="header-inner"><a class="brand" href={href('')} aria-label="Legacy of Goku Hub home"><Ball number={4}/><span>Legacy of Goku <em>Hub</em></span></a>
   <nav class="desktop-nav" aria-label="Main navigation"><a class="active" href={href('#directory')}>Projects</a><a href={submitURL}>Submit</a><a href={sourceURL}><Icon name="github"/> GitHub</a><a href={discordURL} aria-label="Join our Discord"><Icon name="discord"/></a></nav>
   <details class="mobile-nav"><summary aria-label="Open navigation"><Icon name="menu"/></summary><nav aria-label="Mobile navigation"><a href={href('#directory')}>Projects</a><a href={submitURL}>Submit a project</a><a href={sourceURL}>GitHub</a><a href={discordURL} aria-label="Join our Discord">Discord</a></nav></details>
