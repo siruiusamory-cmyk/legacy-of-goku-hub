@@ -11,7 +11,7 @@ export async function identity(request, env) {
   let head, claims, parts;
   try { parts = token.split('.'); requireThat(parts.length === 3); head = parse(parts[0]); claims = parse(parts[1]); } catch { requireThat(false, 401, 'Invalid identity'); }
   requireThat(head.alg === 'RS256' && typeof head.kid === 'string', 401, 'Invalid identity');
-  const response = await fetch(env.ACCESS_ISSUER + '/cdn-cgi/access/certs', {redirect: 'error', signal: AbortSignal.timeout(5000)});
+  const response = await fetch(env.ACCESS_ISSUER + '/cdn-cgi/access/certs', {redirect: 'manual', signal: AbortSignal.timeout(5000)});
   requireThat(response.ok, 503, 'Identity service unavailable');
   const jwk = (await response.json()).keys?.find(key => key.kid === head.kid && key.kty === 'RSA');
   requireThat(jwk, 401, 'Invalid identity');
