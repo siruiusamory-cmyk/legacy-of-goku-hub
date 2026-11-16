@@ -17,7 +17,7 @@
     {
       "binding": "DB",
       "database_name": "loghub-intake",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "7f30d601-b245-4384-95de-792b0b5ed48f",
       "migrations_dir": "migrations"
     }
   ],

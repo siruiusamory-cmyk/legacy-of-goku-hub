@@ -40,3 +40,11 @@ Approval is always a human, signed-pipeline step: an unapproved or changed conte
 ## Verification
 
 `node --test` covers listings, intake Worker, moderator tooling, recovery and a generated project page. `npm run test:browser` covers the submit journeys (receipt, validation, duplicates, claim, status, mobile, axe). Status is never color-only: each state has a glyph and text.
+
+## Live deployment record
+
+- Worker `loghub-intake` at https://loghub-intake.siruiusamory.workers.dev, D1 `loghub-intake` (`7f30d601-b245-4384-95de-792b0b5ed48f`, WNAM), Turnstile widget `loghub-submissions` for `loghub.pages.dev`.
+- The committed `INTAKE_ENABLED` stays `"false"`. The live gate was turned on at deploy time: `wrangler deploy --config intake/wrangler.jsonc --var INTAKE_ENABLED:true`. Redeploy with the same flag or the gate closes.
+- Repository variables `INTAKE_ENABLED`, `INTAKE_API_ORIGIN` and `TURNSTILE_SITE_KEY` feed the protected website build. To roll back, set `INTAKE_ENABLED` to `false` and dispatch the catalog workflow; the site returns to the GitHub Issue Form route.
+- Secrets live only in the Worker and a private local folder. Rotate by re-running `wrangler secret put`.
+- Automated browsers usually fail the Turnstile check, so live end-to-end tests need a person to tick the box.

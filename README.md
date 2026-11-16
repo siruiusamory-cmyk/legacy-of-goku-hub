@@ -17,7 +17,7 @@
 
 ## Submit a project (no account needed)
 
-LOG-HUB-012 adds a native **/submit/** page: paste an address, name the project, describe it, review, send. No GitHub account, repository, public source or registration is required, and projects with no repository get a hub-assigned `ext-` ID. Add, Suggest, Correct and Claim are separate actions; a suggestion never grants ownership. Links say what they are: View Repository, Visit Project, Download Patch (approved distributions only). Submissions stay off until the owner activates them. Details: [submissions guide](docs/launch/SUBMISSIONS.md).
+LOG-HUB-012 adds a native **/submit/** page: paste an address, name the project, describe it, review, send. No GitHub account, repository, public source or registration is required, and projects with no repository get a hub-assigned `ext-` ID. Add, Suggest, Correct and Claim are separate actions; a suggestion never grants ownership. Links say what they are: View Repository, Visit Project, Download Patch (approved distributions only). Submissions are live at https://loghub.pages.dev/submit/ behind a human check and moderator review. Details: [submissions guide](docs/launch/SUBMISSIONS.md).
 
 LOG-HUB-010 prepares **Cloudflare Pages Free**, project `loghub`, exact URL **https://loghub.pages.dev/** and root base `/`. [Owner setup](docs/launch/CLOUDFLARE.md) and [deployment/rollback checklist](docs/launch/DEPLOYMENT.md) supersede the earlier GitHub Pages target. Deployment stays disabled; no account/project/credential setup or public upload has been performed. No alternate URL, domain purchase or paid service is authorized.
 
