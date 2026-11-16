@@ -4,6 +4,7 @@
 
 - Add a native /submit/ page and /submit/status/ with URL-first fields, Add/Suggest/Correct/Claim actions, duplicate detection, accessible errors, review step and receipt. No account, repository or source code is required.
 - Add hub-assigned `ext-` listings for non-GitHub projects with source-aware labels (View Repository, Visit Project, Download Patch), moderated artwork and distributions, and claim/transfer protection. Existing `gh-` IDs and ratings are unchanged.
+- Activate the intake Worker, D1 database and Turnstile widget on the free plan, with the public form enabled through repository variables.
 - Add a default-off Cloudflare Worker/D1 intake queue with Turnstile, rate limits and hashed receipts, plus a moderator CLI. Extend `.loghub.json` to gitlab.com and codeberg.org. Activation, merge and deployment remain owner decisions.
 
 ## LOG-HUB-011: anonymous community ratings preparation
