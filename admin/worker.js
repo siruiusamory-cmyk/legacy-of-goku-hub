@@ -9,9 +9,10 @@ const note = (value = '', max = 1000) => { check(typeof value === 'string' && va
 const item = row => { const {receipt_hash, ...rest} = row; return {...rest, payload: JSON.parse(row.payload)}; };
 const review = row => row && ({...row, payload: JSON.parse(row.payload), package: row.package ? JSON.parse(row.package) : null});
 const history = (env, user, action, submission = null, id = null, pub = '', priv = '') => sql(env, 'INSERT INTO admin_history(submission_id,review_id,actor,action,public_note,private_note,created) VALUES(?,?,?,?,?,?,?)', submission, id, user, action, pub, priv, seconds());
-async function github(env, path, method = 'GET', data) {
+async function github(env, path, method = 'GET', data, missing = false) {
   check(env.GH_DISPATCH_TOKEN && /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(env.SOURCE_REPO), 503, 'GitHub connection is not configured');
   const response = await fetch(`https://api.github.com/repos/${env.SOURCE_REPO}${path}`, {method, headers: {Authorization: 'Bearer ' + env.GH_DISPATCH_TOKEN, Accept: 'application/vnd.github+json', 'User-Agent': 'loghub-admin', 'X-GitHub-Api-Version': '2022-11-28', ...(data ? {'Content-Type': 'application/json'} : {})}, body: data ? JSON.stringify(data) : undefined, redirect: 'error', signal: AbortSignal.timeout(10000)});
+  if (missing && response.status === 404) return null;
   check(response.ok, 503, 'GitHub request failed; retry later');
   return response.status === 204 ? null : response.json();
 }
@@ -145,6 +146,13 @@ export async function handle(request, env) {
         else projects.push({id: rule.project_id, title: rule.project_id, moderation: rule.decision});
       }
       return json({projects});
+    }
+    if (path === '/api/listing' && request.method === 'GET') {
+      const id = url.searchParams.get('id'); check(LISTING_ID.test(id || ''));
+      const file = await github(env, `/contents/listings/${id}/listing.json?ref=main`, 'GET', undefined, true);
+      if (file) return json({editable: true, record: JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(file.content.replace(/\s/g, '')), c => c.charCodeAt(0))))});
+      const live = (await catalog(env)).find(p => p.id === id);
+      return json({editable: Boolean(live), record: live || {id}, ...(!live ? {message: 'Restore this legacy listing through protected review before editing its catalog metadata.'} : {})});
     }
     if (path === '/api/queue' && request.method === 'GET') {
       const state = url.searchParams.get('state') || '', q = (url.searchParams.get('q') || '').slice(0, 100), page = Number(url.searchParams.get('page') || 1), order = url.searchParams.get('sort') === 'oldest' ? 'ASC' : 'DESC';

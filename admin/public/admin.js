@@ -46,6 +46,7 @@ async function detail(id) {
   for (const address of [selected.payload.url, selected.payload.patch_url, ...(selected.payload.links || []).map(l => l.url)].filter(Boolean)) $('details').appendChild(el('p')).append(link(address));
   $('details').append(el('p', 'Submitted artwork references are untrusted. Prepare the private review to inspect normalized previews.'));
   fill(selected.payload); $('submission-actions').hidden = false; $('listing-actions').hidden = true; $('prepare').textContent = selected.kind === 'claim' ? 'Prepare ownership verification' : 'Prepare private review';
+  $('metadata').hidden = false; $('prepare').disabled = false;
   $('history').replaceChildren(el('h3', 'Moderation history'));
   for (const h of data.history) $('history').append(el('p', `${new Date(h.created * 1000).toLocaleString()} · ${h.actor} · ${h.action}`), el('p', 'Public: ' + h.public_note), el('p', 'Private: ' + h.private_note));
   for (const r of data.reviews) $('history').append(button('Open review ' + r.id + ' · ' + r.state, () => showReview(r)));
@@ -65,7 +66,9 @@ async function prepare(operation) {
 async function catalog() {
   const data = await api('catalog'); show('queue'); $('items').replaceChildren(); $('filters').hidden = true; $('pagination').textContent = 'Approved catalog identities, including withdrawn listings'; $('previous').hidden = true; $('next').hidden = true;
   for (const p of data.projects) { const article = el('article'); article.append(el('h3', p.title), el('p', p.id + ' · ' + (p.moderation || 'approved')), button('Manage ' + p.id, async () => {
-    selected = null; listing = p; show('detail'); $('detail-title').textContent = 'Manage: ' + p.title; $('detail-title').focus(); $('details').replaceChildren(el('pre', JSON.stringify(p, null, 2))); fill({...p, url: p.source?.url || p.repository || '', patch_url: p.distribution?.url || ''});
+    const detail = await api('listing?id=' + encodeURIComponent(p.id)), record = detail.record;
+    selected = null; listing = p; show('detail'); $('detail-title').textContent = 'Manage: ' + (record.title || p.title); $('detail-title').focus(); $('details').replaceChildren(el('pre', JSON.stringify(record, null, 2))); if (detail.message) $('details').append(el('p', detail.message)); fill({...record, url: record.source?.url || record.repository || '', patch_url: record.distribution?.url || ''});
+    $('metadata').hidden = !detail.editable; $('prepare').disabled = !detail.editable;
     $('submission-actions').hidden = true; $('listing-actions').hidden = false; $('prepare').textContent = 'Prepare metadata / artwork changes'; $('history').replaceChildren();
   })); $('items').append(article); }
 }

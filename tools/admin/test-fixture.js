@@ -31,6 +31,7 @@ export async function fixture() {
     if (address.includes('/jobs?')) return Response.json({jobs: state.jobs});
     if (address.includes('/actions/workflows/catalog.yml/runs')) return Response.json({workflow_runs: state.runs});
     if (address.includes('/contents/policy')) return Response.json({content: Buffer.from(JSON.stringify({projects: [], external_projects: []})).toString('base64')});
+    if (address.includes('/contents/listings/')) return new Response('{}', {status: 404});
     throw Error('Unexpected fixture request: ' + address);
   };
   let cookie = '', csrf = '';

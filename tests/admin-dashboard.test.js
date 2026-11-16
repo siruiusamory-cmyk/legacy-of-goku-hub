@@ -103,6 +103,9 @@ test('private routes reject bearer reuse, stale submissions, tampered package an
   assert.equal((await x.processCall(created.id, '/claim', {action: 'prepare'})).status, 409);
   assert.equal((await x.call('/api/decision', {id: sub.id, revision: 2, state: 'published'})).status, 400);
   assert.equal((await x.call('/api/logout', {}, {'Sec-Fetch-Site': 'cross-site'})).status, 403);
+  const withdrawn = await data(await x.call('/api/listing?id=ext-abcdefghijkl')); assert.equal(withdrawn.editable, false); assert.match(withdrawn.message, /Restore/);
+  x.state.projects = [{id: 'ext-abcdefghijkl', title: 'Live training project'}];
+  const live = await data(await x.call('/api/listing?id=ext-abcdefghijkl')); assert.equal(live.editable, true); assert.equal(live.record.title, 'Live training project');
   for (let n = 0; n < 125; n++) await x.call('/api/session');
   assert.equal((await x.call('/api/session')).status, 429);
 });
