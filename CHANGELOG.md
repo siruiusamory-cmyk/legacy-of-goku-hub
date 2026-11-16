@@ -1,5 +1,11 @@
 # Changelog
 
+## LOG-HUB-011: anonymous community ratings preparation
+
+- Add a separate default-off Cloudflare Worker/D1 API with hashed browser-local credentials, atomic 1–7 votes, genuine aggregates, rate limits and fraud exclusions. No sign-in or account is required.
+- Connect the existing Dragon Ball controls to anonymous autosave, reload, change and removal behind an explicit activation gate. Preserve the exact preview disclosure when disabled.
+- Add focused backend/browser/accessibility checks, privacy guidance and deletion-aware private export/recovery. Production activation remains a separate owner decision; the live static directory and signed publication safeguards remain unchanged.
+
 ## LOG-HUB-010: Cloudflare Pages launch preparation
 
 - Replace the disabled GitHub Pages target with pinned Cloudflare Pages Direct Upload for loghub.pages.dev at `/`, preserving verified catalog publication and all three approved resources.
