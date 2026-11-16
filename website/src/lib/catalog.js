@@ -10,7 +10,7 @@ export const href = relative => base + relative;
 export const names = {'legacy-of-goku': 'LoG 1', 'legacy-of-goku-2': 'LoG II', 'buus-fury': "Buu’s Fury", multiple: 'LoG series', 'rom-hack': 'ROM Hack', 'fan-project': 'Fan Project', tool: 'Tools', resource: 'Resource', released: 'Released', 'in-development': 'In Development', 'on-hold': 'On Hold', discontinued: 'Discontinued'};
 export const fullGame = {'legacy-of-goku': 'Legacy of Goku', 'legacy-of-goku-2': 'Legacy of Goku II', 'buus-fury': "Buu’s Fury", multiple: 'Multiple games'};
 export const projectURL = project => href('projects/' + project.id + '/');
-export const submitURL = href('submit/');
+export const submitURL = import.meta.env.PUBLIC_INTAKE_ENABLED === 'true' ? href('submit/') : 'https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/issues/new/choose';
 export const statusURL = href('submit/status/');
 export const advancedSubmitURL = 'https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/issues/new/choose';
 export const sourceURL = 'https://github.com/siruiusamory-cmyk/legacy-of-goku-hub';
