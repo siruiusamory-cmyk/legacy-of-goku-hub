@@ -142,9 +142,10 @@ test('moderator requests changes, submitter revises, moderator publishes; privat
   assert.equal((await x.call('/revise', 'POST', {receipt, changes: {creator: 'Sir Hacker'}})).status, 200);
   assert.equal(JSON.parse(x.db.prepare('SELECT payload FROM submissions').get().payload).creator, 'Sir Hacker');
   assert.equal((await x.call('/revise', 'POST', {receipt, changes: {creator: 'Again'}})).status, 409);
-  await x.asAdmin('/admin/decision', 'POST', {id: 1, state: 'published', project_id: 'ext-qqqqqqqqqqqq'});
+  assert.equal((await x.asAdmin('/admin/decision', 'POST', {id: 1, state: 'published', project_id: 'ext-qqqqqqqqqqqq'})).status, 409);
+  await x.asAdmin('/admin/decision', 'POST', {id: 1, state: 'approved', project_id: 'ext-qqqqqqqqqqqq'});
   const done = await (await x.call('/status', 'POST', {receipt})).json();
-  assert.equal(done.status, 'published'); assert.equal(done.project_id, 'ext-qqqqqqqqqqqq');
+  assert.equal(done.status, 'approved'); assert.equal(done.project_id, undefined);
   assert.equal((await x.asAdmin('/admin/decision', 'POST', {id: 1, state: 'published', project_id: '../x'})).status, 400);
   assert.equal((await x.asAdmin('/admin/decision', 'POST', {id: 99, state: 'rejected'})).status, 404);
 });

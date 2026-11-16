@@ -15,7 +15,7 @@ const MESSAGES = {
   received: 'We have your submission. A person will review it before anything is published.',
   'in-review': 'A person is reviewing your submission now.',
   'needs-changes': 'We need a little more information before we can continue.',
-  approved: 'Approved. The listing will appear after the next scheduled site update.',
+  approved: 'Approved. Publication is pending the protected review and deployment checks.',
   published: 'Published. Your listing is live in the directory.',
   rejected: 'We could not accept this submission.'
 };
@@ -115,7 +115,9 @@ async function revise(request, env, ip) {
   const checked = validateSubmission(merged);
   if (!checked.ok) fail(422, 'Please fix the highlighted fields.', {errors: checked.errors});
   const time = now();
-  await sql(env, `UPDATE submissions SET payload=?,url_key=?,state='received',updated=?,expires=? WHERE id=? AND state='needs-changes'`, JSON.stringify(checked.value), submissionKey(checked.value), time, time + 90 * DAY, row.id).run();
+  const revision = row.revision === undefined ? '' : ',revision=revision+1';
+  const changed = await sql(env, `UPDATE submissions SET payload=?,url_key=?,state='received',updated=?,expires=?${revision} WHERE id=? AND state='needs-changes' AND payload=?`, JSON.stringify(checked.value), submissionKey(checked.value), time, time + 90 * DAY, row.id, row.payload).run();
+  if (!changed.meta.changes) fail(409, 'This submission changed. Check its status again.');
   return json(env, {status: 'received', message: MESSAGES.received});
 }
 async function admin(request, env, url, ip) {
@@ -134,9 +136,12 @@ async function admin(request, env, url, ip) {
     const note = (value, max) => { if (value === undefined) return ''; if (typeof value !== 'string' || value.length > max || /[\x00-\x08\x0b-\x1f<>]/.test(value)) fail(400, 'Invalid note'); return value; };
     const project = data.project_id === undefined ? null : data.project_id;
     if (project !== null && !/^(?:ext-[a-z0-9]{12}|gh-[0-9]{1,15})$/.test(project)) fail(400, 'Invalid project id');
+    if (data.state === 'published') fail(409, 'Publication status requires verified protected deployment in the administrator dashboard');
     const time = now();
     const expires = OPEN.includes(data.state) ? time + 90 * DAY : time + 30 * DAY;
-    const result = await sql(env, 'UPDATE submissions SET state=?,public_note=?,private_note=?,project_id=COALESCE(?,project_id),updated=?,expires=? WHERE id=?', data.state, note(data.public_note, 500), note(data.private_note, 1000), project, time, expires, data.id).run();
+    const columns = await sql(env, 'PRAGMA table_info(submissions)').all();
+    const revision = columns.results.some(c => c.name === 'revision') ? ',revision=revision+1' : '';
+    const result = await sql(env, `UPDATE submissions SET state=?,public_note=?,private_note=?,project_id=COALESCE(?,project_id),updated=?,expires=?${revision} WHERE id=?`, data.state, note(data.public_note, 500), note(data.private_note, 1000), project, time, expires, data.id).run();
     if (!result.meta.changes) fail(404, 'Unknown submission');
     return json(env, {id: data.id, state: data.state}, 200, true);
   }

@@ -1,5 +1,11 @@
 # Changelog
 
+## LOG-HUB-013: private administrator dashboard (activation pending)
+
+- Add an Access-protected, default-off browser inbox, visual normalized-artwork review, public/private notes, history, exact approvals, protected publication PR preparation and verified deployment status.
+- Add stable-identity catalog editing, claim evidence, suspend/delist/restore review and expiring/revocable sessions with CSRF protection.
+- Keep unapproved material in private D1/processor memory, preserve signed publication governance and anonymous public services, and require separate owner authorization for merge and production activation.
+
 ## LOG-HUB-012: universal project submissions
 
 - Add a native /submit/ page and /submit/status/ with URL-first fields, Add/Suggest/Correct/Claim actions, duplicate detection, accessible errors, review step and receipt. No account, repository or source code is required.

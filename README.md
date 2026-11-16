@@ -3,6 +3,8 @@
 
 **A community catalog for Legacy of Goku projects, open to everyone.**
 
+Private administrator dashboard: [owner workflow, authentication research and authorization-gated setup](docs/launch/ADMIN.md). LOG-HUB-013 is prepared for review; production administrator access remains disabled.
+
 ![License MIT](https://img.shields.io/badge/license-MIT-blue) ![Platform Claude Code](https://img.shields.io/badge/platform-Claude%20Code-d4a017) ![Submission routes 4](https://img.shields.io/badge/submission%20routes-4-555)
 
 ## Contents

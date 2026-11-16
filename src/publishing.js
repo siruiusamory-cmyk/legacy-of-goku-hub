@@ -99,6 +99,15 @@ export async function publish({root, previous, output, api, issues, fetcher = fe
       for (const key of projectKeys({repository: state.repository?.url, source: record.source})) claimed.add(key);
     }
   };
+  for (const found of listings) {
+    const repositoryId = Number(found.listing.id.slice(3)), old = entries.get(repositoryId);
+    const rule = (policy.external_projects || []).find(r => r.project_id === found.listing.id);
+    if (!old || old.id !== found.listing.id || rules.get(repositoryId)?.decision !== 'delisted' || rule?.decision !== 'approved' || rule.owner_id !== old.owner_id) continue;
+    try {
+      const done = await evaluateListing({listing: found.listing, dir: found.dir, rule, api, fetcher});
+      if (rule.content_digests?.includes(done.initialDigest) && artworkApproved(rule, old.id, done.inspected.artwork)) entries.delete(repositoryId);
+    } catch {}
+  }
   for (const repositoryId of [...new Set([...entries.keys(), ...grouped.keys()])].sort((a, b) => a - b)) {
     const prior = entries.get(repositoryId); const group = grouped.get(repositoryId); const rule = rules.get(repositoryId);
     if (!prior && listedIds.has('gh-' + repositoryId)) { report.push({repository_id: repositoryId, issues: (group?.candidates || []).map(c => c.number), outcome: 'review', reason: 'this repository already has an approved listing; submission is a duplicate'}); continue; }

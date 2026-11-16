@@ -34,6 +34,11 @@ async function saveImages(dir, covers, fetcher) {
   return names;
 }
 
+export async function freezeReviewedListing(evaluated, directory) {
+  const names = await saveImages(directory, evaluated.inspected.inputs.map(bytes => ({bytes})));
+  return {...evaluated.record, cover: names[0], screenshots: names.slice(1)};
+}
+
 export function listingFields(value, {game, status, developer} = {}) {
   const warnings = [];
   const pick = (given, fallback, name) => { if (!given) warnings.push(`${name} was not provided; defaulted to "${fallback}"`); return given || fallback; };
@@ -66,12 +71,13 @@ export async function prepareListing({submission, directory, api, fetcher, overr
   if (!art.length) throw Error('cover artwork is required: ask the submitter or supply a local cover file');
   await fs.mkdir(directory, {recursive: false});
   const names = await saveImages(directory, art.slice(0, 7), fetcher);
-  const listing = {schema_version: 1, id, ...fields, source,
+  let listing = {schema_version: 1, id, ...fields, source,
     ...(value.patch_url ? {distribution: {label: PATCH_FILE.test(new URL(value.patch_url).pathname) ? 'Download Patch' : 'Patch Page', url: value.patch_url, kind: PATCH_FILE.test(new URL(value.patch_url).pathname) ? 'patch' : 'page'}} : {}),
     ...(value.links ? {links: value.links} : {}), cover: names[0], ...(names.length > 1 ? {screenshots: names.slice(1)} : {}),
     approved_at: now.toISOString().replace(/\.\d{3}Z$/, 'Z')};
   validateListing(listing);
-  const evaluated = await evaluateListing({listing, dir: directory, rule: {owner_id: ownerId}, api, fetcher});
+  const evaluated = await evaluateListing({listing, dir: directory, rule: {owner_id: ownerId}, api, fetcher, captureImages: true});
+  if (evaluated.manifested) listing = await freezeReviewedListing(evaluated, directory);
   const proposed = {project_id: id, ...(ownerId !== undefined ? {owner_id: ownerId} : {}), decision: 'approved', content_digests: [evaluated.initialDigest], artwork_sets: [evaluated.inspected.artwork]};
   await saveJSON(path.join(directory, 'listing.json'), listing);
   await saveJSON(path.join(directory, 'review.json'), {submission_id: submission.id, kind: value.kind, warnings, relation_note: 'Repository or page control does not establish team representation or artwork rights.', proposed_policy: proposed, key: value.url ? urlKey(value.url) : null});
