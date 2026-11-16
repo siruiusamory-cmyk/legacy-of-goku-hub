@@ -19,7 +19,7 @@ Activation (owner decision, not done by this change):
 1. `wrangler d1 create loghub-intake`, put the id in `intake/wrangler.jsonc`, then `wrangler d1 migrations apply loghub-intake --remote`.
 2. Make a moderator token with `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"` and keep it private. Secrets: `TURNSTILE_SECRET`, `RATE_SALT`, and `ADMIN_HASH`, the base64url SHA-256 of that token: `node -e "console.log(require('crypto').createHash('sha256').update(process.argv[1]).digest('base64url'))" TOKEN`. Automatic claim proof works only for project-owned websites; forum, platform and Git claims are verified manually.
 3. Deploy the Worker, set `INTAKE_ENABLED` to `"true"`.
-4. Build the site with `PUBLIC_INTAKE_ENABLED=true`, `PUBLIC_INTAKE_API=<worker origin>`, `PUBLIC_TURNSTILE_SITE_KEY=<site key>`, then redeploy through the protected path.
+4. For the protected production website build, set repository variables `INTAKE_API_ORIGIN=<worker origin>` and `TURNSTILE_SITE_KEY=<public site key>`. After the Worker has passed live checks, set `INTAKE_ENABLED=true` and dispatch `catalog.yml` on protected `main`. The workflow maps these to Astro's `PUBLIC_INTAKE_API`, `PUBLIC_TURNSTILE_SITE_KEY` and `PUBLIC_INTAKE_ENABLED` settings. Until then, leave `INTAKE_ENABLED` absent/false; the site's primary Submit link continues to use the working GitHub route.
 
 ## Moderator workflow
 
