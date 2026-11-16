@@ -48,5 +48,6 @@ export const projectActions = project => {
 };
 export const hostingLabels = {github: 'GitHub', git: 'Git repository', website: 'Project website', forum: 'Community forum', platform: 'Hacking site', none: 'No public page'};
 export const claimLabel = project => project.repository && !project.source ? 'Repository listing; team representation not verified' : {'repository-controlled': 'Maintained through its repository; team representation not verified', 'verified-claim': 'Creator claim verified by a moderator', unclaimed: 'Community listing; not yet claimed by its creator'}[project.ownership?.claim] || 'Community listing';
-export const correctionURL = project => intakeAPI ? submitURL + '?action=correct&listing=' + encodeURIComponent(project.id) : advancedSubmitURL;
-export const claimURL = project => intakeAPI ? submitURL + '?action=claim&listing=' + encodeURIComponent(project.id) : advancedSubmitURL;
+const advancedGuidedURL = 'https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/issues/new?template=submit.yml&title=';
+export const correctionURL = project => intakeAPI ? submitURL + '?action=correct&listing=' + encodeURIComponent(project.id) : advancedGuidedURL + encodeURIComponent('[Submission] Correction: ' + project.title);
+export const claimURL = project => intakeAPI ? submitURL + '?action=claim&listing=' + encodeURIComponent(project.id) : advancedGuidedURL + encodeURIComponent('[Claim] ' + project.title);
