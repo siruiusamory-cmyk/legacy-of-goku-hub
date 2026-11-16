@@ -18,7 +18,14 @@ async function start(api){
  }
  function display(id,data){
   if(!Number.isInteger(data.count)||data.count<0||(data.count===0?data.average!==null:!Number.isFinite(data.average)||data.average<1||data.average>7))throw Error('Ratings unavailable.');
-  document.querySelectorAll('[data-ratings-project]').forEach(el=>{if(el.dataset.ratingsProject!==id)return;const text=data.count?`${data.average.toFixed(1)} / 7 (${data.count} ratings)`:'Not rated yet';el.querySelector('.rating-value').textContent=text;el.setAttribute('aria-label','Community rating: '+text);el.querySelectorAll('.dragon-ball').forEach((ball,i)=>ball.classList.toggle('muted',!data.count||i>=Math.round(data.average)));});
+  document.querySelectorAll('[data-ratings-project]').forEach(el=>{
+   if(el.dataset.ratingsProject!==id)return;
+   const text=data.count?`${data.average.toFixed(1)} / 7 (${data.count} ratings)`:'Not rated yet';
+   const value=el.querySelector('.rating-value'),strong=document.createElement('strong');
+   if(data.count){strong.textContent=data.average.toFixed(1)+' ';const scale=document.createElement('span');scale.textContent='/ 7';strong.append(scale);const count=document.createElement('small');count.textContent=` (${data.count} ratings)`;value.replaceChildren(strong,count);}
+   else{strong.className='unrated';strong.textContent='Not rated yet';value.replaceChildren(strong);}
+   el.setAttribute('aria-label','Community rating: '+text);el.querySelectorAll('.dragon-ball').forEach((ball,i)=>ball.classList.toggle('muted',!data.count||i>=Math.round(data.average)));
+  });
  }
  function unavailable(id){document.querySelectorAll('[data-ratings-project]').forEach(el=>{if(el.dataset.ratingsProject===id){el.querySelector('.rating-value').textContent='Ratings unavailable';el.setAttribute('aria-label','Community ratings unavailable');el.querySelectorAll('.dragon-ball').forEach(ball=>ball.classList.add('muted'));}});}
  async function refresh(id){try{display(id,await request('/projects/'+id));}catch{unavailable(id);}}

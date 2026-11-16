@@ -167,3 +167,5 @@ LOG-HUB-011 anonymous ratings implementation and its separate activation gate: [
 Anonymous ratings checks and activation limits are recorded in [ratings verification](docs/launch/RATINGS-VERIFICATION.md); the runtime remains isolated from signed static publication.
 
 The [bounded ratings review](docs/launch/RATINGS-REVIEW.md) records the independent findings and their regression-tested fixes; no production ratings activation has occurred.
+
+Ratings verification also covers network-wide anonymous abuse limits, oversized input and database quota failures; existing community-average typography is retained.

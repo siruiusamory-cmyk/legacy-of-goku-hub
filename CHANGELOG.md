@@ -134,3 +134,5 @@ Use the Report project content Issue Form for inappropriate artwork or misleadin
 LOG-HUB-011 validation: add atomic fraud-exclusion/appeal triggers and deletion-aware recovery import checks; production voting stays disabled.
 
 LOG-HUB-011 review fixes: prevent early selections during initialization, preserve successful appeals during recovery, and document explicit workers.dev activation.
+
+LOG-HUB-011 final checks: retain original aggregate typography and cover network-wide abuse limits, quota failures and isolated local D1 recovery import.
