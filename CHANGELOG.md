@@ -130,3 +130,5 @@ Use the Report project content Issue Form for inappropriate artwork or misleadin
 
 - Label the existing seven-ball selector as an unsaved preview; no public votes or ratings service are implied.
 
+
+LOG-HUB-011 validation: add atomic fraud-exclusion/appeal triggers and deletion-aware recovery import checks; production voting stays disabled.

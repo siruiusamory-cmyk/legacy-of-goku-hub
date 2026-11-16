@@ -1,0 +1,12 @@
+# LOG-HUB-011 verification
+
+Status: implementation prepared; production activation remains owner-gated. Latest owner decision is anonymous voting, superseding the earlier OAuth proposal. No sign-in code, app credential or account workflow is required.
+
+- Ten focused backend/recovery tests pass: three approved IDs, anonymous save/read/edit/delete, concurrent upserts and averages, credential isolation, invalid inputs, Origin/CORS, identity-wide removal, fraud exclusion/appeal/recreation, removed projects, database constraints, abuse limits and unavailable-state handling.
+- Eight connected workflow/artifact tests pass (18 combined): signed static transfer inventory, stale-source/policy rejection, root-only/static-only artifacts, exact Cloudflare target and immutable Actions/permissions boundaries.
+- Actual local Wrangler 4.105.0/workerd and D1 browser flow passes for gh-1398951057, gh-1429374563 and gh-1432341427. An anonymous browser selects 7, autosaves, reloads it, changes to 3, reloads and removes it. Card averages update. Separate browser identity isolation, mobile/desktop layout, zero Axe violations in the ratings panel, backend outage and rate-limit UI states pass. No production request or sign-in is part of that test.
+- Both activated-local and default-off static builds from the verified three-resource signed export pass. Default-off HTML retains the exact original preview wording and emits no API configuration. Existing artwork and descriptions remain unchanged.
+- Local Wrangler private export helper and fresh SQLite recovery import pass. Recovery excludes a later-erased identity, restores another as excluded, recomputes eligible totals and preserves unexpired deletion markers. Remote database restore is deliberately not exercised before authorization.
+- One bounded read-only Zeroshot review is running: 01a1e286-0b16-71a0-9aaf-4985d302de62. Final verdict and hosted check results will be appended before readiness is declared.
+
+Local detailed evidence lives in ignored .review/011/BROWSER.json, RECOVERY.json and screenshots; it includes no raw browser credential. No new production database/API, paid feature, catalog data, moderation policy or backup change was made. The existing live directory remains available and preview-only. A public live anonymous rating is not claimed before owner activation.
