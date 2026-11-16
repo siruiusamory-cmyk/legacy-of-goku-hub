@@ -1,5 +1,11 @@
 # Changelog
 
+## LOG-HUB-010: Cloudflare Pages launch preparation
+
+- Replace the disabled GitHub Pages target with pinned Cloudflare Pages Direct Upload for loghub.pages.dev at `/`, preserving verified catalog publication and all three approved resources.
+- Transfer the exact immutable website artifact with a full output hash inventory, current build/policy binding, strict target check and protected-main/default-off deployment gate. Scope Cloudflare secrets to the deployment environment/job.
+- Document Free account/project/credential setup, monitoring and current-policy rollback. No live deployment, paid feature, runtime service, catalog approval or artwork/design change.
+
 ## LOG-HUB-009: initial catalog approval
 
 - Record explicit owner approval of three disassembly resources from guided issues #31–#33, binding exact content and ordered source/normalized banner hashes to repository/owner/project identities.

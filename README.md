@@ -1,5 +1,7 @@
 # Legacy of Goku Hub
 
+LOG-HUB-010 prepares **Cloudflare Pages Free**, project `loghub`, exact URL **https://loghub.pages.dev/** and root base `/`. [Owner setup](docs/launch/CLOUDFLARE.md) and [deployment/rollback checklist](docs/launch/DEPLOYMENT.md) supersede the earlier GitHub Pages target. Deployment stays disabled; no account/project/credential setup or public upload has been performed. No alternate URL, domain purchase or paid service is authorized.
+
 Launch preparation: the seven-ball selector is explicitly labeled “Preview only · not saved”; selections do not submit community votes. Public launch still requires a separate owner decision.
 
 LOG-HUB-005 integrated the reviewed frontend into main. LOG-HUB-006 adds mandatory exact-content artwork moderation; see [the moderation guide](docs/moderation.md). No website is deployed.

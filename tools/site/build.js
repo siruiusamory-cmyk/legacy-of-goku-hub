@@ -55,6 +55,7 @@ else {
   }
   provenance = {purpose:'production',point:recovered.point,snapshot_id:recovered.envelope.snapshot_id,source_commit:recovered.envelope.provenance.source_commit};
 }
+provenance.base = base;
 await validateSiteCatalog(catalog);
 const artwork={};
 const artDirection=await readJSON('website/src/assets/art-direction.json');

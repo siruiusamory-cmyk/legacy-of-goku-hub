@@ -247,6 +247,9 @@ jobs:
       actions: read
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    outputs:
+      artifact_id: ${{ steps.website-artifact.outputs.artifact-id }}
+      manifest_sha256: ${{ steps.seal.outputs.manifest_sha256 }}
     steps:
       - *a2
       - *a3
@@ -266,35 +269,49 @@ jobs:
           BACKUP_TOKEN: ${{ steps.app.outputs.token }}
       - run: npm run site:build -- --snapshot .previous
         env:
-          SITE_BASE: /legacy-of-goku-hub/
+          SITE_BASE: /
       - run: node src/backup-cli.js config
         env:
           GH_TOKEN: ${{ github.token }}
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - id: seal
+        run: node tools/site/check-deployment.js seal .site/production "$GITHUB_SHA"
+      - id: website-artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: website
           path: .site/production/
           retention-days: 30
           if-no-files-found: error
-      - if: vars.SITE_DEPLOYMENT_ENABLED == 'true'
-        run: node tools/site/check-deployment.js
-      - if: vars.SITE_DEPLOYMENT_ENABLED == 'true'
-        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
-        with:
-          path: .site/production/
   deploy-website:
-    needs: website
-    if: vars.SITE_DEPLOYMENT_ENABLED == 'true' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    needs: [publish, website]
+    if: vars.SITE_DEPLOYMENT_ENABLED == 'true' && github.ref == 'refs/heads/main' && github.ref_protected && github.event.repository.default_branch == 'main' && needs.publish.result == 'success' && needs.website.result == 'success'
     permissions:
       contents: read
-      pages: write
-      id-token: write
+      actions: read
     environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      name: cloudflare-pages
+      url: https://loghub.pages.dev/
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - *a2
+      - *a3
+      - name: Download the exact verified website artifact from this run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: ${{ needs.website.outputs.artifact_id }}
+          path: ${{ runner.temp }}/loghub-direct-upload/website
+          merge-multiple: true
+      - name: Verify website artifact inventory and current policy
+        env:
+          WEBSITE_DIR: ${{ runner.temp }}/loghub-direct-upload/website
+          EXPECTED_MANIFEST_SHA256: ${{ needs.website.outputs.manifest_sha256 }}
+        run: node tools/site/check-deployment.js verify "$WEBSITE_DIR" "$GITHUB_SHA" "$EXPECTED_MANIFEST_SHA256"
+      - name: Verify the existing exact Cloudflare project
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: node tools/site/cloudflare-project.js
       - name: Reject a stale source revision before deployment
         env:
           GH_TOKEN: ${{ github.token }}
@@ -304,5 +321,19 @@ jobs:
         run: |
           current=$(gh api "repos/$SOURCE_REPOSITORY/git/ref/heads/$SOURCE_BRANCH" --jq '.object.sha')
           test "$current" = "$EXPECTED_SHA"
-      - id: deploy
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
+      - name: Upload verified static assets to loghub.pages.dev
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4.105.0'
+          packageManager: npm
+          workingDirectory: ${{ runner.temp }}/loghub-direct-upload
+          preCommands: |
+            node "$GITHUB_WORKSPACE/tools/site/check-deployment.js" verify website "$GITHUB_SHA" "$EXPECTED_MANIFEST_SHA256"
+            test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')" = "$GITHUB_SHA"
+          command: pages deploy website --project-name=loghub --branch=main --commit-hash=${{ github.sha }}
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_MANIFEST_SHA256: ${{ needs.website.outputs.manifest_sha256 }}
