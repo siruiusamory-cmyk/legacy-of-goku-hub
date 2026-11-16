@@ -168,4 +168,5 @@ Anonymous ratings checks and activation limits are recorded in [ratings verifica
 
 The [bounded ratings review](docs/launch/RATINGS-REVIEW.md) records the independent findings and their regression-tested fixes; no production ratings activation has occurred.
 
-Ratings verification also covers network-wide anonymous abuse limits, oversized input and database quota failures; existing community-average typography is retained.
+Ratings verification also covers network-wide anonymous abuse limits, oversized input and database quota failures; existing community-average typography is retained, with autosave feedback and removal controls inside the existing selector panel.
+
