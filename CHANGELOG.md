@@ -1,5 +1,12 @@
 # Changelog
 
+## LOG-HUB-015: administrator Featured project management
+
+- Add administrator Feature, Replace Featured and Remove from Featured actions with published-project eligibility and actual approved cover/details in private review.
+- Make a single approved publishing-policy selection authoritative across fresh and retained GitHub/community records. Replacement clears the previous selection atomically, and suspension or delisting clears it.
+- Reject conflicting assignments and verify the requested selection after protected signed deployment. Preserve the homepage frame, listing identities, ratings, artwork approvals and ownership claims.
+- Cover isolated exact approval, policy-only PR generation, signed publication, rendered artwork/ratings/actions and mobile accessibility. Merge and deployment await owner authorization.
+
 ## LOG-HUB-014: Permanent domain migration
 
 - Move public canonical URLs, Worker custom domains and publication URLs to `legacyofgokuhub.com`, preserving the existing Pages project, D1 identities and protected signed deployment.

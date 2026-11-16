@@ -59,6 +59,7 @@ export async function buildCatalog(root) {
     projects.push(project);
   }
   const compare = (a, b) => a < b ? -1 : a > b ? 1 : 0;
+  if (projects.filter(project => project.featured).length > 1) throw Error('catalog: conflicting featured assignments');
   projects.sort((a, b) => compare(a.id, b.id));
   const order = key => [...projects].sort((a, b) => compare(b[key] || '', a[key] || '') || compare(a.id, b.id)).map(p => p.id);
   const catalog = {schema_version: 1, projects,

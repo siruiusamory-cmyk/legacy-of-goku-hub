@@ -34,6 +34,7 @@ export async function validateSiteCatalog(catalog) {
     for (const url of p.source?.also_known_at || []) publicURL(url, 'source');
     if (p.distribution) publicURL(p.distribution.url, 'distribution', {download: true});
   }
+  if (catalog.projects.filter(project => project.featured).length > 1) throw Error('conflicting site featured assignments');
   for (const values of Object.values(catalog.sort)) if (values.length !== ids.size || values.some(id => !ids.has(id))) throw Error('site sort identities mismatch');
   return catalog;
 }

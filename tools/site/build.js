@@ -47,6 +47,11 @@ else {
     }
   }
   catalog.projects = catalog.projects.filter(p=>eligible.has(p.id));
+  for (const project of catalog.projects) {
+    const entry = entries.find(entry => entry.id === project.id);
+    const rule = ruleFor(policy, entry);
+    if (project.featured !== Boolean(rule.featured && rule.decision === 'approved')) throw Error('signed catalog Featured placement differs from current policy');
+  }
   const ids = new Set(catalog.projects.map(p=>p.id));
   for (const key of Object.keys(catalog.sort)) catalog.sort[key] = catalog.sort[key].filter(id=>ids.has(id));
   for (const p of catalog.projects) for (const image of [p.cover,...p.screenshots]) {

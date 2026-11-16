@@ -15,7 +15,7 @@ export async function fixture() {
   const jwt = async changes => { const enc = v => Buffer.from(JSON.stringify(v)).toString('base64url'); const data = enc({alg: 'RS256', kid: 'fixture'}) + '.' + enc({iss: issuer, aud: ['fixture'], type: 'app', sub: 'owner', email: 'owner@example.org', iat: time - 1, exp: time + 3600, ...changes}); return data + '.' + Buffer.from(await crypto.subtle.sign('RSASSA-PKCS1-v1_5', keys.privateKey, Buffer.from(data))).toString('base64url'); };
   const token = await jwt(), processor = random();
   const env = {DB: binding(db), ADMIN_ENABLED: 'true', ADMIN_ORIGIN: origin, ACCESS_ISSUER: issuer, ACCESS_AUD: 'fixture', ADMIN_EMAILS: 'owner@example.org', PROCESSOR_HASH: await digest(processor), SITE_ORIGIN: 'https://site.example', SOURCE_REPO: 'fictional/hub', GH_DISPATCH_TOKEN: 'test-only'};
-  const state = {projects: [], pr: null, runs: [], jobs: [], manifest: {}, dispatched: [], assets: []};
+  const state = {projects: [], policy: {projects: [], external_projects: []}, pr: null, runs: [], jobs: [], manifest: {}, dispatched: [], assets: []};
   env.ASSETS = {fetch: async req => { const name = new URL(req.url).pathname === '/' ? 'index.html' : new URL(req.url).pathname.slice(1); if (!['index.html', 'admin.js', 'admin.css'].includes(name)) return new Response('Not found', {status: 404}); const bytes = await fs.readFile(new URL('../../admin/public/' + name, import.meta.url)); return new Response(bytes, {headers: {'Content-Type': name.endsWith('html') ? 'text/html' : name.endsWith('js') ? 'application/javascript' : 'text/css'}}); }};
   const fetcher = async (url, opts = {}) => {
     if (opts.redirect !== undefined && !['follow', 'manual'].includes(opts.redirect)) throw TypeError('Cloudflare Workers supports only follow or manual redirects');
@@ -31,7 +31,7 @@ export async function fixture() {
     if (address.includes('/compare/')) return Response.json({status: 'identical'});
     if (address.includes('/jobs?')) return Response.json({jobs: state.jobs});
     if (address.includes('/actions/workflows/catalog.yml/runs')) return Response.json({workflow_runs: state.runs});
-    if (address.includes('/contents/policy')) return Response.json({content: Buffer.from(JSON.stringify({projects: [], external_projects: []})).toString('base64')});
+    if (address.includes('/contents/policy')) return Response.json({content: Buffer.from(JSON.stringify(state.policy)).toString('base64')});
     if (address.includes('/contents/listings/')) return new Response('{}', {status: 404});
     throw Error('Unexpected fixture request: ' + address);
   };

@@ -12,6 +12,8 @@ The Worker independently validates RS256 signatures, issuer, audience, app-token
 
 ## Owner workflow
 
+Featured placement (LOG-HUB-015) is managed under **Existing listings**. The panel shows the currently published Featured project. Choose **Manage**, then **Feature**, **Replace Featured**, or **Remove from Featured**. Only approved projects present in the published catalog are eligible. Review the actual published title, description, links and approved normalized cover in the private package, approve it, then prepare its protected publication PR. Replacement clears the previous selection in the same policy file. Clearing restores the existing empty homepage frame. The dashboard reports completion only after the signed deployment shows the requested selection. Suspension or delisting clears that project's selection. These controls require deployment of LOG-HUB-015 after owner authorization.
+
 1. Open the protected administrator origin, authenticate by allowed email PIN and select **Sign in**.
 2. Search, filter and sort the paginated inbox. Select a submission to inspect all supplied metadata, notes, source/download links, artwork references, ownership challenge and history. Duplicate warnings include pending submissions and current listings.
 3. Start review, request corrections or reject with a public reason. Receipt holders see public notes; private notes stay in the dashboard. Reload after the anonymous submitter revises. Stale revisions are rejected.

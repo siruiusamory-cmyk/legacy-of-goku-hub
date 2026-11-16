@@ -24,6 +24,23 @@ async function catalog(env) {
   check(response.ok, 503, 'Catalog unavailable');
   const data = await response.json(); check(Array.isArray(data.projects), 503); return data.projects;
 }
+async function managedCatalog(env) {
+  const projects = await catalog(env);
+  const file = await github(env, '/contents/policy/publishing.json?ref=main');
+  const policy = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(file.content.replace(/\s/g, '')), c => c.charCodeAt(0))));
+  const rules = [...policy.projects, ...(policy.external_projects || [])];
+  check(rules.filter(rule => rule.featured).length <= 1 && projects.filter(project => project.featured).length <= 1, 503, 'Conflicting featured assignments');
+  for (const project of projects) project.published = true;
+  for (const rule of rules) {
+    if (!rule.project_id) continue;
+    let project = projects.find(project => project.id === rule.project_id);
+    if (!project) { project = {id: rule.project_id, title: rule.project_id, published: false}; projects.push(project); }
+    project.moderation = rule.decision;
+    project.feature_selected = rule.featured === true;
+    project.feature_eligible = project.published && rule.decision === 'approved' && !(policy.revoked_owner_ids || []).includes(rule.owner_id);
+  }
+  return {projects, featured: projects.find(project => project.featured) || null};
+}
 async function currentReview(env, id) {
   check(/^[A-Za-z0-9_-]{24}$/.test(id || ''));
   const row = await sql(env, 'SELECT * FROM admin_reviews WHERE id=?', id).first(); check(row, 404, 'Review not found'); return row;
@@ -52,8 +69,10 @@ async function publication(env, row) {
   const projects = await catalog(env), live = projects.find(p => p.id === row.project_id);
   const absent = ['suspend', 'delist'].includes(row.operation);
   if (absent ? Boolean(live) : !live) return result;
+  if (row.operation === 'feature' && (!live.featured || projects.filter(project => project.featured).length !== 1)) return result;
+  if (row.operation === 'unfeature' && projects.some(project => project.featured)) return result;
   result.status = absent ? 'withdrawn' : 'published'; result.run = run.html_url;
-  if (live) result.live_url = env.SITE_ORIGIN + '/projects/' + row.project_id + '/';
+  if (live) result.live_url = ['feature', 'unfeature'].includes(row.operation) ? env.SITE_ORIGIN + '/' : env.SITE_ORIGIN + '/projects/' + row.project_id + '/';
   if (row.submission_id && !absent) await sql(env, "UPDATE submissions SET state='published',updated=? WHERE id=? AND revision=? AND state='approved'", seconds(), row.submission_id, row.revision).run();
   return result;
 }
@@ -135,18 +154,7 @@ export async function handle(request, env) {
       await env.DB.batch([sql(env, 'DELETE FROM admin_sessions WHERE subject=?', data.subject), sql(env, 'INSERT INTO admin_revocations(subject,before) VALUES(?,?) ON CONFLICT(subject) DO UPDATE SET before=excluded.before', data.subject, seconds()), history(env, user.email, 'revoke-sessions')]); return json({ok: true});
     }
     if (path === '/api/sessions' && request.method === 'GET') return json((await sql(env, 'SELECT subject,email,max(expires) expires FROM admin_sessions WHERE expires>? GROUP BY subject,email', seconds()).all()).results);
-    if (path === '/api/catalog' && request.method === 'GET') {
-      const projects = await catalog(env);
-      const file = await github(env, '/contents/policy/publishing.json?ref=main');
-      const policy = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(file.content.replace(/\s/g, '')), c => c.charCodeAt(0))));
-      for (const rule of [...policy.projects, ...(policy.external_projects || [])]) {
-        if (!rule.project_id) continue;
-        const live = projects.find(p => p.id === rule.project_id);
-        if (live) live.moderation = rule.decision;
-        else projects.push({id: rule.project_id, title: rule.project_id, moderation: rule.decision});
-      }
-      return json({projects});
-    }
+    if (path === '/api/catalog' && request.method === 'GET') return json(await managedCatalog(env));
     if (path === '/api/listing' && request.method === 'GET') {
       const id = url.searchParams.get('id'); check(LISTING_ID.test(id || ''));
       const file = await github(env, `/contents/listings/${id}/listing.json?ref=main`, 'GET', undefined, true);
@@ -199,7 +207,7 @@ export async function handle(request, env) {
       await sql(env, "DELETE FROM admin_files WHERE review_id IN (SELECT id FROM admin_reviews WHERE state IN ('stale','failed','expired'))").run();
       const stored = await sql(env, "SELECT count(DISTINCT review_id) n FROM admin_files WHERE name NOT LIKE 'preview-%'").first();
       check(stored.n < 6, 503, 'Private artwork storage is full; wait for its seven-day retention cleanup');
-      check(['submission', 'edit', 'suspend', 'delist', 'restore', 'claim'].includes(data.operation));
+      check(['submission', 'edit', 'suspend', 'delist', 'restore', 'claim', 'feature', 'unfeature'].includes(data.operation));
       let sub = null, payload;
       if (data.operation === 'submission' || data.operation === 'claim') {
         check(Number.isInteger(data.submission_id)); sub = await sql(env, 'SELECT * FROM submissions WHERE id=?', data.submission_id).first();
@@ -208,7 +216,14 @@ export async function handle(request, env) {
         check(checked.value.kind === sub.kind && (checked.value.listing_id || null) === sub.listing_id, 400, 'Submission identity cannot change');
         payload = checked.value;
         check((data.operation === 'claim') === (sub.kind === 'claim'));
-      } else { check(LISTING_ID.test(data.project_id || '')); payload = data.payload || {}; }
+      } else {
+        check(LISTING_ID.test(data.project_id || '')); payload = data.payload || {};
+        if (['feature', 'unfeature'].includes(data.operation)) {
+          const project = (await managedCatalog(env)).projects.find(project => project.id === data.project_id);
+          check(project?.feature_eligible, 409, 'Featured requires an approved, published project');
+          if (data.operation === 'unfeature') check(project.feature_selected, 409, 'Featured selection changed; reload the catalog');
+        }
+      }
       const priv = note(data.reason); if (data.operation === 'claim' || ['suspend', 'delist', 'restore'].includes(data.operation)) check(priv.length >= 10, 400, 'Record a reason of at least 10 characters');
       const id = random().slice(0, 24);
       const active = await sql(env, "SELECT count(*) n FROM admin_reviews WHERE state IN ('queued','processing','ready','approved','publishing')").first(); check(active.n < 6, 503, 'Finish existing private reviews before preparing more');
