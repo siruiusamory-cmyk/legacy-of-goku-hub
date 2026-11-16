@@ -58,17 +58,20 @@ async function decide(state) {
 }
 async function prepare(operation) {
   if (!await confirmAction(`Prepare ${operation} for private review? This does not approve or publish anything.`)) return;
-  let payload = values();
+  let payload = ['feature', 'unfeature'].includes(operation) ? {} : values();
   if (!selected) { const {creator, ...rest} = payload; payload = {...rest, developer: creator}; }
   const result = await api('prepare', {operation, payload, ...(selected ? {submission_id: selected.id, revision: selected.revision} : {project_id: listing.id}), reason: $('reason').value, transfer: $('transfer').checked});
   notice('Private preparation queued. Refresh Publication reviews to inspect results.'); await reviews(result.id);
 }
 async function catalog() {
   const data = await api('catalog'); show('queue'); $('items').replaceChildren(); $('filters').hidden = true; $('pagination').textContent = 'Approved catalog identities, including withdrawn listings'; $('previous').hidden = true; $('next').hidden = true;
+  $('items').append(el('p', data.featured ? 'Currently Featured: ' + data.featured.title + ' · ' + data.featured.id : 'Currently Featured: none'));
   for (const p of data.projects) { const article = el('article'); article.append(el('h3', p.title), el('p', p.id + ' · ' + (p.moderation || 'approved')), button('Manage ' + p.id, async () => {
     const detail = await api('listing?id=' + encodeURIComponent(p.id)), record = detail.record;
     selected = null; listing = p; show('detail'); $('detail-title').textContent = 'Manage: ' + (record.title || p.title); $('detail-title').focus(); $('details').replaceChildren(el('pre', JSON.stringify(record, null, 2))); if (detail.message) $('details').append(el('p', detail.message)); fill({...record, url: record.source?.url || record.repository || '', patch_url: record.distribution?.url || ''});
     $('metadata').hidden = !detail.editable; $('prepare').disabled = !detail.editable;
+    $('feature').hidden = !p.feature_eligible || Boolean(p.featured); $('feature').textContent = data.featured ? 'Replace Featured' : 'Feature';
+    $('unfeature').hidden = !p.featured || !p.feature_eligible;
     $('submission-actions').hidden = true; $('listing-actions').hidden = false; $('prepare').textContent = 'Prepare metadata / artwork changes'; $('history').replaceChildren();
   })); $('items').append(article); }
 }
@@ -84,6 +87,14 @@ async function showReview(r) {
   const pkg = r.package;
   box.append(el('p', 'Approval readiness: ' + (r.state === 'ready' ? 'Prepared. Review all fields, links, artwork and policy below.' : r.state)), el('p', 'Exact package digest: ' + r.digest));
   for (const warning of pkg.warnings) box.append(el('p', warning));
+  if (['feature', 'unfeature'].includes(pkg.operation)) {
+    box.append(el('h3', 'Proposed homepage Featured project'));
+    const project = pkg.featured_preview;
+    if (project) {
+      box.append(el('h4', project.title), el('p', project.description));
+      for (const url of [project.repository, project.source?.url, project.distribution?.url, project.release?.download_url, ...(project.links || []).map(item => item.url)].filter(Boolean)) box.appendChild(el('p')).append(link(url));
+    } else box.append(el('p', 'No project selected. The existing empty Featured frame will appear after protected publication.'));
+  }
   if (pkg.listing) { box.append(el('h3', 'Proposed listing'), el('pre', JSON.stringify(pkg.listing, null, 2))); for (const url of [pkg.listing.source.url, pkg.listing.distribution?.url, ...(pkg.listing.links || []).map(l => l.url)].filter(Boolean)) box.appendChild(el('p')).append(link(url)); }
   const art = el('div'); art.className = 'artwork';
   for (const f of pkg.files.filter(f => f.name.startsWith('preview-'))) { const figure = el('figure'), img = el('img'); img.src = `/api/preview?id=${r.id}&name=${f.name}`; img.alt = f.name === 'preview-0.webp' ? 'Prepared cover artwork' : 'Prepared project screenshot'; figure.append(img, el('figcaption', f.name + ' · SHA-256 ' + f.sha256)); art.append(figure); }
@@ -105,5 +116,5 @@ $('catalog').onclick = run(catalog); $('reviews').onclick = run(() => reviews())
 $('filters').onsubmit = run(async () => { page = 1; await queue(); }); $('previous').onclick = run(async () => { page--; await queue(); }); $('next').onclick = run(async () => { page++; await queue(); });
 $('start').onclick = run(() => decide('in-review')); $('corrections').onclick = run(() => decide('needs-changes')); $('reject').onclick = run(() => decide('rejected'));
 $('prepare').onclick = run(() => prepare(selected?.kind === 'claim' ? 'claim' : selected ? 'submission' : 'edit'));
-for (const op of ['suspend', 'delist', 'restore']) $(op).onclick = run(() => prepare(op));
+for (const op of ['suspend', 'delist', 'restore', 'feature', 'unfeature']) $(op).onclick = run(() => prepare(op));
 try { signedIn(await api('session')); await queue(); } catch { notice('Sign in through your authorized administrator identity.'); }

@@ -143,7 +143,7 @@ export function setDecision(root, listingId, decision, reason) {
   return setRule(root, listingId, rule => {
     if (!rule) throw Error('no policy rule exists for this listing');
     const {reason: _old, ...rest} = rule;
-    return {...rest, decision, ...(reason ? {reason} : {})};
+    return {...rest, decision, ...(rest.featured && decision !== 'approved' ? {featured: false} : {}), ...(reason ? {reason} : {})};
   });
 }
 

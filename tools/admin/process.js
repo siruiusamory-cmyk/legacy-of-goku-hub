@@ -8,7 +8,7 @@ import {readJSON} from '../../src/records.js';
 import {prepareListing, manualClaim, verifyPageClaim, freezeReviewedListing} from '../../src/intake-admin.js';
 import {safeFetcher} from '../../src/safe-fetch.js';
 import {evaluateListing} from '../../src/listings.js';
-import {normalizeImage, imageHash} from '../../src/images.js';
+import {normalizeImage, imageHash, boundedBody, MAX_IMAGE_BYTES} from '../../src/images.js';
 import {validateListing} from '../../src/listing-schema.js';
 import {policyCheck, artworkApproved} from '../../src/moderation.js';
 import {sourceKind} from '../../website/src/lib/urlkey.js';
@@ -22,11 +22,11 @@ const ALLOWED = /^(?:cover|screenshot-[1-6])\.(?:png|jpg|jpeg|webp)$/;
 const EDITABLE = ['title', 'developer', 'description', 'game', 'category', 'status', 'distribution', 'links'];
 
 export async function preparePackage({row, root = ROOT, api = new GitHub(), fetcher = safeFetcher(), site = 'https://legacyofgokuhub.com', base}) {
-  const policy = await readJSON(path.join(root, 'policy/publishing.json'));
+  const policy = policyCheck(await readJSON(path.join(root, 'policy/publishing.json')));
   const originalPolicy = structuredClone(policy);
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'loghub-admin-'));
   try {
-    let listing, rule, warnings = [], previews = [], files = [], projectId = row.project_id;
+    let listing, rule, featuredPreview, warnings = [], previews = [], files = [], projectId = row.project_id;
     const value = row.payload.value;
     const existingRule = (policy.external_projects || []).find(r => r.project_id === projectId);
     const legacyRule = policy.projects.find(r => r.project_id === projectId);
@@ -35,7 +35,26 @@ export async function preparePackage({row, root = ROOT, api = new GitHub(), fetc
       try { oldListing = await readJSON(path.join(root, 'listings', projectId, 'listing.json')); }
       catch (error) { if (error.code !== 'ENOENT') throw error; }
     }
-    if (['suspend', 'delist', 'restore', 'claim'].includes(row.operation)) {
+    if (['feature', 'unfeature'].includes(row.operation)) {
+      rule = existingRule || legacyRule;
+      assert(rule && rule.decision === 'approved' && !policy.revoked_owner_ids.includes(rule.owner_id), 'Featured requires an approved project');
+      const response = await fetcher(site + '/catalog.json'); assert(response.ok, 'Published catalog unavailable');
+      const projects = (await response.json()).projects;
+      assert(Array.isArray(projects) && projects.filter(project => project.featured).length <= 1, 'Conflicting published featured assignments');
+      const live = projects.find(project => project.id === projectId);
+      if (row.operation === 'feature') {
+        assert(live, 'Featured requires a published project');
+        assert(live.cover === `assets/${projectId}/cover.webp`, 'Unexpected published cover path');
+        const artwork = await fetcher(site + '/' + live.cover); assert(artwork.ok, 'Published artwork unavailable');
+        const bytes = await boundedBody(artwork, MAX_IMAGE_BYTES);
+        assert(rule.artwork_sets?.some(set => set[0]?.sha256 === imageHash(bytes)), 'Published cover does not match approved artwork');
+        await normalizeImage(bytes, 'cover');
+        featuredPreview = live;
+        previews.push({name: 'preview-0.webp', bytes});
+      } else assert(rule.featured, 'Featured selection changed; reload the catalog');
+      for (const previous of [...policy.projects, ...(policy.external_projects || [])]) if (previous.featured) previous.featured = false;
+      rule.featured = row.operation === 'feature';
+    } else if (['suspend', 'delist', 'restore', 'claim'].includes(row.operation)) {
       const old = existingRule || legacyRule; assert(old, 'No approved policy identity exists');
       rule = structuredClone(old);
       if (row.operation === 'claim') {
@@ -51,6 +70,7 @@ export async function preparePackage({row, root = ROOT, api = new GitHub(), fetc
       } else {
         rule.decision = {suspend: 'suspended', delist: 'delisted', restore: 'approved'}[row.operation];
         rule.reason = row.payload.reason;
+        if (rule.featured && rule.decision !== 'approved') rule.featured = false;
       }
       const target = existingRule ? policy.external_projects : policy.projects;
       target[target.indexOf(existingRule || legacyRule)] = rule;
@@ -99,11 +119,16 @@ export async function preparePackage({row, root = ROOT, api = new GitHub(), fetc
       const index = policy.external_projects.findIndex(r => r.project_id === projectId);
       if (index === -1) policy.external_projects.push(rule); else policy.external_projects[index] = rule;
       policy.external_projects.sort((a, b) => a.project_id.localeCompare(b.project_id));
-      if (legacyRule) { legacyRule.decision = 'delisted'; legacyRule.reason = 'Replaced by exact-approved managed listing with the same stable identity'; warnings.push('Converts the prior GitHub intake record to a managed listing; stable ID and ratings are retained.'); }
+      if (legacyRule) {
+        if (legacyRule.featured) { rule.featured = true; legacyRule.featured = false; }
+        legacyRule.decision = 'delisted';
+        legacyRule.reason = 'Replaced by exact-approved managed listing with the same stable identity';
+        warnings.push('Converts the prior GitHub intake record to a managed listing; stable ID and ratings are retained.');
+      }
     }
     policyCheck(policy);
     const buffers = [...files, ...previews];
-    const pkg = {version: 1, project_id: projectId, operation: row.operation, base_commit: base, base_policy_sha256: sha(text(originalPolicy)), listing: listing || null, policy, rule, warnings, files: buffers.map(f => ({name: f.name, sha256: imageHash(f.bytes), parts: Math.ceil(f.bytes.toString('base64').length / 262144)}))};
+    const pkg = {version: 1, project_id: projectId, operation: row.operation, base_commit: base, base_policy_sha256: sha(text(originalPolicy)), listing: listing || null, ...(['feature', 'unfeature'].includes(row.operation) ? {featured_preview: featuredPreview || null} : {}), policy, rule, warnings, files: buffers.map(f => ({name: f.name, sha256: imageHash(f.bytes), parts: Math.ceil(f.bytes.toString('base64').length / 262144)}))};
     return {package: pkg, buffers};
   } finally { await fs.rm(directory, {recursive: true, force: true}); }
 }

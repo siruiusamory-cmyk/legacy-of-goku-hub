@@ -12,6 +12,9 @@ export function policyCheck(policy) {
   const external = policy.external_projects || [];
   if (new Set(external.map(p => p.project_id)).size !== external.length) throw Error('policy: duplicate project IDs');
   for (const rule of external) if (rule.project_id.startsWith('gh-') !== (rule.owner_id !== undefined)) throw Error('policy: only GitHub listings carry an owner ID');
+  const featured = [...policy.projects, ...external].filter(rule => rule.featured);
+  if (featured.length > 1) throw Error('policy: conflicting featured assignments');
+  if (featured.some(rule => !rule.project_id || rule.decision !== 'approved' || policy.revoked_owner_ids.includes(rule.owner_id))) throw Error('policy: Featured requires an approved project identity');
   return policy;
 }
 const sorted = value => Array.isArray(value) ? value.map(sorted) : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).sort().map(key => [key, sorted(value[key])])) : value;
@@ -51,5 +54,6 @@ export async function assertPublicationPolicy(snapshot, catalog, policy, entries
     const entry = entries.find(e => e.id === project.id);
     const rule = entry && ruleFor(policy, entry);
     if (!entry || !rule || ['suspended', 'delisted'].includes(rule.decision) || policy.revoked_owner_ids.includes(entry.owner_id)) throw Error('current moderation policy excludes catalog project');
+    if (Boolean(project.featured) !== Boolean(rule.featured && rule.decision === 'approved')) throw Error('catalog Featured placement differs from approved policy');
   }
 }

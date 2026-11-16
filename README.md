@@ -7,6 +7,8 @@ Private administrator dashboard: [owner workflow, authentication research and au
 
 The listing manager loads approved source metadata even for withdrawn managed listings. Withdrawn legacy listings can be restored through protected review before their catalog metadata is edited.
 
+LOG-HUB-015 adds **Feature**, **Replace Featured** and **Remove from Featured** to the administrator listing manager for approved, published GitHub and community projects. The private review shows the published details and normalized cover before exact approval. A policy-only protected PR and signed deployment apply the selection. See the [administrator workflow](docs/launch/ADMIN.md). Merge and deployment await owner authorization.
+
 [Administrator verification and independent review resolutions](docs/launch/ADMIN-REVIEW.md) describe the isolated evidence and remaining activation checks.
 
 Administrator server requests use Cloudflare Workers-supported manual redirects and reject redirect responses; browser authentication still follows the protected Access sign-in flow.

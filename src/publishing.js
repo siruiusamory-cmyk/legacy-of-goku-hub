@@ -3,7 +3,7 @@ import path from 'node:path';
 import {readJSON, saveJSON, loadRecords, validateRecord, validateAnyRecord} from './records.js';
 import {repositoryInfo, releaseInfo} from './github.js';
 import {inspectImages, writeImages} from './images.js';
-import {policyCheck, contentDigest, artworkApproved, entryApproved, verifyEntryArtwork} from './moderation.js';
+import {policyCheck, contentDigest, artworkApproved, entryApproved, verifyEntryArtwork, ruleFor} from './moderation.js';
 import {evaluateListing, loadListings} from './listings.js';
 import {projectKeys} from './urlkey.js';
 export {policyCheck} from './moderation.js';
@@ -88,6 +88,8 @@ export async function publish({root, previous, output, api, issues, fetcher = fe
   const listings = await loadListings(root);
   const listedIds = new Set([...listingPrior.keys(), ...listings.map(l => l.listing.id)]);
   const persist = async (entry, visible) => {
+    const rule = ruleFor(policy, entry);
+    entry = {...entry, record: {...entry.record, featured: Boolean(rule?.featured && rule.decision === 'approved')}};
     if (entry.files !== snapshot) await copyProject(entry.files, snapshot, entry.record);
     await saveJSON(path.join(snapshot, 'records', entry.id + '.json'), entry.record);
     await saveJSON(path.join(snapshot, 'state', entry.id + '.json'), entry.state);

@@ -75,7 +75,7 @@ export async function evaluateListing({listing, dir, rule, prior, api, fetcher =
   if (manifested && prior && SENSITIVE.some(key => prior.record[key] !== record[key]) && rule?.approved_metadata_digest !== metadataDigest) throw Error(`sensitive attribution/game/category change requires review; metadata digest ${metadataDigest}`);
   const inspected = await inspectListingImages(record, dir, fetcher, captureImages);
   const initialDigest = listingDigest(record, host && {id: host.id, owner_id: host.owner_id});
-  const localFields = value => { const copy = {...value}; for (const key of MANIFEST_FIELDS) delete copy[key]; return digest(copy); };
+  const localFields = value => { const copy = {...value}; for (const key of [...MANIFEST_FIELDS, 'featured']) delete copy[key]; return digest(copy); };
   const contentApproved = manifested && prior && !transferred && localFields(record) === localFields(prior.record) ? prior.moderation.initial_content_digest : initialDigest;
   const claim = rule?.claim;
   const priorClaim = prior?.source.claim_digest;
