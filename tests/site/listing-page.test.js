@@ -56,7 +56,8 @@ test('an approved external submission becomes a generated project page with accu
   assert.doesNotMatch(page, /View Repository|Download on GitHub/);
   assert.match(page, /Community forum/);
   assert.match(page, /not yet claimed/);
-  assert.match(page, /href="https:\/\/github\.com\/siruiusamory-cmyk\/legacy-of-goku-hub\/issues\/new\/choose"/);
+  assert.match(page, /issues\/new\?template=submit\.yml&amp;title=/);
+  assert.match(page, /%5BClaim%5D/);
   const home = await fs.readFile(path.join(work, 'site/index.html'), 'utf8');
   assert.match(home, new RegExp(`data-id="${prepared.id}"`));
   assert.match(home, /aria-label="Download Patch for Page Test Hack"/);
