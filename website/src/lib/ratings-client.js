@@ -47,6 +47,7 @@ async function start(api){
  selector.querySelectorAll('input').forEach(input=>input.addEventListener('change',()=>{if(input.checked)save(Number(input.value));}));
  async function removeVote(){if(busy)return;busy=true;selector.querySelectorAll('input').forEach(el=>el.disabled=true);say('Removing rating...');try{const data=await request('/projects/'+id+'/mine','DELETE',undefined,true);display(id,data);saved=null;selected(null);say('Your rating was removed.');}catch(error){say(error.message);unavailable(id);}finally{busy=false;selector.querySelectorAll('input').forEach(el=>el.disabled=false);}}
  selector.querySelectorAll('input').forEach(input=>input.addEventListener('click',event=>{if(!busy&&Number(input.value)===saved){event.preventDefault();removeVote();}}));
+ selector.querySelectorAll('input').forEach(input=>input.addEventListener('keydown',event=>{if((event.key===' '||event.key==='Spacebar')&&!busy&&Number(input.value)===saved){event.preventDefault();removeVote();}}));
  window.addEventListener('storage',event=>{if(event.key===storage&&!busy)mine();});
  window.addEventListener('pageshow',event=>{if(event.persisted&&!busy)mine();});
  await aggregates;await mine();
