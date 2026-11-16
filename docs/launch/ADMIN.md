@@ -1,5 +1,7 @@
 # Private administration (LOG-HUB-013)
 
+Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake` and `ratings` custom subdomains. See [domain migration](DOMAIN-MIGRATION.md). Earlier activation instructions and hostname references below are historical; production is already enabled.
+
 Prepared for review, **not activated**. Production migrations, administrator deployment, account provisioning and merge require separate owner authorization. Anonymous intake, ratings and the public site remain operational.
 
 ## Authentication decision

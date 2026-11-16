@@ -1,5 +1,7 @@
 # Universal project submissions (LOG-HUB-012)
 
+Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake` and `ratings` custom subdomains. See [domain migration](DOMAIN-MIGRATION.md). Earlier activation instructions and hostname references below are historical; production is already enabled.
+
 Anyone can suggest, add, correct or claim a project at `/submit/` without a GitHub account, a Git repository, public source code or registration. Submission stays **default-off**: the site shows "Submissions are not open yet" until the owner activates it.
 
 ## What changed

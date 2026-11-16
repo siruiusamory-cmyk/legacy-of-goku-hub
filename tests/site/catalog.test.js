@@ -30,7 +30,7 @@ test('frontend deployment is default-branch gated, production-only and separated
   assert.match(workflow.jobs['deploy-website'].if,/ref_protected/);
   assert.deepEqual(workflow.jobs['deploy-website'].needs,['publish','website']);
   assert.equal(workflow.jobs['deploy-website'].environment.name,'cloudflare-pages');
-  assert.equal(workflow.jobs['deploy-website'].environment.url,'https://loghub.pages.dev/');
+  assert.equal(workflow.jobs['deploy-website'].environment.url,'https://legacyofgokuhub.com/');
   assert.deepEqual(workflow.jobs['deploy-website'].permissions,{contents:'read',actions:'read'});
   assert.ok(workflow.jobs['deploy-website'].steps.some(s=>s.name==='Reject a stale source revision before deployment'));
   assert.ok(workflow.jobs.website.steps.some(s=>s.id==='seal'));

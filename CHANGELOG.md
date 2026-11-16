@@ -1,5 +1,11 @@
 # Changelog
 
+## LOG-HUB-014: Permanent domain migration
+
+- Move public canonical URLs, Worker custom domains and publication URLs to `legacyofgokuhub.com`, preserving the existing Pages project, D1 identities and protected signed deployment.
+- Require the exact site hostname in Turnstile verification, with regressions for missing and obsolete hostnames; preserve exact origins and administrator authentication.
+- Document the verified cutover order, explicit enabled production flags and account-level permanent legacy redirects.
+
 ## LOG-HUB-013 activation runtime compatibility
 
 - Use manual redirect handling for administrator certificate, GitHub, catalog and deployment-manifest requests because Cloudflare Workers rejects the Node-supported `redirect: error` setting. Redirect responses remain rejected; authentication and publication checks fail closed.

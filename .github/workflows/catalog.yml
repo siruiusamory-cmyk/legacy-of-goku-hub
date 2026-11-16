@@ -295,7 +295,7 @@ jobs:
       actions: read
     environment:
       name: cloudflare-pages
-      url: https://loghub.pages.dev/
+      url: https://legacyofgokuhub.com/
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -326,7 +326,7 @@ jobs:
         run: |
           current=$(gh api "repos/$SOURCE_REPOSITORY/git/ref/heads/$SOURCE_BRANCH" --jq '.object.sha')
           test "$current" = "$EXPECTED_SHA"
-      - name: Upload verified static assets to loghub.pages.dev
+      - name: Upload verified static assets to legacyofgokuhub.com
         uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}

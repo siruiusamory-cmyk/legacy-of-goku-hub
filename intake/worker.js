@@ -56,7 +56,7 @@ async function human(env, token, ip) {
     const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {method: 'POST', body: form, signal: AbortSignal.timeout(8000)});
     result = await response.json();
   } catch { fail(503, 'The human check is unavailable. Please try again soon.'); }
-  if (result?.success !== true) fail(400, 'The human check did not pass. Please try again.');
+  if (result?.success !== true || result.hostname !== new URL(env.SITE_ORIGIN).hostname) fail(400, 'The human check did not pass. Please try again.');
 }
 async function published(env) {
   try {
