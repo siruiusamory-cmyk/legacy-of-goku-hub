@@ -27,7 +27,7 @@ for (const width of [390, 1280]) test(`owner browser workflow, safe content, acc
     await expect(page.getByRole('button', {name: 'Review submission 1'})).toBeVisible();
     await expect(page.locator('#items img')).toHaveCount(0);
     await page.getByRole('button', {name: 'Review submission 1'}).click();
-    await page.getByRole('button', {name: 'Start review', exact: true}).click(); await page.getByRole('button', {name: 'Confirm', exact: true}).click();
+    await page.getByRole('button', {name: 'Start review', exact: true}).click();
     await expect(page.locator('#details')).toContainText('revision 2');
     await page.getByLabel('Public receipt note', {exact: true}).fill('Please correct the description.');
     await page.getByLabel('Private moderation note').fill('Private browser training evidence');
@@ -46,7 +46,7 @@ for (const width of [390, 1280]) test(`owner browser workflow, safe content, acc
     const prepared = await preparePackage({row, root, fetcher: async () => new Response(png), base: 'a'.repeat(40)});
     for (const file of prepared.buffers) { const bytes = file.bytes.toString('base64'); for (let part = 0; part * 262144 < bytes.length; part++) await x.processCall(row.id, '/file', {name: file.name, part, data: bytes.slice(part * 262144, (part + 1) * 262144)}); }
     expect((await x.processCall(row.id, '/ready', {package: prepared.package})).status).toBe(200);
-    await page.getByRole('button', {name: 'Refresh reviews', exact: true}).click();
+    await expect(page.getByRole('img', {name: 'Prepared cover artwork'})).toBeVisible({timeout: 12000});
     await expect(page.getByRole('img', {name: 'Prepared cover artwork'})).toBeVisible();
     await expect.poll(() => page.getByRole('img', {name: 'Prepared cover artwork'}).evaluate(img => img.complete && img.naturalWidth === 640)).toBe(true);
     await page.getByLabel('I reviewed the exact content', {exact: false}).check();
