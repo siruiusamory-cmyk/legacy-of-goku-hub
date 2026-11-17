@@ -1,4 +1,6 @@
-# LOG-HUB-003 verification report
+# LOG-HUB-003 verification report (historical)
+
+> **Historical evidence:** This report documents the LOG-HUB-003 verification snapshot, not the current public deployment or feature set. Later launches, authentication changes, anonymous ratings, and catalogue updates supersede its operational status claims. Consult the [documentation index](docs/README.md) and current signed deployment evidence for present-day operations.
 
 Verified 2026-11-15 UTC (2026-11-14 Pacific). Existing architecture preserved. No frontend, CMS, database, server, runtime AI dependency, paid plan or upgrade was added.
 
