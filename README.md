@@ -58,6 +58,8 @@ This repository contains the source for the Legacy of Goku Hub website and its s
 
 For those contributing to or operating the Hub:
 
+- [Contributing to the Hub](CONTRIBUTING.md)
+- [Documentation index](docs/README.md)
 - [Moderation and content policy](docs/moderation.md)
 - [Maintainer operations and recovery](docs/OPERATIONS.md)
 - [Administrator documentation](docs/launch/ADMIN.md)

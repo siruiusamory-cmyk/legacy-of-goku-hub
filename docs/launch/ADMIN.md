@@ -2,9 +2,9 @@
 
 Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake` and `ratings` custom subdomains. See [domain migration](DOMAIN-MIGRATION.md). Earlier activation instructions and hostname references below are historical; production is already enabled.
 
-Prepared for review, **not activated**. Production migrations, administrator deployment, account provisioning and merge require separate owner authorization. Anonymous intake, ratings and the public site remain operational.
+**Status note:** This document contains original administrator setup decisions and historical activation steps. The administrator service is operated at https://admin.legacyofgokuhub.com/. Do not interpret the historical activation checklist below as an instruction to re-provision an existing production service. Check the current Worker, D1 migrations, Access application, and protected GitHub workflows before making changes. Operational changes still require authorization.
 
-## Authentication decision
+## Authentication design (historical rationale)
 
 Choose Cloudflare Access Free, email one-time PIN, an explicit administrator email policy and a separate `loghub-admin.<account>.workers.dev` origin. [Official pricing](https://www.cloudflare.com/plans/zero-trust-services/) supports up to 50 Free users; [Access for Workers](https://developers.cloudflare.com/workers/configuration/cloudflare-access/) supports workers.dev without purchasing a domain. Putting Access on the existing anonymous intake service would interfere with public submissions. Custom passwords or email links add credential recovery/delivery machinery; GitHub OAuth adds unnecessary account coupling. A browser-held moderator bearer token is unsafe. No new runtime dependency or paid service was added.
 

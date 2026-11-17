@@ -5,8 +5,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Releases and downloads come from GitHub automatically. Images can use repository-relative
-        paths (images/cover.png) or immutable raw.githubusercontent.com URLs in this repository.
+        Releases and downloads come from GitHub automatically. Cover artwork and screenshots are optional.
+        If provided, image paths (images/cover.png) belong to the submitted project's repository;
+        immutable raw.githubusercontent.com URLs must also identify that repository.
         Cover output is 640×360; screenshots are 480×320, letterboxed without distortion.
         Inputs: static PNG/JPEG/WebP, <=5 MiB, <=20 MP, <=8192px per side.
         Claims are verified against GitHub numeric IDs, not this form's declarations.

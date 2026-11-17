@@ -2,9 +2,9 @@
 
 Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake` and `ratings` custom subdomains. See [domain migration](DOMAIN-MIGRATION.md). Earlier activation instructions and hostname references below are historical; production is already enabled.
 
-LOG-HUB-010 supersedes the GitHub Pages plan. Host: **Cloudflare Pages Free**, project **loghub**, exact URL **https://loghub.pages.dev/**, base **/**, budget **$0**. No custom domain, paid feature, Workers/Functions, database, analytics or persistent ratings. Deployment is disabled; this checklist is not authorization.
+**Current public destination:** https://legacyofgokuhub.com/ on the existing Cloudflare Pages project `loghub`. The site and separate intake, ratings, and administrator services have since been activated; the original prelaunch instructions below are retained for historical reference and must not be rerun as a new setup. For current releases, use the protected signed `catalog.yml` workflow, verify the deployed manifest, and confirm current production configuration. This document does not itself authorize a deployment.
 
-## Before first live upload
+## Historical first-upload checklist (not a current setup procedure)
 
 - [ ] Follow [owner account/project/secret setup](CLOUDFLARE.md). Confirm Free, an existing Direct Upload project `loghub`, production branch `main` and exact subdomain `loghub.pages.dev`. Stop on conflict/suffix; no alternate URL or Git integration.
 - [ ] Review/merge the LOG-HUB-010 PR with passing required test/frontend checks. Preserve branch/receipt protections, three approved LOG-HUB-009 resources/artwork and DragonByte exclusion.

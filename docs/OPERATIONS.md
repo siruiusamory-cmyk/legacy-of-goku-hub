@@ -2,7 +2,7 @@
 
 LOG-HUB-014 moves the public site to https://legacyofgokuhub.com/ and services to `admin`, `intake` and `ratings` subdomains. See [domain migration](launch/DOMAIN-MIGRATION.md) for current configuration and cutover evidence. Earlier launch activation instructions below are historical.
 
-Current launch guidance: [Cloudflare Pages Free setup](launch/CLOUDFLARE.md), [maintainer moderation checklist](launch/MODERATION-CHECKLIST.md) and [deployment/rollback checklist](launch/DEPLOYMENT.md). Intended URL is https://loghub.pages.dev/ at `/`; GitHub Pages remains disabled and no website is deployed. Backup-health monitors signed catalog publication, not Cloudflare availability; deployment failures require checking the deploy job/Actions notifications and the live URL after authorized uploads.
+**Status:** The public website is live at https://legacyofgokuhub.com/. This runbook also preserves earlier provisioning and recovery procedures; older references to an undeployed site or a first launch are historical, not current operational state. Before acting, verify the deployed Cloudflare/GitHub settings, exact signed recovery point, and latest workflow behavior. See the [documentation index](README.md) and [deployment reference](launch/DEPLOYMENT.md). Backup-health monitors signed catalog publication, not Cloudflare availability; verify the live URL and deployment jobs separately.
 
 Source: https://github.com/siruiusamory-cmyk/legacy-of-goku-hub (public).
 Recovery vault: https://github.com/siruiusamory-cmyk/legacy-of-goku-hub-backups (private).
