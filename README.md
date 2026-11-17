@@ -3,6 +3,8 @@
 
 **A community catalog for Legacy of Goku projects, open to everyone.**
 
+LOG-HUB-017 begins with the proposed [publication-owner authority contract](docs/decisions/log-hub-017-authority.md) and [compatible migration plan](docs/decisions/log-hub-017-migrations.md). Phase 0 records the current approval paths and phased implementation gates. Runtime changes and production configuration require their reviewed phases and owner authorization.
+
 Private administrator dashboard: [owner workflow, authentication research and authorization-gated setup](docs/launch/ADMIN.md). LOG-HUB-013 is prepared for review; production administrator access remains disabled.
 
 The listing manager loads approved source metadata even for withdrawn managed listings. Withdrawn legacy listings can be restored through protected review before their catalog metadata is edited.
