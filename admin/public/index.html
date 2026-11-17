@@ -1,15 +1,159 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LoG Hub administration</title><link rel="stylesheet" href="/admin.css"><script type="module" src="/admin.js"></script></head>
-<body><header><h1>LoG Hub administration</h1><p id="identity">Private moderation</p><button id="login">Sign in</button> <button id="logout" hidden>Sign out everywhere</button></header>
-<p id="notice" role="status" aria-live="polite"></p>
-<main id="workspace" hidden><nav aria-label="Administration"><button id="inbox">Submission inbox</button> <button id="catalog">Existing listings</button> <button id="reviews">Publication reviews</button> <button id="sessions">Sessions</button></nav>
-<section id="queue"><h2>Submission inbox</h2><form id="filters"><label>Search<input id="search" type="search" maxlength="100"></label><label>Status<select id="state"><option value="">All statuses</option><option value="received">New submissions</option><option value="in-review">Under review</option><option value="needs-changes">Awaiting corrections</option><option value="approved">Approved</option><option value="published">Published</option><option value="rejected">Rejected</option></select></label><label>Sort<select id="sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></label><button>Apply filters</button></form><div id="items"></div><p id="pagination"></p><button id="previous">Previous page</button> <button id="next">Next page</button></section>
-<section id="detail" hidden aria-labelledby="detail-title"><h2 id="detail-title" tabindex="-1">Review submission</h2><div id="details"></div>
-<form id="metadata"><fieldset><legend>Review and correct metadata</legend><label>Project name<input name="title" maxlength="100"></label><label>Creator / developer<input name="creator" maxlength="100"></label><label>Description<textarea name="description" rows="5" maxlength="2000"></textarea></label><label>Project source address<input name="url" type="url"></label><label><input name="no_page" type="checkbox"> No public project page</label><label>Game<select name="game"><option value="">Select game</option><option value="legacy-of-goku">Legacy of Goku</option><option value="legacy-of-goku-2">Legacy of Goku II</option><option value="buus-fury">Buu’s Fury</option><option value="multiple">Multiple games</option></select></label><label>Category<select name="category"><option value="rom-hack">ROM hack</option><option value="fan-project">Fan project</option><option value="tool">Tool</option><option value="resource">Resource</option></select></label><label>Project status<select name="status"><option value="in-development">In development</option><option value="released">Released</option><option value="on-hold">On hold</option><option value="discontinued">Discontinued</option></select></label><label>Patch or download page<input name="patch_url" type="url"></label><label>Artwork addresses (one per line; cover first)<textarea name="artwork" rows="4"></textarea></label><label><input id="omit-artwork" type="checkbox"> Omit all artwork, including repository manifest images</label><label>Community links (label | HTTPS address, one per line)<textarea name="links" rows="3"></textarea></label></fieldset></form>
-<label>Public receipt note<textarea id="public-note" maxlength="500"></textarea></label><label>Private moderation note<textarea id="private-note" maxlength="1000"></textarea></label>
-<div id="submission-actions"><button id="start">Start review</button> <button id="corrections">Request corrections</button> <button id="reject">Reject submission</button></div>
-<label>Public policy reason / private claim-verification evidence<textarea id="reason" maxlength="1000"></textarea></label><p>Suspension and restoration reasons enter the public policy. Claim-verification evidence stays private. For a project-owned website, prefix the reason with “page-token:” to verify its receipt challenge automatically; shared pages require documented manual verification.</p><label><input id="transfer" type="checkbox"> I separately verified an ownership transfer</label>
-<button id="prepare">Prepare private review</button><div id="listing-actions" hidden><button id="feature" hidden>Feature</button> <button id="unfeature" hidden>Remove from Featured</button> <button id="suspend">Suspend listing</button> <button id="delist">Delist listing</button> <button id="restore">Restore listing</button></div><div id="history"></div></section>
-<section id="publication" hidden><h2 tabindex="-1" id="publication-title">Publication reviews</h2><p>Approval and publication are separate. A protected PR and successful signed deployment are required.</p><div id="review-list"></div><div id="review-detail"></div></section>
-<section id="session-panel" hidden><h2>Active administrator sessions</h2><p>Revocation ends dashboard sessions and rejects existing Access identity tokens. Remove an administrator from both allowlists to revoke authorization permanently.</p><div id="session-list"></div></section>
-</main><dialog id="confirmation"><form method="dialog"><h2>Confirm moderation action</h2><p id="confirmation-text"></p><button value="cancel" autofocus>Cancel</button> <button value="confirm">Confirm</button></form></dialog></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#172642">
+  <title>Administration | Legacy of Goku Hub</title>
+  <link rel="stylesheet" href="/admin.css">
+  <script type="module" src="/admin.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand">
+      <span class="eyebrow">Legacy of Goku Hub</span>
+      <h1>Administration</h1>
+      <p>Review projects, manage listings, and publish approved changes.</p>
+    </div>
+    <div class="account">
+      <p id="identity">Private moderation</p>
+      <button id="login" type="button" class="button-primary">Sign in</button>
+      <button id="logout" type="button" hidden>Sign out everywhere</button>
+    </div>
+  </header>
+
+  <p id="notice" role="status" aria-live="polite"></p>
+
+  <main id="workspace" hidden>
+    <nav class="primary-nav" aria-label="Administration">
+      <button id="inbox" type="button">Submission inbox</button>
+      <button id="catalog" type="button">Existing listings</button>
+      <button id="reviews" type="button">Publication reviews</button>
+      <button id="sessions" type="button">Sessions</button>
+    </nav>
+
+    <section id="queue" class="workspace-panel" aria-labelledby="queue-title">
+      <div class="section-intro">
+        <div><span class="eyebrow">Step 1 · Triage</span><h2 id="queue-title">Submission inbox</h2>
+        <p>Open a submission, check the information, then prepare it for approval.</p></div>
+        <p id="queue-count" class="section-stat" aria-live="polite"></p>
+      </div>
+      <form id="filters" class="filter-bar">
+        <label>Find a submission<input id="search" type="search" maxlength="100" placeholder="Name, project or receipt"></label>
+        <label>Status<select id="state">
+          <option value="">All statuses</option><option value="received">New submissions</option>
+          <option value="in-review">Under review</option><option value="needs-changes">Awaiting corrections</option>
+          <option value="approved">Approved</option><option value="published">Published</option>
+          <option value="rejected">Rejected</option>
+        </select></label>
+        <label>Order<select id="sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></label>
+        <button type="submit" class="button-secondary">Apply filters</button>
+      </form>
+      <div id="items" class="card-list"></div>
+      <div class="pagination">
+        <p id="pagination" aria-live="polite"></p>
+        <div><button id="previous" type="button">Previous page</button> <button id="next" type="button">Next page</button></div>
+      </div>
+    </section>
+
+    <section id="catalog-panel" class="workspace-panel" hidden aria-labelledby="catalog-title">
+      <div class="section-intro">
+        <div><span class="eyebrow">Manage published projects</span><h2 id="catalog-title">Existing listings</h2>
+        <p>Find a project to edit its details, change Featured, or manage its visibility.</p></div>
+        <p id="catalog-count" class="section-stat" aria-live="polite"></p>
+      </div>
+      <div id="featured-summary" class="featured-summary"></div>
+      <label class="catalog-search">Find a listing<input id="catalog-search" type="search" placeholder="Search project name or ID"></label>
+      <div id="catalog-items" class="card-list"></div>
+    </section>
+
+    <section id="detail" class="workspace-panel" hidden aria-labelledby="detail-title">
+      <div class="detail-navigation"><button id="back-to-list" type="button">← Back to list</button><span id="detail-kind"></span></div>
+      <div class="section-intro"><div><span class="eyebrow">Review and prepare</span><h2 id="detail-title" tabindex="-1">Review submission</h2>
+      <p id="detail-helper">Confirm the details before preparing an approval package.</p></div></div>
+      <div id="details" class="submission-summary"></div>
+
+      <form id="metadata">
+        <fieldset class="plain-fieldset"><legend>Project details</legend>
+          <div class="field-grid">
+            <label>Project name<input name="title" maxlength="100"></label>
+            <label>Creator / developer<input name="creator" maxlength="100"></label>
+          </div>
+          <label>Description<textarea name="description" rows="4" maxlength="2000"></textarea></label>
+          <div class="field-grid">
+            <label>Game<select name="game"><option value="">Select game</option><option value="legacy-of-goku">Legacy of Goku</option><option value="legacy-of-goku-2">Legacy of Goku II</option><option value="buus-fury">Buu’s Fury</option><option value="multiple">Multiple games</option></select></label>
+            <label>Category<select name="category"><option value="rom-hack">ROM hack</option><option value="fan-project">Fan project</option><option value="tool">Tool</option><option value="resource">Resource</option></select></label>
+          </div>
+          <details class="disclosure" id="more-metadata">
+            <summary>Source, artwork, links and other details</summary>
+            <div class="disclosure-body">
+              <label>Project source address<input name="url" type="url"></label>
+              <label class="inline-check"><input name="no_page" type="checkbox"> No public project page</label>
+              <label>Project status<select name="status"><option value="in-development">In development</option><option value="released">Released</option><option value="on-hold">On hold</option><option value="discontinued">Discontinued</option></select></label>
+              <label>Patch or download page<input name="patch_url" type="url"></label>
+              <label>Artwork addresses (one per line; cover first)<textarea name="artwork" rows="3"></textarea></label>
+              <label class="inline-check"><input id="omit-artwork" type="checkbox"> Omit all artwork, including repository manifest images</label>
+              <label>Community links (label | HTTPS address, one per line)<textarea name="links" rows="3"></textarea></label>
+            </div>
+          </details>
+        </fieldset>
+      </form>
+
+      <div id="submission-actions" class="action-panel">
+        <h3>Submission decision</h3>
+        <p>Record its review status or request corrections. This does not publish the project.</p>
+        <div class="action-row"><button id="start" type="button">Start review</button><button id="corrections" type="button">Request corrections</button><button id="reject" type="button" class="button-danger">Reject submission</button></div>
+      </div>
+
+      <details class="disclosure" id="moderation-notes">
+        <summary>Notes for the submitter and moderators</summary>
+        <div class="disclosure-body">
+          <label>Public receipt note<textarea id="public-note" maxlength="500" rows="3"></textarea></label>
+          <label>Private moderation note<textarea id="private-note" maxlength="1000" rows="3"></textarea></label>
+          <p class="muted">The public note appears on the submission receipt. The private note stays inside moderation.</p>
+        </div>
+      </details>
+
+      <details class="disclosure" id="policy-evidence">
+        <summary>Ownership verification and policy reasons</summary>
+        <div class="disclosure-body">
+          <label>Public policy reason / private claim-verification evidence<textarea id="reason" maxlength="1000" rows="3"></textarea></label>
+          <p class="muted">Suspension and restoration reasons enter the public policy. Claim-verification evidence stays private. For a project-owned website, prefix the reason with “page-token:” to verify its receipt challenge automatically; shared pages require documented manual verification.</p>
+          <label class="inline-check"><input id="transfer" type="checkbox"> I separately verified an ownership transfer</label>
+        </div>
+      </details>
+
+      <div class="action-panel prepare-panel">
+        <h3>Next: prepare a publication review</h3>
+        <p>This builds a private preview. Nothing is approved or published until you review the exact package.</p>
+        <div class="action-row"><button id="prepare" type="button" class="button-primary">Prepare private review</button>
+          <span id="listing-actions" hidden><button id="feature" type="button" hidden>Feature</button> <button id="unfeature" type="button" hidden>Remove from Featured</button>
+          <button id="suspend" type="button">Suspend listing</button> <button id="delist" type="button" class="button-danger">Delist listing</button> <button id="restore" type="button">Restore listing</button></span>
+        </div>
+      </div>
+      <details id="history-panel" class="disclosure"><summary>Moderation history and earlier reviews</summary><div id="history" class="disclosure-body"></div></details>
+    </section>
+
+    <section id="publication" class="workspace-panel" hidden aria-labelledby="publication-title">
+      <div class="section-intro"><div><span class="eyebrow">Step 2 · Approve and publish</span><h2 tabindex="-1" id="publication-title">Publication reviews</h2>
+        <p>Inspect the prepared result, approve it, then publish through the protected pipeline. Approval alone does not make a listing live.</p></div>
+      </div>
+      <div class="review-layout"><div id="review-list" class="review-list"></div><div id="review-detail" class="review-detail"></div></div>
+    </section>
+
+    <section id="session-panel" class="workspace-panel" hidden aria-labelledby="session-title">
+      <div class="section-intro"><div><span class="eyebrow">Account security</span><h2 id="session-title">Active administrator sessions</h2>
+        <p>Revoke a dashboard session when access should end. Permanent authorization changes are managed through both allowlists.</p></div></div>
+      <div id="session-list" class="card-list"></div>
+    </section>
+  </main>
+
+  <dialog id="confirmation" aria-labelledby="confirmation-title">
+    <form method="dialog">
+      <h2 id="confirmation-title">Confirm moderation action</h2>
+      <p id="confirmation-text"></p>
+      <div class="dialog-actions"><button value="cancel" autofocus>Cancel</button><button value="confirm" class="button-primary">Confirm</button></div>
+    </form>
+  </dialog>
+</body>
+</html>
