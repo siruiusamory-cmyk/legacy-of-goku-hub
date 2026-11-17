@@ -69,6 +69,21 @@
   ],
   "external_projects": [
     {
+      "project_id": "ext-gvp2t5evruov",
+      "decision": "approved",
+      "content_digests": [
+        "4c6c11ce45c9daeb9fdbf65beb98439f5f8b3998f600b50a7a1f42022bc7bc06"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "978281c15bfd8e8f69f87ba96f283d41613d37460c35f70e1dc0e1f779d87b25",
+            "sha256": "51441a2c60a68aedd4f85cacdfdbdb84bca5a503ecf6324ea3305bfe35fd131a"
+          }
+        ]
+      ]
+    },
+    {
       "project_id": "gh-1131874995",
       "owner_id": 127344248,
       "decision": "approved",
