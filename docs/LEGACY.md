@@ -1,4 +1,6 @@
-# Legacy of Goku Hub pipeline
+# Legacy of Goku Hub pipeline (historical)
+
+> **Archived architecture:** This document records an earlier pipeline before the public website and separate services launched. Statements about there being no website or database are historical. For the current Hub, start at [README](../README.md) or the [documentation index](README.md). Do not reuse these instructions as a live deployment procedure.
 
 Static content infrastructure for Legacy of Goku, Legacy of Goku II and Buu's Fury projects. No website, database, CMS, accounts, monetization or running server. GitHub Issues collect submissions, Actions validates them, moderators merge approval PRs, and Actions publishes a JSON-and-images artifact.
 
