@@ -62,7 +62,6 @@ test('owner features, replaces and clears GitHub/community projects through priv
       const project = x.state.projects.find(project => project.id === id);
       await page.getByRole('button', {name: 'Manage ' + id, exact: true}).click();
       await page.getByRole('button', {name: action, exact: true}).click();
-      await page.getByRole('button', {name: 'Confirm', exact: true}).click();
       await expect(page.locator('#notice')).toContainText('Private preparation queued');
       const row = (await (await x.call('/api/reviews')).json()).items[0];
       await x.processCall(row.id, '/claim', {action: 'prepare'});

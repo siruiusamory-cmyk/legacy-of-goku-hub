@@ -36,7 +36,7 @@ for (const width of [390, 1280]) test(`owner browser workflow, safe content, acc
     x.db.prepare("UPDATE submissions SET state='received',revision=revision+1 WHERE id=1").run();
     await page.getByRole('button', {name: 'Submission inbox', exact: true}).click(); await page.getByRole('button', {name: 'Review submission 1'}).click();
     await page.getByLabel('Project name', {exact: true}).fill('Fictional Training');
-    await page.getByRole('button', {name: 'Prepare private review', exact: true}).click(); await page.getByRole('button', {name: 'Confirm', exact: true}).click();
+    await page.getByRole('button', {name: 'Prepare private review', exact: true}).click();
     await expect(page.locator('#notice')).toContainText('Private preparation queued');
     const row = (await (await x.call('/api/reviews')).json()).items[0];
     await x.processCall(row.id, '/claim', {action: 'prepare'});
