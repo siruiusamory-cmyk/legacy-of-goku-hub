@@ -106,7 +106,7 @@ async function detail(id) {
 }
 async function decide(state) {
   if (!selected) return;
-  if (!await confirmAction(`Set this submission to “${labels[state]}”? The public note will appear on its receipt.`)) return;
+  if (state !== 'in-review' && !await confirmAction(`Set this submission to “${labels[state]}”? The public note will appear on its receipt.`)) return;
   await api('decision', {id: selected.id, revision: selected.revision, state, public_note: $('public-note').value, private_note: $('private-note').value}); notice('Moderation decision recorded.'); await detail(selected.id);
 }
 async function prepare(operation) {
