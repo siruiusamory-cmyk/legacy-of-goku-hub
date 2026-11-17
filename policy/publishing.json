@@ -66,5 +66,18 @@
       "approved_issue": 33,
       "approved_digest": "a8e3d67a64741b341e17e59b99247eb1f6536a79d0a6905c04527086ce1bc877"
     }
+  ],
+  "external_projects": [
+    {
+      "project_id": "gh-1131874995",
+      "owner_id": 127344248,
+      "decision": "approved",
+      "content_digests": [
+        "f26531340a78e66bf9a604dd6d1d02f4661b868005e0116c83f42325d81e7a13"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    }
   ]
 }
