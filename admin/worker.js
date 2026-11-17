@@ -1,4 +1,5 @@
 import {digest, random} from '../intake/worker.js';
+import {isOwner} from '../src/owner-authority.js';
 import {validateSubmission, LISTING_ID} from '../website/src/lib/submission.js';
 import {projectKeys} from '../website/src/lib/urlkey.js';
 import {identity, session, startSession, cookie, seconds, requireThat as check, sql, readBody, rate} from './auth.js';
@@ -233,6 +234,10 @@ export async function handle(request, env) {
       return json({id}, 201);
     }
     if (path === '/api/approve') {
+      const control = await sql(env, 'SELECT c.authority_epoch,c.owner_config_hash FROM publication_control c JOIN publication_authorities a ON a.epoch=c.authority_epoch AND a.config_hash=c.owner_config_hash WHERE c.id=1').first();
+      check(await isOwner(user, env, control), 403, 'Only the publication owner can approve');
+      const override = data.override === true, reason = note(data.reason, 500);
+      check(!override || reason.length >= 5, 400, 'A reason is required to approve incomplete metadata');
       const row = await currentReview(env, data.id); await fresh(env, row);
       const pkg = row.package && JSON.parse(row.package);
       const noArtwork = Array.isArray(pkg?.files) && pkg.files.length === 0;
@@ -240,8 +245,10 @@ export async function handle(request, env) {
       const pub = note(data.public_note, 500), priv = note(data.private_note);
       const changes = [sql(env, "UPDATE admin_reviews SET state='approved',approved_digest=digest,version=version+1,updated=? WHERE id=? AND version=? AND state='ready' AND (submission_id IS NULL OR EXISTS (SELECT 1 FROM submissions s WHERE s.id=admin_reviews.submission_id AND s.revision=admin_reviews.revision AND s.state IN ('received','in-review','needs-changes','approved')))", seconds(), row.id, row.version)];
       if (row.submission_id) changes.push(sql(env, "UPDATE submissions SET state='approved',project_id=?,public_note=?,private_note=?,updated=? WHERE id=? AND revision=? AND changes()=1", row.project_id, pub, priv, seconds(), row.submission_id, row.revision));
-      changes.push(sql(env, "INSERT INTO admin_history(submission_id,review_id,actor,action,public_note,private_note,created) SELECT ?,?,?,?,?,?,? WHERE changes()=1", row.submission_id, row.id, user.email, 'exact-approval', pub, priv, seconds()));
-      const results = await env.DB.batch(changes); check(results[0].meta.changes, 409, 'Submission or review changed; reload before approving'); return json({ok: true});
+      changes.push(sql(env, "INSERT INTO admin_history(submission_id,review_id,actor,action,public_note,private_note,created) SELECT ?,?,?,?,?,?,? WHERE changes()=1", row.submission_id, row.id, user.email, (override ? 'exact-approval-override' : 'exact-approval') + (data.expedite === true ? '-expedited' : ''), pub, override ? (reason + ' ' + priv).slice(0, 1000) : priv, seconds()));
+      const results = await env.DB.batch(changes); check(results[0].meta.changes, 409, 'Submission or review changed; reload before approving');
+      if (data.expedite === true) await dispatch(env, row.id, 'publish');
+      return json({ok: true, expedited: data.expedite === true});
     }
     if (path === '/api/publish') {
       const row = await currentReview(env, data.id); await fresh(env, row);

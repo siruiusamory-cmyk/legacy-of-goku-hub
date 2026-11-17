@@ -2,19 +2,23 @@ import {DatabaseSync} from 'node:sqlite';
 import fs from 'node:fs/promises';
 import {handle} from '../../admin/worker.js';
 import {digest, random} from '../../intake/worker.js';
+import {ownerConfigHash} from '../../src/owner-authority.js';
 export const origin = 'https://admin.example';
 export function binding(db) {
   return {prepare(query) { return {bind(...args) { const stmt = db.prepare(query); return {first: async () => stmt.get(...args) || null, all: async () => ({results: stmt.all(...args)}), run: async () => ({meta: {changes: Number(stmt.run(...args).changes)}})}; }}; }, batch: async statements => { db.exec('BEGIN'); try { const results = []; for (const stmt of statements) results.push(await stmt.run()); db.exec('COMMIT'); return results; } catch (error) { db.exec('ROLLBACK'); throw error; } }};
 }
 export async function fixture() {
   const db = new DatabaseSync(':memory:'); db.exec('PRAGMA foreign_keys=ON');
-  for (const name of ['0001_submissions.sql', '0002_admin.sql']) db.exec(await fs.readFile(new URL('../../intake/migrations/' + name, import.meta.url), 'utf8'));
+  for (const name of ['0001_submissions.sql', '0002_admin.sql', '0003_publication_authority.sql']) db.exec(await fs.readFile(new URL('../../intake/migrations/' + name, import.meta.url), 'utf8'));
   const keys = await crypto.subtle.generateKey({name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256'}, true, ['sign', 'verify']);
   const jwk = {...await crypto.subtle.exportKey('jwk', keys.publicKey), kid: 'fixture'};
   const time = Math.floor(Date.now() / 1000), issuer = 'https://fixture.cloudflareaccess.com';
   const jwt = async changes => { const enc = v => Buffer.from(JSON.stringify(v)).toString('base64url'); const data = enc({alg: 'RS256', kid: 'fixture'}) + '.' + enc({iss: issuer, aud: ['fixture'], type: 'app', sub: 'owner', email: 'owner@example.org', iat: time - 1, exp: time + 3600, ...changes}); return data + '.' + Buffer.from(await crypto.subtle.sign('RSASSA-PKCS1-v1_5', keys.privateKey, Buffer.from(data))).toString('base64url'); };
   const token = await jwt(), processor = random();
-  const env = {DB: binding(db), ADMIN_ENABLED: 'true', ADMIN_ORIGIN: origin, ACCESS_ISSUER: issuer, ACCESS_AUD: 'fixture', ADMIN_EMAILS: 'owner@example.org', PROCESSOR_HASH: await digest(processor), SITE_ORIGIN: 'https://site.example', SOURCE_REPO: 'fictional/hub', GH_DISPATCH_TOKEN: 'test-only'};
+  const env = {DB: binding(db), ADMIN_ENABLED: 'true', ADMIN_ORIGIN: origin, ACCESS_ISSUER: issuer, ACCESS_AUD: 'fixture', ADMIN_EMAILS: 'owner@example.org', PROCESSOR_HASH: await digest(processor), SITE_ORIGIN: 'https://site.example', SOURCE_REPO: 'fictional/hub', GH_DISPATCH_TOKEN: 'test-only', OWNER_ACCESS_SUB: 'owner', OWNER_ACCESS_EMAIL: 'owner@example.org'};
+  const ownerHash = await ownerConfigHash({issuer, audience: 'fixture', subject: 'owner', email: 'owner@example.org'});
+  db.prepare("INSERT INTO publication_authorities VALUES (1,?,'fixture','owner','owner@example.org',?,?,'fixture','fixture')").run(issuer, ownerHash, time);
+  db.prepare('UPDATE publication_control SET authority_epoch=1,owner_config_hash=? WHERE id=1').run(ownerHash);
   const state = {projects: [], policy: {projects: [], external_projects: []}, pr: null, runs: [], jobs: [], manifest: {}, dispatched: [], assets: []};
   env.ASSETS = {fetch: async req => { const name = new URL(req.url).pathname === '/' ? 'index.html' : new URL(req.url).pathname.slice(1); if (!['index.html', 'admin.js', 'admin.css'].includes(name)) return new Response('Not found', {status: 404}); const bytes = await fs.readFile(new URL('../../admin/public/' + name, import.meta.url)); return new Response(bytes, {headers: {'Content-Type': name.endsWith('html') ? 'text/html' : name.endsWith('js') ? 'application/javascript' : 'text/css'}}); }};
   const fetcher = async (url, opts = {}) => {
