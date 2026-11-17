@@ -81,7 +81,8 @@
             "sha256": "51441a2c60a68aedd4f85cacdfdbdb84bca5a503ecf6324ea3305bfe35fd131a"
           }
         ]
-      ]
+      ],
+      "featured": true
     },
     {
       "project_id": "gh-1131874995",
@@ -93,7 +94,7 @@
       "artwork_sets": [
         []
       ],
-      "featured": true
+      "featured": false
     }
   ]
 }
