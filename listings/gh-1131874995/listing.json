@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "gh-1131874995",
+  "title": "Legacy of Goku Engine",
+  "developer": "Ariku",
+  "description": "Open Source, Legacy of Goku Engine made for the purpose of anyone being able to create games like LOG, LOG2 and LOG Buu's Fury!",
+  "game": "buus-fury",
+  "category": "tool",
+  "status": "in-development",
+  "source": {
+    "type": "github",
+    "url": "https://github.com/Arikuvfx/Legacy-of-Goku-Maker-Engine"
+  },
+  "distribution": {
+    "label": "Patch Page",
+    "url": "https://github.com/Arikuvfx/Legacy-of-Goku-Maker-Engine/releases/tag/exe",
+    "kind": "page"
+  },
+  "links": [
+    {
+      "label": "Legacy of Goku Fan Server",
+      "url": "https://discord.gg/dy5wk9ap3"
+    }
+  ],
+  "screenshots": [],
+  "approved_at": "2026-11-17T04:56:00Z"
+}
