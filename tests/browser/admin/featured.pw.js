@@ -60,7 +60,7 @@ test('owner features, replaces and clears GitHub/community projects through priv
     await expect(page.getByText('Currently Featured: none', {exact: true})).toBeVisible();
     for (const [id, action] of [['gh-123', 'Feature'], ['ext-abcdefghijkl', 'Replace Featured'], ['ext-abcdefghijkl', 'Remove from Featured']]) {
       const project = x.state.projects.find(project => project.id === id);
-      if (action === 'Feature') await page.getByRole('button', {name: 'Make Featured', exact: true}).click();
+      if (action === 'Feature') await page.locator('.item-card').filter({has: page.getByRole('button', {name: 'Manage ' + id, exact: true})}).getByRole('button', {name: 'Make Featured', exact: true}).click();
       else {
         await page.getByRole('button', {name: 'Manage ' + id, exact: true}).click();
         await page.getByRole('button', {name: action, exact: true}).click();
