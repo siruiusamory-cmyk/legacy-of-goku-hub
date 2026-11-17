@@ -28,6 +28,19 @@ test('permanent domain configurations retain disabled defaults and original D1 i
     assert.deepEqual(config.routes,[{pattern:`${service}.legacyofgokuhub.com`,custom_domain:true}]);
   }
 });
+test('administrator production configuration is explicit and preserves every security constraint',async()=>{
+  const base=JSON.parse(await fs.readFile('admin/wrangler.jsonc','utf8'));
+  const production=JSON.parse(await fs.readFile('admin/wrangler.production.jsonc','utf8'));
+  assert.equal(base.vars.ADMIN_ENABLED,'false');
+  assert.equal(production.vars.ADMIN_ENABLED,'true');
+  assert.deepEqual({...production,vars:{...production.vars,ADMIN_ENABLED:'false'}},base);
+  assert.equal(production.workers_dev,false);
+  assert.equal(production.preview_urls,false);
+  assert.deepEqual(production.routes,[{pattern:'admin.legacyofgokuhub.com',custom_domain:true}]);
+  assert.equal(production.assets.run_worker_first,true);
+  assert.equal(production.d1_databases[0].database_id,'7f30d601-b245-4384-95de-792b0b5ed48f');
+});
+
 test('manifest substitution, stale build rollback and revoked-policy replay are rejected',async t=>{
   const directory=await artifact(t);const digest=await sealArtifact(directory,commit);
   await assert.rejects(verifyArtifact(directory,'c'.repeat(40),digest),/Stale/);
