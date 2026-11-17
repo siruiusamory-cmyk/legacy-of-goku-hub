@@ -137,7 +137,7 @@ function renderCatalog() {
     actions.append(button('Manage ' + p.id, () => manageListing(p)));
     if (p.feature_eligible) {
       const op = p.featured ? 'unfeature' : 'feature';
-      actions.append(button(p.featured ? 'Remove Featured' : (catalogItems.some(item => item.featured) ? 'Replace Featured' : 'Feature'), async () => {
+      actions.append(button(p.featured ? 'Clear Featured' : (catalogItems.some(item => item.featured) ? 'Switch Featured to this project' : 'Make Featured'), async () => {
         selected = null; listing = p; await prepare(op);
       }));
     }
