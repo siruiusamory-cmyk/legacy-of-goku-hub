@@ -6,6 +6,7 @@ import {loadRecords, readJSON, saveJSON, repoSlug} from './records.js';
 import {isListing} from './listing-schema.js';
 import {projectKeys} from './urlkey.js';
 import {date} from './github.js';
+import {imageEntries} from './images.js';
 const checkCatalog = new Ajv({allErrors: true}).compile(await readJSON(new URL('../schema/catalog.schema.json', import.meta.url)));
 
 export async function validateState(state) {
@@ -35,17 +36,17 @@ export async function buildCatalog(root) {
       if (identities.has(state.repository.id)) throw Error('duplicate GitHub repository identity (including renamed repositories)');
       identities.add(state.repository.id);
     }
-    const images = ['cover.webp', ...(record.screenshots || []).map((_, i) => `screenshot-${i + 1}.webp`)];
-    for (const [i, name] of images.entries()) {
+    const images = imageEntries(record);
+    for (const {name, kind} of images) {
       const meta = await sharp(await fs.readFile(path.join(root, 'assets', record.id, name))).metadata();
-      if (meta.format !== 'webp' || meta.width !== (i ? 480 : 640) || meta.height !== (i ? 320 : 360)) throw Error(`${record.id}: missing or unstandardized ${name}`);
+      if (meta.format !== 'webp' || meta.width !== (kind === 'cover' ? 640 : 480) || meta.height !== (kind === 'cover' ? 360 : 320)) throw Error(`${record.id}: missing or unstandardized ${name}`);
     }
     const listing = isListing(record);
     const project = {id: record.id, title: record.title, developer: record.developer, description: record.description,
       game: record.game, category: record.category, status: record.status, featured: record.featured || false,
       ...(state.repository ? {repository: state.repository.url, repository_id: state.repository.id, archived: state.repository.archived} : {}),
       availability: state.availability, warning: state.warning,
-      cover: `assets/${record.id}/cover.webp`, screenshots: images.slice(1).map(n => `assets/${record.id}/${n}`),
+      cover: record.cover ? `assets/${record.id}/cover.webp` : null, screenshots: images.filter(image => image.kind === 'screenshot').map(image => `assets/${record.id}/${image.name}`),
       release: state.release || null, last_updated: state.last_updated,
       ...(record.links?.length ? {links: record.links} : {}),
       ...(state.ownership ? {ownership: state.ownership} : {}),
@@ -70,7 +71,7 @@ export async function buildCatalog(root) {
   const output = path.join(root, 'dist');
   await fs.rm(output, {recursive: true, force: true});
   for (const p of projects) {
-    for (const relative of [p.cover, ...p.screenshots]) {
+    for (const {ref: relative} of imageEntries(p)) {
       await fs.mkdir(path.dirname(path.join(output, relative)), {recursive: true});
       await fs.copyFile(path.join(root, relative), path.join(output, relative));
     }

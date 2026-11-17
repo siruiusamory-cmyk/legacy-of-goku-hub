@@ -3,7 +3,7 @@
   "title": ".loghub.json version 1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "title", "developer", "description", "game", "category", "status", "cover"],
+  "required": ["schema_version", "title", "developer", "description", "game", "category", "status"],
   "properties": {
     "schema_version": {"const": 1},
     "title": {"type": "string", "minLength": 1, "maxLength": 100},

@@ -66,10 +66,12 @@ test('GitHub project submitted through the form gets its real repository ID and 
   assert.equal(result.catalog.projects[0].id, 'gh-123'); assert.equal(result.catalog.projects[0].release, null);
 });
 
-test('prepare refuses submissions without artwork, with bad fields or non-listing kinds', async t => {
+test('prepare accepts missing artwork and still refuses bad fields or unsafe image bytes', async t => {
   const root = await repo(t);
   const target = name => path.join(root, name);
-  await assert.rejects(prepareListing({submission: submission({artwork: undefined}), directory: target('a'), api: offline, fetcher: fetcher()}), /cover artwork is required/);
+  const withoutArt = await prepareListing({submission: submission({artwork: undefined}), directory: target('a'), api: offline, fetcher: fetcher()});
+  assert.equal(withoutArt.listing.cover, undefined);
+  assert.deepEqual(withoutArt.proposed.artwork_sets, [[]]);
   await assert.rejects(prepareListing({submission: submission({title: ''}), directory: target('b'), api: offline, fetcher: fetcher()}), /invalid/);
   await assert.rejects(prepareListing({submission: {id: 1, payload: {kind: 'claim', listing_id: 'ext-abcdefghijkl', note: 'mine'}}, directory: target('c'), api: offline, fetcher: fetcher()}), /only add and suggest/);
   await assert.rejects(prepareListing({submission: submission({artwork: ['https://img.example.org/page.png']}), directory: target('d'), api: offline, fetcher: async () => new Response(Buffer.from('not an image'))}));

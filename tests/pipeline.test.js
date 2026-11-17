@@ -39,9 +39,11 @@ async function submit(root, client = api(), r = record) {
 
 test('valid record, form parsing, schema lengths and required fields', () => {
   assert.deepEqual(validateRecord(parseIssue(body(record))), record);
-  for (const key of ['id', 'title', 'developer', 'description', 'game', 'category', 'status', 'repository', 'cover']) {
+  for (const key of ['id', 'title', 'developer', 'description', 'game', 'category', 'status', 'repository']) {
     const r = {...record}; delete r[key]; assert.throws(() => validateRecord(r), /record:/);
   }
+  const {cover, ...withoutCover} = record;
+  assert.equal(validateRecord(withoutCover).cover, undefined);
   for (const patch of [{title: 'x'.repeat(101)}, {id: '../escape'}, {title: ' hi '}, {description: '<script>untrusted text here</script>'}, {category: 'other'}, {download_url: 'https://bad.test'}, {asset_name: 'game.gba'}]) assert.throws(() => validateRecord({...record, ...patch}));
   assert.throws(() => parseIssue('not a form'));
   assert.throws(() => parseIssue(body(record) + body(record)));

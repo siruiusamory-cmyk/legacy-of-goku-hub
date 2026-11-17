@@ -79,10 +79,10 @@ test('owner features, replaces and clears GitHub/community projects through priv
         await expect.poll(() => image.evaluate(img => img.complete && img.naturalWidth === 640)).toBe(true);
       }
       await page.getByLabel('I reviewed the exact content', {exact: false}).check();
-      await page.getByLabel('I inspected all normalized artwork', {exact: false}).check();
+      if (prepared.package.files.length) await page.getByLabel('I inspected all normalized artwork', {exact: false}).check();
       expect((await new AxeBuilder({page}).analyze()).violations).toEqual([]);
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await page.getByRole('button', {name: 'Approve exact content and artwork'}).click(); await page.getByRole('button', {name: 'Confirm', exact: true}).click();
+      await page.getByRole('button', {name: prepared.package.files.length ? 'Approve exact content and artwork' : 'Approve exact content', exact: true}).click(); await page.getByRole('button', {name: 'Confirm', exact: true}).click();
       await expect(page.locator('#notice')).toContainText('Exact approval recorded');
       await page.getByRole('button', {name: 'Prepare protected publication PR'}).click(); await page.getByRole('button', {name: 'Confirm', exact: true}).click();
       await expect(page.locator('#notice')).toContainText('PR preparation queued');

@@ -8,7 +8,7 @@ import {readJSON} from '../../src/records.js';
 import {prepareListing, manualClaim, verifyPageClaim, freezeReviewedListing} from '../../src/intake-admin.js';
 import {safeFetcher} from '../../src/safe-fetch.js';
 import {evaluateListing} from '../../src/listings.js';
-import {normalizeImage, imageHash, boundedBody, MAX_IMAGE_BYTES} from '../../src/images.js';
+import {normalizeImage, imageHash, boundedBody, MAX_IMAGE_BYTES, imageEntries} from '../../src/images.js';
 import {validateListing} from '../../src/listing-schema.js';
 import {policyCheck, artworkApproved} from '../../src/moderation.js';
 import {sourceKind} from '../../website/src/lib/urlkey.js';
@@ -44,13 +44,15 @@ export async function preparePackage({row, root = ROOT, api = new GitHub(), fetc
       const live = projects.find(project => project.id === projectId);
       if (row.operation === 'feature') {
         assert(live, 'Featured requires a published project');
-        assert(live.cover === `assets/${projectId}/cover.webp`, 'Unexpected published cover path');
-        const artwork = await fetcher(site + '/' + live.cover); assert(artwork.ok, 'Published artwork unavailable');
-        const bytes = await boundedBody(artwork, MAX_IMAGE_BYTES);
-        assert(rule.artwork_sets?.some(set => set[0]?.sha256 === imageHash(bytes)), 'Published cover does not match approved artwork');
-        await normalizeImage(bytes, 'cover');
+        assert(live.cover === null || live.cover === `assets/${projectId}/cover.webp`, 'Unexpected published cover path');
+        if (live.cover) {
+          const artwork = await fetcher(site + '/' + live.cover); assert(artwork.ok, 'Published artwork unavailable');
+          const bytes = await boundedBody(artwork, MAX_IMAGE_BYTES);
+          assert(rule.artwork_sets?.some(set => set[0]?.sha256 === imageHash(bytes)), 'Published cover does not match approved artwork');
+          await normalizeImage(bytes, 'cover');
+          previews.push({name: 'preview-0.webp', bytes});
+        }
         featuredPreview = live;
-        previews.push({name: 'preview-0.webp', bytes});
       } else assert(rule.featured, 'Featured selection changed; reload the catalog');
       for (const previous of [...policy.projects, ...(policy.external_projects || [])]) if (previous.featured) previous.featured = false;
       rule.featured = row.operation === 'feature';
@@ -78,7 +80,7 @@ export async function preparePackage({row, root = ROOT, api = new GitHub(), fetc
       const isNew = !projectId || (row.operation === 'submission' && ['add', 'suggest'].includes(value.kind) && !existingRule && !legacyRule);
       let preparedDirectory = path.join(directory, 'listing');
       if (isNew) {
-        const result = await prepareListing({submission: {id: row.submission_id, payload: value}, directory: preparedDirectory, api, fetcher, overrides: {id: projectId || undefined}});
+        const result = await prepareListing({submission: {id: row.submission_id, payload: value}, directory: preparedDirectory, api, fetcher, overrides: {id: projectId || undefined, omitArtwork: row.payload.omit_artwork === true}});
         ({listing, proposed: rule, warnings} = result); projectId = listing.id;
         assert(!policy.projects.some(r => r.project_id === projectId) && !(policy.external_projects || []).some(r => r.project_id === projectId), 'Existing identity: use the catalog editor');
       } else {
@@ -87,7 +89,7 @@ export async function preparePackage({row, root = ROOT, api = new GitHub(), fetc
         else {
           const response = await fetcher(site + '/catalog.json'); assert(response.ok, 'Catalog unavailable');
           const live = (await response.json()).projects.find(p => p.id === projectId); assert(live && legacyRule, 'Listing not found');
-          listing = {schema_version: 1, id: projectId, ...Object.fromEntries(['title', 'developer', 'description', 'game', 'category', 'status'].map(k => [k, live[k]])), source: live.source || {type: 'github', url: live.repository}, cover: site + '/' + live.cover, screenshots: live.screenshots.map(s => site + '/' + s), approved_at: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'), ...(live.links ? {links: live.links} : {}), ...(live.distribution ? {distribution: live.distribution} : {})};
+          listing = {schema_version: 1, id: projectId, ...Object.fromEntries(['title', 'developer', 'description', 'game', 'category', 'status'].map(k => [k, live[k]])), source: live.source || {type: 'github', url: live.repository}, ...(live.cover ? {cover: site + '/' + live.cover} : {}), screenshots: live.screenshots.map(s => site + '/' + s), approved_at: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'), ...(live.links ? {links: live.links} : {}), ...(live.distribution ? {distribution: live.distribution} : {})};
         }
         const edits = row.operation === 'submission' ? {...value, developer: value.creator} : value;
         for (const field of EDITABLE) if (edits[field] !== undefined) listing[field] = edits[field];
@@ -95,24 +97,31 @@ export async function preparePackage({row, root = ROOT, api = new GitHub(), fetc
         if (value.patch_url) listing.distribution = {label: 'Patch Page', url: value.patch_url, kind: /\.(?:ips|bps|ups|xdelta|zip|7z)$/i.test(new URL(value.patch_url).pathname) ? 'patch' : 'page'};
         else if (row.operation === 'edit' && Object.hasOwn(value, 'patch_url')) delete listing.distribution;
         if (Array.isArray(value.artwork) && value.artwork.length) { listing.cover = value.artwork[0]; listing.screenshots = value.artwork.slice(1); }
-        const refs = [listing.cover, ...(listing.screenshots || [])], names = [];
-        for (const [i, ref] of refs.entries()) {
+        if (row.payload.omit_artwork === true) {
+          delete listing.cover; listing.screenshots = []; listing.omit_artwork = true;
+        } else if (value.artwork?.length || Object.hasOwn(row.payload, 'omit_artwork')) delete listing.omit_artwork;
+        const local = {screenshots: []};
+        for (const image of imageEntries(listing)) {
+          const ref = image.ref;
           let bytes;
           if (ALLOWED.test(ref)) bytes = await fs.readFile(path.join(root, 'listings', projectId, ref));
-          else { const response = await fetcher(ref); assert(response.ok, 'Artwork unavailable'); bytes = Buffer.from(await response.arrayBuffer()); }
-          await normalizeImage(bytes, i ? 'screenshot' : 'cover');
+          else { const response = await fetcher(ref); assert(response.ok, 'Artwork unavailable'); bytes = await boundedBody(response, MAX_IMAGE_BYTES); }
+          await normalizeImage(bytes, image.kind);
           const extension = bytes[0] === 137 ? 'png' : bytes[0] === 255 ? 'jpg' : 'webp';
-          const name = (i ? `screenshot-${i}` : 'cover') + '.' + extension; names.push(name); await fs.writeFile(path.join(preparedDirectory, name), bytes);
+          const name = image.name.replace('webp', extension);
+          if (image.kind === 'cover') local.cover = name; else local.screenshots.push(name);
+          await fs.writeFile(path.join(preparedDirectory, name), bytes);
         }
-        listing.cover = names[0]; listing.screenshots = names.slice(1); validateListing(listing);
+        listing = {...listing, ...local}; validateListing(listing);
         const result = await evaluateListing({listing, dir: preparedDirectory, rule: existingRule || legacyRule, api, fetcher, captureImages: true});
         listing = await freezeReviewedListing(result, preparedDirectory);
         rule = {...(existingRule || {}), project_id: projectId, ...(result.owner_id ? {owner_id: result.owner_id} : {}), decision: 'approved', content_digests: [...new Set([...(existingRule?.content_digests || []), result.initialDigest])], artwork_sets: artworkApproved(existingRule, projectId, result.inspected.artwork) ? existingRule.artwork_sets : [...(existingRule?.artwork_sets || []), result.inspected.artwork]};
       }
-      for (const [i, name] of [listing.cover, ...(listing.screenshots || [])].entries()) {
+      for (const [i, image] of imageEntries(listing).entries()) {
+        const name = image.ref;
         assert(ALLOWED.test(name), 'Artwork must be local');
         const bytes = await fs.readFile(path.join(preparedDirectory, name));
-        const preview = await normalizeImage(bytes, i ? 'screenshot' : 'cover');
+        const preview = await normalizeImage(bytes, image.kind);
         files.push({name, bytes}); previews.push({name: `preview-${i}.webp`, bytes: preview});
       }
       if (!policy.external_projects) policy.external_projects = [];

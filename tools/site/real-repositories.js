@@ -3,11 +3,9 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import assert from 'node:assert/strict';
-import sharp from 'sharp';
 import {GitHub} from '../../src/github.js';
 import {repositoryInfo, releaseInfo} from '../../src/github.js';
 import {parseSubmission, manifestRecord, loadManifest} from '../../src/intake.js';
-import {normalizeImage} from '../../src/images.js';
 import {publish} from '../../src/publishing.js';
 import {buildCatalog} from '../../src/catalog.js';
 import {readJSON, saveJSON} from '../../src/records.js';
@@ -25,10 +23,6 @@ export function combinePreview(projects) {
   const sorted=key=>[...projects].sort((a,b)=>compare(key(b),key(a))||compare(a.id,b.id)).map(p=>p.id);
   return {schema_version:1,projects,filters:{games:[...new Set(projects.map(p=>p.game))].sort(),categories:[...new Set(projects.map(p=>p.category))].sort(),statuses:[...new Set(projects.map(p=>p.status))].sort()},sort:{name:[...projects].sort((a,b)=>compare(a.title.toLowerCase(),b.title.toLowerCase())||compare(a.id,b.id)).map(p=>p.id),release_date:sorted(p=>p.release?.release_date || ''),update_date:sorted(p=>p.last_updated)}};
 }
-export async function makeNeutralPlaceholder() {
-  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="640" height="360" fill="#202040"/><g fill="#f8f8f8" text-anchor="middle" font-family="Arial"><text x="320" y="135" font-size="29">DragonByte Z / Webfoot SDK</text><text x="320" y="190" font-size="20">Current artwork not supplied</text><text x="320" y="238" font-size="16">NEUTRAL PREVIEW PLACEHOLDER</text></g></svg>';
-  return normalizeImage(await sharp(Buffer.from(svg)).png().toBuffer(),'cover');
-}
 export async function ingestRealRepositories(api, output) {
   if (process.env.GITHUB_ACTIONS || process.env.CI) throw Error('real-repository artwork review is local-only');
   const plan=await readJSON('proposals/log-hub-004a/repositories.json');
@@ -40,7 +34,6 @@ export async function ingestRealRepositories(api, output) {
   await fs.mkdir(path.join(validationRoot,'records'),{recursive:true});
   await saveJSON(path.join(validationRoot,'policy/publishing.json'),policy);
   const issues=plan.projects.map((p,i)=>({number:i+1,user:{id:actor.id},body:guidedBody(p)}));
-  const blocked=[];
   const fetched=[];
   const imageCache=new Map();
   const fetchImages=async (url,options) => {
@@ -64,15 +57,8 @@ export async function ingestRealRepositories(api, output) {
     const releases=await api.request(`/repos/${details.full_name}/releases?per_page=100`);assert.ok(Array.isArray(releases));assert.equal(releases.length,0,'release availability changed; inspect before continuing');
     const release=await releaseInfo(api,{},repository);assert.equal(release,null);
     const candidate=parseSubmission(issues[plan.projects.indexOf(p)]);
-    let record;
-    if (p.metadata.cover) {
-      record=manifestRecord(p.metadata,repository,head.sha);
-      assert.deepEqual(record,manifestRecord(candidate.metadata,repository,head.sha));
-    } else {
-      assert.throws(()=>manifestRecord(p.metadata,repository,head.sha),/cover/);
-      assert.throws(()=>manifestRecord(candidate.metadata,repository,head.sha),/cover/);
-      blocked.push({repository_id:p.repository_id,reason:'Current approved repository cover art required; neutral preview placeholder is not submission-ready artwork.'});
-    }
+    const record=manifestRecord(p.metadata,repository,head.sha);
+    assert.deepEqual(record,manifestRecord(candidate.metadata,repository,head.sha));
     repos.push({plan:p,repository,record,release,commit:head.sha});
   }
   const validation=await publish({root:validationRoot,output:path.join(output,'validation'),api,issues,fetcher:fetchImages});
@@ -83,22 +69,18 @@ export async function ingestRealRepositories(api, output) {
   for (const r of repos) {
     const id=`gh-${r.repository.id}`;
     const state={repository:r.repository,release:r.release,availability:r.repository.archived?'archived':'available',warning:null,last_updated:r.repository.updated_at,ownership:{claim:'unclaimed',representation_verified:false}};
-    if (r.record) {
-      const {processImages}=await import('../../src/images.js');
-      await processImages(r.record,work,fetchImages);
-      await saveJSON(path.join(work,'records',id+'.json'),r.record);await saveJSON(path.join(work,'state',id+'.json'),state);
-    }
-    sourceFacts.push({repository:r.repository.url,repository_id:r.repository.id,owner_id:r.repository.owner_id,default_branch:'master',commit:r.commit,release:null,manifest_discovery:'absent',guided_source:'local form event; no hosted issue created',manifest_proposal_valid:!!r.record,production_approved:false,artwork:r.plan.metadata.cover?{path:r.plan.metadata.cover,source_dimensions:[1800,450],normalized_dimensions:[640,360]}:{placeholder:true,reason:'No current suitable artwork established'}});
+    const {processImages}=await import('../../src/images.js');
+    await processImages(r.record,work,fetchImages);
+    await saveJSON(path.join(work,'records',id+'.json'),r.record);await saveJSON(path.join(work,'state',id+'.json'),state);
+    sourceFacts.push({repository:r.repository.url,repository_id:r.repository.id,owner_id:r.repository.owner_id,default_branch:'master',commit:r.commit,release:null,manifest_discovery:'absent',guided_source:'local form event; no hosted issue created',manifest_proposal_valid:true,production_approved:false,artwork:r.plan.metadata.cover?{path:r.plan.metadata.cover,source_dimensions:[1800,450],normalized_dimensions:[640,360]}:{provided:false,reason:'No current suitable artwork established'}});
   }
   const generated=await buildCatalog(work);
-  const dbz=repos.find(r=>!r.record);const m=dbz.plan.metadata;const id=`gh-${dbz.repository.id}`;
-  const target=path.join(work,'dist/assets',id);await fs.mkdir(target,{recursive:true});await fs.writeFile(path.join(target,'cover.webp'),await makeNeutralPlaceholder());
-  const {schema_version,...editorial}=m;
-  const placeholderProject={...editorial,id,featured:true,repository:dbz.repository.url,repository_id:dbz.repository.id,archived:dbz.repository.archived,availability:'available',warning:null,cover:`assets/${id}/cover.webp`,screenshots:[],release:null,last_updated:dbz.repository.updated_at,search_text:[m.title,m.developer,m.description,m.game,m.category].join(' ').normalize('NFKC').toLowerCase(),ownership:{claim:'unclaimed',representation_verified:false}};
-  const catalog=combinePreview([...generated.projects,placeholderProject]);await validateSiteCatalog(catalog);
+  const dbz=repos.find(r=>!r.plan.metadata.cover);
+  const projects=generated.projects.map(project=>({...project,featured:project.repository_id===dbz.repository.id}));
+  const catalog=combinePreview(projects);await validateSiteCatalog(catalog);
   await saveJSON(path.join(work,'dist/catalog.json'),catalog);
-  await saveJSON(path.join(output,'preview-provenance.json'),{purpose:'real-preview',repository_ids:realRepositoryIds,placeholder_repository_ids:[dbz.repository.id],preview_spotlight_only:dbz.repository.id,production_approved:false,sources:sourceFacts});
-  await saveJSON(path.join(output,'verification.json'),{read_only_github:true,remote_writes:0,live_owner:{id:actor.id,login:actor.login},projects:sourceFacts,blocked,untrusted_submission_report:validation.report,production_catalog_unchanged:true,artwork_requests:fetched,obsolete_artwork_requests:0});
+  await saveJSON(path.join(output,'preview-provenance.json'),{purpose:'real-preview',repository_ids:realRepositoryIds,artwork_free_repository_ids:[dbz.repository.id],preview_spotlight_only:dbz.repository.id,production_approved:false,sources:sourceFacts});
+  await saveJSON(path.join(output,'verification.json'),{read_only_github:true,remote_writes:0,live_owner:{id:actor.id,login:actor.login},projects:sourceFacts,blocked:[],untrusted_submission_report:validation.report,production_catalog_unchanged:true,artwork_requests:fetched,obsolete_artwork_requests:0});
   return catalog;
 }
 if (process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.url)) {

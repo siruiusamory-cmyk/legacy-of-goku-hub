@@ -24,7 +24,7 @@ export async function validateSiteCatalog(catalog) {
       if (p.release || p.repository || !p.id.startsWith('ext-')) throw Error('invalid external project identity');
       await validateState({kind: 'external', availability: p.availability, last_updated: p.last_updated});
     }
-    if (p.cover !== `assets/${p.id}/cover.webp` || p.screenshots.some((s,i) => s !== `assets/${p.id}/screenshot-${i+1}.webp`)) throw Error('unsafe site image path');
+    if ((p.cover !== null && p.cover !== `assets/${p.id}/cover.webp`) || p.screenshots.some((s,i) => s !== `assets/${p.id}/screenshot-${i+1}.webp`)) throw Error('unsafe site image path');
     for (const link of p.links || []) {
       if (p.source) { publicURL(link.url, 'links'); continue; }
       const u = new URL(link.url);

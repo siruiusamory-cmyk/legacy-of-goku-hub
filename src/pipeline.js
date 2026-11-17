@@ -43,7 +43,7 @@ export async function refresh(root, api, fetcher = fetch) {
     catch (error) { if (error.code !== 'ENOENT') throw error; }
     const state = await synchronize(api, record, previous);
     const images = [];
-    for (const url of [record.cover, ...(record.screenshots || [])]) {
+    for (const url of [...(record.cover ? [record.cover] : []), ...(record.screenshots || [])]) {
       try {
         const response = await fetcher(url, {method: 'HEAD', redirect: 'error', signal: AbortSignal.timeout(15000)});
         if (!response.ok) images.push(`image link HTTP ${response.status}: ${url}`);

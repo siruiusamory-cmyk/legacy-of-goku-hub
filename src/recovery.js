@@ -7,6 +7,7 @@ import {readJSON, json, repoSlug, validateRecord} from './records.js';
 import {readSnapshot} from './publishing.js';
 import {buildCatalog, validateState} from './catalog.js';
 import {policyCheck} from './moderation.js';
+import {imageEntries} from './images.js';
 
 const checkConfig = new Ajv({allErrors: true}).compile(await readJSON(new URL('../schema/recovery.schema.json', import.meta.url)));
 const checkCatalog = new Ajv().compile(await readJSON(new URL('../schema/catalog.schema.json', import.meta.url)));
@@ -64,7 +65,7 @@ export async function payloadFiles(snapshot, catalogFile) {
     if (state.repository) keys(state.repository, ['id', 'url', 'owner', 'owner_type', 'owner_id', 'archived', 'updated_at'], 'repository');
     if (state.release) keys(state.release, ['version', 'download_url', 'file_name', 'file_size', 'release_date', 'updated_at', 'sha256'], 'release');
     if (state.ownership) keys(state.ownership, ['claim', 'representation_verified'], 'ownership');
-    for (const name of [`records/${entry.id}.json`, `state/${entry.id}.json`, `assets/${entry.id}/cover.webp`, ...(record.screenshots || []).map((_, i) => `assets/${entry.id}/screenshot-${i + 1}.webp`)]) files.set(name, await regularFile(path.join(snapshot, name)));
+    for (const name of [`records/${entry.id}.json`, `state/${entry.id}.json`, ...imageEntries(record).map(image => `assets/${entry.id}/${image.name}`)]) files.set(name, await regularFile(path.join(snapshot, name)));
   }
   const catalogIds = new Set();
   for (const project of catalog.projects) {
@@ -276,7 +277,7 @@ export class RecoveryStore {
 export async function verifyPublicationFiles(recovered, directory) {
   const catalog = JSON.parse(recovered.files.get('catalog.json'));
   const expected = new Map([['catalog.json', recovered.files.get('catalog.json')]]);
-  for (const project of catalog.projects) for (const name of [project.cover, ...project.screenshots]) {
+  for (const project of catalog.projects) for (const {ref: name} of imageEntries(project)) {
     if (!safeName(name) || !recovered.files.has(name)) throw Error('invalid protected publication image');
     expected.set(name, recovered.files.get(name));
   }
@@ -328,7 +329,7 @@ export async function materialize(recovered, destination) {
     const verifyRoot = path.join(staging, '.verify');
     await fs.mkdir(verifyRoot);
     for (const directory of ['records', 'state', 'assets']) {
-      await fs.cp(path.join(staging, directory), path.join(verifyRoot, directory), {recursive: true}).catch(error => {if (error.code !== 'ENOENT' || entries.length) throw error;});
+      await fs.cp(path.join(staging, directory), path.join(verifyRoot, directory), {recursive: true}).catch(error => {if (error.code !== 'ENOENT' || (directory !== 'assets' && entries.length)) throw error;});
     }
     await fs.mkdir(path.join(verifyRoot, 'records'), {recursive: true});
     const allProjects = await buildCatalog(verifyRoot);

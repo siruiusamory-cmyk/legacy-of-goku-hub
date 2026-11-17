@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {readJSON, saveJSON, loadRecords, validateRecord, validateAnyRecord} from './records.js';
 import {repositoryInfo, releaseInfo} from './github.js';
-import {inspectImages, writeImages} from './images.js';
+import {inspectImages, writeImages, imageEntries} from './images.js';
 import {policyCheck, contentDigest, artworkApproved, entryApproved, verifyEntryArtwork, ruleFor} from './moderation.js';
 import {evaluateListing, loadListings} from './listings.js';
 import {projectKeys} from './urlkey.js';
@@ -32,7 +32,7 @@ export async function readSnapshot(root) {
 }
 async function copyProject(from, to, record) {
   await fs.mkdir(path.join(to, 'assets', record.id), {recursive: true});
-  for (const name of ['cover.webp', ...(record.screenshots || []).map((_, i) => `screenshot-${i + 1}.webp`)]) {
+  for (const {name} of imageEntries(record)) {
     await fs.copyFile(path.join(from, 'assets', record.id, name), path.join(to, 'assets', record.id, name));
   }
 }

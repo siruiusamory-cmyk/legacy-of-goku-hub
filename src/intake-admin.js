@@ -8,7 +8,7 @@ import {evaluateListing} from './listings.js';
 import {newExternalId, validateListing} from './listing-schema.js';
 import {validateSubmission} from '../website/src/lib/submission.js';
 import {parseHttps, sourceKind, urlKey} from '../website/src/lib/urlkey.js';
-import {MAX_IMAGE_BYTES, boundedBody} from './images.js';
+import {MAX_IMAGE_BYTES, boundedBody, imageEntries} from './images.js';
 
 const EXTENSIONS = {png: 'png', jpeg: 'jpg', webp: 'webp'};
 const PATCH_FILE = /\.(ips|bps|ups|xdelta|zip|7z)$/i;
@@ -21,22 +21,22 @@ async function imageBytes(ref, fetcher) {
   if (!response.ok) throw Error(`artwork ${ref}: HTTP ${response.status}`);
   return boundedBody(response, MAX_IMAGE_BYTES);
 }
-async function saveImages(dir, covers, fetcher) {
-  const names = [];
-  for (const [i, ref] of covers.entries()) {
-    const bytes = await imageBytes(ref, fetcher);
+async function saveImages(dir, images, fetcher) {
+  const result = {screenshots: []};
+  for (const image of images) {
+    const bytes = await imageBytes(image.ref, fetcher);
     const format = (await sharp(bytes).metadata()).format;
     if (!EXTENSIONS[format]) throw Error('artwork must be PNG, JPEG or WebP');
-    const name = (i === 0 ? 'cover.' : `screenshot-${i}.`) + EXTENSIONS[format];
+    const name = image.name.replace('webp', EXTENSIONS[format]);
     await fs.writeFile(path.join(dir, name), bytes);
-    names.push(name);
+    if (image.kind === 'cover') result.cover = name; else result.screenshots.push(name);
   }
-  return names;
+  return result;
 }
 
 export async function freezeReviewedListing(evaluated, directory) {
-  const names = await saveImages(directory, evaluated.inspected.inputs.map(bytes => ({bytes})));
-  return {...evaluated.record, cover: names[0], screenshots: names.slice(1)};
+  const images = imageEntries(evaluated.record).map((image, i) => ({...image, ref: {bytes: evaluated.inspected.inputs[i]}}));
+  return {...evaluated.record, ...await saveImages(directory, images)};
 }
 
 export function listingFields(value, {game, status, developer} = {}) {
@@ -67,13 +67,12 @@ export async function prepareListing({submission, directory, api, fetcher, overr
     id = `gh-${repository.id}`; ownerId = repository.owner_id;
   }
   const {fields, warnings} = listingFields(value, overrides);
-  const art = [...(overrides.cover ? [{bytes: overrides.cover}] : []), ...(value.artwork || [])];
-  if (!art.length) throw Error('cover artwork is required: ask the submitter or supply a local cover file');
+  const art = overrides.omitArtwork ? [] : [...(overrides.cover ? [{bytes: overrides.cover}] : []), ...(value.artwork || [])];
   await fs.mkdir(directory, {recursive: false});
-  const names = await saveImages(directory, art.slice(0, 7), fetcher);
+  const images = await saveImages(directory, imageEntries({cover: art[0], screenshots: art.slice(1, 7)}), fetcher);
   let listing = {schema_version: 1, id, ...fields, source,
     ...(value.patch_url ? {distribution: {label: PATCH_FILE.test(new URL(value.patch_url).pathname) ? 'Download Patch' : 'Patch Page', url: value.patch_url, kind: PATCH_FILE.test(new URL(value.patch_url).pathname) ? 'patch' : 'page'}} : {}),
-    ...(value.links ? {links: value.links} : {}), cover: names[0], ...(names.length > 1 ? {screenshots: names.slice(1)} : {}),
+    ...(value.links ? {links: value.links} : {}), ...images, ...(overrides.omitArtwork ? {omit_artwork: true} : {}),
     approved_at: now.toISOString().replace(/\.\d{3}Z$/, 'Z')};
   validateListing(listing);
   const evaluated = await evaluateListing({listing, dir: directory, rule: {owner_id: ownerId}, api, fetcher, captureImages: true});
@@ -90,7 +89,7 @@ export async function adoptListing({directory, root, approve = false}) {
   const target = path.join(root, 'listings', listing.id);
   await fs.mkdir(path.dirname(target), {recursive: true});
   await fs.mkdir(target, {recursive: false});
-  for (const name of [listing.cover, ...(listing.screenshots || [])]) await fs.copyFile(path.join(directory, name), path.join(target, name));
+  for (const {ref: name} of imageEntries(listing)) await fs.copyFile(path.join(directory, name), path.join(target, name));
   await saveJSON(path.join(target, 'listing.json'), listing);
   if (approve) await setRule(root, listing.id, () => review.proposed_policy);
   return {id: listing.id, approved: approve};

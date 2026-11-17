@@ -81,8 +81,9 @@ body:
     attributes:
       label: Cover image
       placeholder: images/cover.png
+      description: Optional. Listings without artwork use the built-in placeholder.
     validations:
-      required: true
+      required: false
   - type: textarea
     id: screenshots
     attributes:

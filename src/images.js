@@ -33,14 +33,20 @@ export async function normalizeImage(bytes, kind) {
   return sharp(bytes, options).rotate().resize(width, height, {fit: 'contain', background: '#161616'}).flatten({background: '#161616'}).webp({quality: 82, effort: 6}).toBuffer();
 }
 export const imageHash = bytes => createHash('sha256').update(bytes).digest('hex');
+export function imageEntries(record) {
+  return [
+    ...(record.cover ? [{ref: record.cover, kind: 'cover', name: 'cover.webp'}] : []),
+    ...(record.screenshots || []).map((ref, i) => ({ref, kind: 'screenshot', name: `screenshot-${i + 1}.webp`}))
+  ];
+}
 export async function inspectImages(record, fetcher = fetch) {
   const outputs = [];
   const artwork = [];
-  for (const [i, url] of [record.cover, ...(record.screenshots || [])].entries()) {
-    const response = await fetcher(imageURL(url, record.repository), {redirect: 'error', signal: AbortSignal.timeout(20000)});
-    if (!response.ok) throw Error(`image ${i + 1}: HTTP ${response.status}; check public pinned URL`);
+  for (const image of imageEntries(record)) {
+    const response = await fetcher(imageURL(image.ref, record.repository), {redirect: 'error', signal: AbortSignal.timeout(20000)});
+    if (!response.ok) throw Error(`image ${image.name}: HTTP ${response.status}; check public pinned URL`);
     const bytes = await boundedBody(response, MAX_IMAGE_BYTES);
-    const normalized = await normalizeImage(bytes, i === 0 ? 'cover' : 'screenshot');
+    const normalized = await normalizeImage(bytes, image.kind);
     outputs.push(normalized);
     artwork.push({source_sha256: imageHash(bytes), sha256: imageHash(normalized)});
   }
@@ -49,7 +55,8 @@ export async function inspectImages(record, fetcher = fetch) {
 export async function writeImages(record, root, outputs) {
   const directory = path.join(root, 'assets', record.id);
   await fs.mkdir(directory, {recursive: true});
-  for (let i = 0; i < outputs.length; i++) await fs.writeFile(path.join(directory, i === 0 ? 'cover.webp' : `screenshot-${i}.webp`), outputs[i]);
+  const images = imageEntries(record);
+  for (let i = 0; i < outputs.length; i++) await fs.writeFile(path.join(directory, images[i].name), outputs[i]);
 }
 export async function processImages(record, root, fetcher = fetch) {
   const result = await inspectImages(record, fetcher);

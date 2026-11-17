@@ -9,7 +9,7 @@ import {listSubmissions} from '../src/publishing.js';
 import {reviewDestination} from '../tools/moderation-review.js';
 
 const artwork=[{source_sha256:'a'.repeat(64),sha256:imageHash(Buffer.from('harmless hash fixture'))}];
-const entry={id:'gh-123',repository_id:123,owner_id:99,record:{screenshots:[]},moderation:{initial_content_digest:'b'.repeat(64),artwork}};
+const entry={id:'gh-123',repository_id:123,owner_id:99,record:{cover:'cover.webp',screenshots:[]},moderation:{initial_content_digest:'b'.repeat(64),artwork}};
 const policy=()=>({version:1,trusted_owner_ids:[],revoked_owner_ids:[],projects:[{repository_id:123,owner_id:99,project_id:'gh-123',decision:'approved',content_digests:['b'.repeat(64)],artwork_sets:[artwork]}]});
 test('last publication gate rechecks normalized bytes and current moderation policy',async t=>{
  const root=await fs.mkdtemp(path.join(os.tmpdir(),'loghub-gate-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));

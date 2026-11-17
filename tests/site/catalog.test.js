@@ -21,6 +21,18 @@ test('site validates both full fixture and empty catalog with stable identities'
   }
   const sorts=structuredClone(catalog);sorts.sort.name=['absent'];await assert.rejects(validateSiteCatalog(sorts),/sort/);
 });
+test('artwork-free and screenshot-only site listings retain explicit absence and exact image paths', async t => {
+  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'loghub-site-no-art-'));t.after(()=>fs.rm(dir,{recursive:true,force:true}));
+  const {catalog}=await fixtureInput(dir,false,false,false,true);
+  assert.equal(catalog.projects[0].cover,null);
+  assert.deepEqual(catalog.projects[0].screenshots,[]);
+  assert.equal(catalog.projects[1].cover,null);
+  assert.deepEqual(catalog.projects[1].screenshots,['assets/fixture-1/screenshot-1.webp']);
+  await validateSiteCatalog(catalog);
+  await assert.rejects(fs.access(path.join(dir,'public/assets/fixture-0/cover.webp')));
+  const wrong=structuredClone(catalog);wrong.projects[1].screenshots=['assets/fixture-1/cover.webp'];
+  await assert.rejects(validateSiteCatalog(wrong),/unsafe site image path/);
+});
 test('frontend deployment is default-branch gated, production-only and separated from write credentials', async () => {
   const workflow=YAML.parse(await fs.readFile('.github/workflows/catalog.yml','utf8'));
   assert.equal(workflow.jobs.website.needs,'publish');

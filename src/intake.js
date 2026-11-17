@@ -32,7 +32,7 @@ export function parseSubmission(issue) {
   const metadata = method === 'Guided form' ? {
     schema_version: 1, title: f['Project title'], developer: f['Developer or team'],
     description: f.Description?.replace(/\n+/g, ' '), game: f['Base game'], category: f.Category,
-    status: f['Development status'], cover: f['Cover image'],
+    status: f['Development status'], ...(f['Cover image'] ? {cover: f['Cover image']} : {}),
     screenshots: (f.Screenshots || '').split('\n').map(s => s.trim()).filter(Boolean),
     links: (f['Project links'] || '').split('\n').filter(Boolean).map(line => {
       const match = /^(.{1,32})\s+(https:\/\/\S+)$/.exec(line.trim());
@@ -51,7 +51,7 @@ export function manifestRecord(metadata, repository, commit, id = `gh-${reposito
     return `https://raw.githubusercontent.com/${repoSlug(repository.url)}/${commit}/${value}`;
   };
   const {schema_version, ...editorial} = metadata;
-  return validateRecord({...editorial, id, repository: repository.url, cover: image(metadata.cover), screenshots: (metadata.screenshots || []).map(image)});
+  return validateRecord({...editorial, id, repository: repository.url, ...(metadata.cover ? {cover: image(metadata.cover)} : {}), screenshots: (metadata.screenshots || []).map(image)});
 }
 export async function loadManifest(api, repository) {
   const slug = repoSlug(repository.url);

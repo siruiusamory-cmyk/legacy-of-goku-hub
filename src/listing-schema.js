@@ -49,7 +49,8 @@ export function validateListing(listing) {
     if (distribution.kind === 'page' && PATCH_FILE.test(url.pathname)) throw Error('distribution: a page link must not point at a file');
   }
   for (const link of listing.links || []) { plain(link.label, 'link label'); publicURL(link.url, 'links'); }
-  for (const ref of [listing.cover, ...(listing.screenshots || [])]) imageRef(ref);
+  for (const ref of [...(listing.cover ? [listing.cover] : []), ...(listing.screenshots || [])]) imageRef(ref);
+  if (listing.omit_artwork && (listing.cover || listing.screenshots?.length)) throw Error('images: omitted artwork cannot contain image references');
   const keys = [source.url, ...(source.also_known_at || [])].filter(Boolean).map(urlKey);
   if (new Set(keys).size !== keys.length) throw Error('source: duplicate alternate addresses');
   return listing;

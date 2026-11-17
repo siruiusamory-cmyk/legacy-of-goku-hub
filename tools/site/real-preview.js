@@ -13,7 +13,7 @@ export async function copyRealPreview(directory,destination) {
     const expected=plan.projects.find(r=>r.repository_id===p.repository_id);
     if(p.repository!==expected.repository || p.id!==`gh-${p.repository_id}` || p.game!==expected.metadata.game || p.category!==expected.metadata.category || p.release!==null || p.screenshots.length)throw Error('real preview identity/classification or release/artwork differs from inspected evidence');
   }
-  for (const p of catalog.projects) for (const image of [p.cover,...p.screenshots]) {
+  for (const p of catalog.projects) for (const image of [p.cover,...p.screenshots].filter(Boolean)) {
     const root=path.resolve(directory,'work/dist');let current=root;
     for (const part of image.split('/')) {current=path.join(current,part);if((await fs.lstat(current)).isSymbolicLink())throw Error('preview image cannot contain symlinks');}
     const stat=await fs.stat(current);if(!stat.isFile()||stat.size>2*1024*1024)throw Error('invalid preview image size/type');
