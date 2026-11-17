@@ -2,7 +2,7 @@
 
 Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake` and `ratings` custom subdomains. See [domain migration](DOMAIN-MIGRATION.md). Earlier activation instructions and hostname references below are historical; production is already enabled.
 
-Anyone can suggest, add, correct or claim a project at `/submit/` without a GitHub account, a Git repository, public source code or registration. Submission stays **default-off**: the site shows "Submissions are not open yet" until the owner activates it.
+Anyone can suggest, add, correct or claim a project at [the public submission form](https://legacyofgokuhub.com/submit/) without a GitHub account, a Git repository, public source code or registration. The checked-in Worker configuration retains a safe default-off setting; production enablement must be checked against live configuration, not assumed from that default. Historical first-activation steps below are retained for reference and must not be repeated blindly.
 
 ## What changed
 
