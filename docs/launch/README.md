@@ -1,4 +1,6 @@
-# LOG-HUB-008: launch readiness
+# LOG-HUB-008: historical launch-readiness assessment
+
+> **Historical record (November 15, 2026):** This assessment predates the public launch and subsequent production changes. Statements below describing the site as blocked, empty, or not deployed refer to that earlier point in time. The public site is now at https://legacyofgokuhub.com/. See the [documentation index](../README.md) for current entry points.
 
 Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake` and `ratings` custom subdomains. See [domain migration](DOMAIN-MIGRATION.md). Earlier activation instructions and hostname references below are historical; production is already enabled.
 
