@@ -126,23 +126,29 @@ async function processor(request, env, path) {
 }
 
 export async function handle(request, env) {
+  let stage = 'request-validation';
   try {
     check(env.ADMIN_ENABLED === 'true', 404, 'Not found');
     const url = new URL(request.url), path = url.pathname;
     check(url.origin === env.ADMIN_ORIGIN, 400, 'Wrong origin');
-    if (path.startsWith('/processor/')) return await processor(request, env, path);
+    if (path.startsWith('/processor/')) { stage = 'processor'; return await processor(request, env, path); }
+    stage = 'database-rate-limit';
     await rate(env, await digest(request.headers.get('CF-Connecting-IP') || 'local'), 240);
+    stage = 'access-identity';
     const user = await identity(request, env);
     if (!path.startsWith('/api/')) {
       check(request.method === 'GET', 405);
+      stage = 'static-assets';
       const response = await env.ASSETS.fetch(request);
       return new Response(response.body, {status: response.status, headers: {...Object.fromEntries(response.headers), ...security}});
     }
+    stage = 'authenticated-rate-limit';
     await rate(env, user.sub);
     if (request.method !== 'GET') check(request.method === 'POST' && request.headers.get('Origin') === env.ADMIN_ORIGIN && request.headers.get('Sec-Fetch-Site') !== 'cross-site', 403, 'Origin rejected');
     if (path === '/api/login' && request.method === 'POST') {
       const s = await startSession(env, user); return json({email: user.email, csrf: s.csrf, expires: s.expires}, 200, {'Set-Cookie': cookie(s.token, s.expires - seconds())});
     }
+    stage = 'session-database';
     const s = await session(request, env, user);
     if (request.method !== 'GET') check(request.headers.get('X-CSRF-Token') === s.csrf, 403, 'CSRF check failed');
     if (path === '/api/session') return json({email: user.email, csrf: s.csrf, expires: s.expires});
@@ -257,6 +263,9 @@ export async function handle(request, env) {
       await dispatch(env, row.id, 'publish'); return json({ok: true});
     }
     check(false, 404);
-  } catch (error) { return json({error: error.status ? error.message : 'Administration unavailable; retry later'}, error.status || 503); }
+  } catch (error) {
+    if (!error?.status) console.error('Unexpected admin failure at stage: ' + stage);
+    return json({error: error.status ? error.message : 'Administration unavailable; retry later'}, error.status || 503);
+  }
 }
 export default {fetch: handle};
