@@ -4,14 +4,14 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
-import {featuredFixture, featureBase} from '../tools/admin/featured-fixture.js';
-import {preparePackage} from '../tools/admin/process.js';
-import {handle} from '../admin/worker.js';
-import {origin} from '../tools/admin/test-fixture.js';
-import {saveJSON} from '../src/records.js';
-import {detailImage} from '../tools/site/artwork.js';
+import {featuredFixture, featureBase} from '../../../tools/admin/featured-fixture.js';
+import {preparePackage} from '../../../tools/admin/process.js';
+import {handle} from '../../../admin/worker.js';
+import {origin} from '../../../tools/admin/test-fixture.js';
+import {saveJSON} from '../../../src/records.js';
+import {detailImage} from '../../../tools/site/artwork.js';
 
-const root = fileURLToPath(new URL('../', import.meta.url));
+const root = fileURLToPath(new URL('../../../', import.meta.url));
 test('owner features, replaces and clears GitHub/community projects through private approval; actual homepage preserves artwork, rating and actions', async ({page, context}) => {
   test.setTimeout(120000);
   const x = await featuredFixture(), original = globalThis.fetch;

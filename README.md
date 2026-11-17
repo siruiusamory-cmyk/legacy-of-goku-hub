@@ -64,6 +64,5 @@ For those contributing to or operating the Hub:
 - [Maintainer operations and recovery](docs/OPERATIONS.md)
 - [Administrator documentation](docs/launch/ADMIN.md)
 - [Deployment documentation](docs/launch/DEPLOYMENT.md)
-- [Verification records](VERIFICATION.md)
 
 Legacy of Goku Hub is an **unofficial community project**. The games and associated trademarks belong to their respective owners.

@@ -1,6 +1,6 @@
 # Private administration (LOG-HUB-013)
 
-Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake` and `ratings` custom subdomains. See [domain migration](DOMAIN-MIGRATION.md). Earlier activation instructions and hostname references below are historical; production is already enabled.
+Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake` and `ratings` custom subdomains. See live Cloudflare configuration. Earlier activation instructions and hostname references below are historical; production is already enabled.
 
 **Status note:** This document contains original administrator setup decisions and historical activation steps. The administrator service is operated at https://admin.legacyofgokuhub.com/. Do not interpret the historical activation checklist below as an instruction to re-provision an existing production service. Check the current Worker, D1 migrations, Access application, and protected GitHub workflows before making changes. Operational changes still require authorization.
 

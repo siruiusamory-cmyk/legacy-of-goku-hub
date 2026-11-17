@@ -3,10 +3,10 @@ import AxeBuilder from '@axe-core/playwright';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import {fixture, origin} from '../tools/admin/test-fixture.js';
-import {handle} from '../admin/worker.js';
-import {preparePackage} from '../tools/admin/process.js';
-import {saveJSON} from '../src/records.js';
+import {fixture, origin} from '../../../tools/admin/test-fixture.js';
+import {handle} from '../../../admin/worker.js';
+import {preparePackage} from '../../../tools/admin/process.js';
+import {saveJSON} from '../../../src/records.js';
 
 test('administrator deliberately omits supplied artwork and approves the exact artwork-free package', async ({page, context}) => {
   const x = await fixture(), original = globalThis.fetch;

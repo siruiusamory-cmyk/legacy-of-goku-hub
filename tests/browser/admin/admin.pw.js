@@ -4,9 +4,9 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import sharp from 'sharp';
-import {fixture, origin} from '../tools/admin/test-fixture.js';
-import {handle} from '../admin/worker.js';
-import {preparePackage} from '../tools/admin/process.js';
+import {fixture, origin} from '../../../tools/admin/test-fixture.js';
+import {handle} from '../../../admin/worker.js';
+import {preparePackage} from '../../../tools/admin/process.js';
 
 for (const width of [390, 1280]) test(`owner browser workflow, safe content, accessibility and layout at ${width}px`, async ({page, context}) => {
   const x = await fixture(), original = globalThis.fetch; globalThis.fetch = x.fetcher;

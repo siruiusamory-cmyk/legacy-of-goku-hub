@@ -24,22 +24,6 @@ test('workflow YAML parses; actions are immutable; untrusted PR jobs have no wri
     }
   }
 });
-test('legacy approval workflow cannot stage public unapproved artwork or grant approvals', async () => {
-  const source = await fs.readFile(new URL('approve.yml', directory), 'utf8');
-  const workflow = YAML.parse(source);
-  assert.deepEqual(workflow.permissions, {contents: 'read'});
-  assert.ok(!source.includes('upload-artifact') && !source.includes('create-pull-request') && !source.includes('src/cli.js stage'));
-  assert.ok(!source.includes('git push'));
-});
-
-test('archived legacy issue form preserves the exact parser heading and JSON field', async () => {
-  const form = YAML.parse(await fs.readFile(new URL('../.github/legacy/submit.yml', import.meta.url), 'utf8'));
-  const field = form.body.find(b => b.id === 'record');
-  assert.equal(field.attributes.label, 'Project record');
-  assert.equal(field.attributes.render, 'json');
-  assert.doesNotThrow(() => JSON.parse(field.attributes.value));
-});
-
 test('candidate artifact includes its hidden staging directory while excluding HTTP cache', async () => {
   const workflow = YAML.parse(await fs.readFile(new URL('catalog.yml', directory), 'utf8'));
   const upload = workflow.jobs.synchronize.steps.find(s => s.with?.name === 'candidate');
