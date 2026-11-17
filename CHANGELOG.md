@@ -1,5 +1,11 @@
 # Changelog
 
+## LOG-HUB-017 Phase 2: owner-only approval
+
+- Restrict final dashboard approval to the pinned publication owner (exact Access issuer, audience, subject, normalized email, allowlist and authority hash); fails closed when pins are missing.
+- Allow the owner to approve incomplete metadata with a written reason, and to approve and expedite the existing protected publication in one step. Checks still run and nothing is marked published early.
+- Add additive migration `0003_publication_authority.sql` (shadow control row, owner authority history, session epoch fields).
+
 ## LOG-HUB-017 Phase 1: optional artwork
 
 - Allow artwork-free manifests and managed listings through private preparation, exact approval, catalogue generation, signed publication and recovery.

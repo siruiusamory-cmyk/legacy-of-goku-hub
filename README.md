@@ -7,6 +7,8 @@ LOG-HUB-017 begins with the proposed [publication-owner authority contract](docs
 
 LOG-HUB-017 Phase 1 makes cover artwork and screenshots optional throughout preparation, exact approval, signed publication and recovery. Artwork-free cards, details and Featured projects use the built-in placeholder. Administrators can deliberately omit supplied artwork before private review; supplied images retain exact-byte moderation and safety checks. This dependent candidate awaits owner-authorized merge and deployment.
 
+LOG-HUB-017 Phase 2 makes final approval owner-only. Other administrators keep review and preparation. The owner can approve incomplete metadata with a written reason, or approve and expedite the protected publication. Owner pins and migration `0003` still need owner-authorized provisioning before production use.
+
 Private administrator dashboard: [owner workflow, authentication research and authorization-gated setup](docs/launch/ADMIN.md). LOG-HUB-013 is prepared for review; production administrator access remains disabled.
 
 The listing manager loads approved source metadata even for withdrawn managed listings. Withdrawn legacy listings can be restored through protected review before their catalog metadata is edited.
