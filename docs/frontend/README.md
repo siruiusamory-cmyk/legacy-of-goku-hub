@@ -1,6 +1,6 @@
 # LOG-HUB-004: approved design implementation
 
-The Astro frontend PRs #24–#27 and moderation #28 are integrated into main; the website is not deployed. Follow the current [launch report](../launch/README.md) and [deployment checklist](../launch/DEPLOYMENT.md). Historical verification below records the frontend milestone; its former merge/review status is superseded by LOG-HUB-008. Current visual details are recorded in the [typography](typography/README.md) and [visual refinement](visual-identity/REFINEMENT.md) reports.
+**Historical design report:** This file records frontend design and verification at the LOG-HUB-004 stage. The website has since launched at https://legacyofgokuhub.com/, and earlier descriptions of an empty catalogue, unsaved ratings or an undeployed frontend are no longer current status statements. For current navigation see the [documentation index](../README.md); for the historical design rationale, see the [typography](typography/README.md) and [visual refinement](visual-identity/REFINEMENT.md) reports.
 
 ## Architecture and data boundary
 
