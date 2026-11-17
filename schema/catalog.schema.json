@@ -54,7 +54,7 @@
         "archived": {"type": "boolean"},
         "availability": {"enum": ["available", "archived", "unavailable"]},
         "warning": {"type": ["null", "string"], "maxLength": 4000},
-        "cover": {"type": "string", "pattern": "^assets/[a-z0-9-]+/cover\\.webp$"},
+        "cover": {"type": ["null", "string"], "pattern": "^assets/[a-z0-9-]+/cover\\.webp$"},
         "screenshots": {"type": "array", "$ref": "#/definitions/strings", "maxItems": 6},
         "release": {"anyOf": [{"type": "null"}, {"$ref": "#/definitions/release"}]},
         "last_updated": {"$ref": "#/definitions/date"},

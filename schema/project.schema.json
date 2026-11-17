@@ -3,7 +3,7 @@
   "title": "Editorial project record; release fields are generated",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "title", "developer", "description", "game", "category", "status", "repository", "cover"],
+  "required": ["id", "title", "developer", "description", "game", "category", "status", "repository"],
   "properties": {
     "id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$", "maxLength": 64},
     "title": {"type": "string", "minLength": 1, "maxLength": 100},

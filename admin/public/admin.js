@@ -29,6 +29,7 @@ function fill(value) {
   for (const name of ['title', 'description', 'url', 'game', 'category', 'status', 'patch_url']) form[name].value = value[name] || '';
   form.creator.value = value.creator || value.developer || ''; form.no_page.checked = value.no_page === true;
   form.artwork.value = (value.artwork || []).join('\n'); form.links.value = (value.links || []).map(l => l.label + ' | ' + l.url).join('\n');
+  $('omit-artwork').checked = value.omit_artwork === true;
   $('public-note').value = selected?.public_note || ''; $('private-note').value = selected?.private_note || ''; $('reason').value = ''; $('transfer').checked = false;
 }
 function values() {
@@ -60,7 +61,7 @@ async function prepare(operation) {
   if (!await confirmAction(`Prepare ${operation} for private review? This does not approve or publish anything.`)) return;
   let payload = ['feature', 'unfeature'].includes(operation) ? {} : values();
   if (!selected) { const {creator, ...rest} = payload; payload = {...rest, developer: creator}; }
-  const result = await api('prepare', {operation, payload, ...(selected ? {submission_id: selected.id, revision: selected.revision} : {project_id: listing.id}), reason: $('reason').value, transfer: $('transfer').checked});
+  const result = await api('prepare', {operation, payload, ...(selected ? {submission_id: selected.id, revision: selected.revision} : {project_id: listing.id}), reason: $('reason').value, transfer: $('transfer').checked, omit_artwork: $('omit-artwork').checked});
   notice('Private preparation queued. Refresh Publication reviews to inspect results.'); await reviews(result.id);
 }
 async function catalog() {
@@ -97,13 +98,17 @@ async function showReview(r) {
   }
   if (pkg.listing) { box.append(el('h3', 'Proposed listing'), el('pre', JSON.stringify(pkg.listing, null, 2))); for (const url of [pkg.listing.source.url, pkg.listing.distribution?.url, ...(pkg.listing.links || []).map(l => l.url)].filter(Boolean)) box.appendChild(el('p')).append(link(url)); }
   const art = el('div'); art.className = 'artwork';
-  for (const f of pkg.files.filter(f => f.name.startsWith('preview-'))) { const figure = el('figure'), img = el('img'); img.src = `/api/preview?id=${r.id}&name=${f.name}`; img.alt = f.name === 'preview-0.webp' ? 'Prepared cover artwork' : 'Prepared project screenshot'; figure.append(img, el('figcaption', f.name + ' · SHA-256 ' + f.sha256)); art.append(figure); }
+  for (const f of pkg.files.filter(f => f.name.startsWith('preview-'))) { const figure = el('figure'), img = el('img'); img.src = `/api/preview?id=${r.id}&name=${f.name}`; img.alt = f.name === 'preview-0.webp' && (pkg.listing?.cover || pkg.featured_preview?.cover) ?'Prepared cover artwork' : 'Prepared project screenshot'; figure.append(img, el('figcaption', f.name + ' · SHA-256 ' + f.sha256)); art.append(figure); }
+  if (!pkg.files.length) art.append(el('p', 'This package contains no artwork to inspect.'));
+  if ((pkg.listing && !pkg.listing.cover) || (pkg.featured_preview && !pkg.featured_preview.cover)) art.append(el('p', 'No cover supplied. Public pages use the built-in artwork placeholder.'));
   box.append(art, el('h3', 'Exact proposed publishing policy'), el('pre', JSON.stringify(pkg.policy, null, 2)), el('h3', 'Approved file inventory'), el('pre', JSON.stringify(pkg.files, null, 2)));
   if (r.state === 'ready') {
-    for (const [id, text] of [['content-reviewed', 'I reviewed the exact content, source, download links and proposed policy.'], ['artwork-reviewed', 'I inspected all normalized artwork and verified its suitability and rights. For policy-only changes, I reviewed the existing approval requirements.']]) { const label = el('label'), input = el('input'); input.type = 'checkbox'; input.id = id; label.append(input, document.createTextNode(' ' + text)); box.append(label); }
+    const acknowledgements = [['content-reviewed', 'I reviewed the exact content, source, download links and proposed policy.']];
+    if (pkg.files.length) acknowledgements.push(['artwork-reviewed', 'I inspected all normalized artwork and verified its suitability and rights.']);
+    for (const [id, text] of acknowledgements) { const label = el('label'), input = el('input'); input.type = 'checkbox'; input.id = id; label.append(input, document.createTextNode(' ' + text)); box.append(label); }
     const pub = el('textarea'); pub.id = 'approval-public'; pub.maxLength = 500; const pl = el('label', 'Public receipt decision note'); pl.append(pub); box.append(pl);
     const priv = el('textarea'); priv.id = 'approval-private'; priv.maxLength = 1000; const prl = el('label', 'Private decision note'); prl.append(priv); box.append(prl);
-    box.append(button('Approve exact content and artwork', async () => { if (!await confirmAction('Approve this exact package? It remains unpublished until its protected PR is merged and deployment succeeds.')) return; await api('approve', {id: r.id, version: r.version, digest: r.digest, content_reviewed: $('content-reviewed').checked, artwork_reviewed: $('artwork-reviewed').checked, public_note: pub.value, private_note: priv.value}); notice('Exact approval recorded.'); await reviews(r.id); }));
+    box.append(button(pkg.files.length ? 'Approve exact content and artwork' : 'Approve exact content', async () => { if (!await confirmAction('Approve this exact package? It remains unpublished until its protected PR is merged and deployment succeeds.')) return; await api('approve', {id: r.id, version: r.version, digest: r.digest, content_reviewed: $('content-reviewed').checked, artwork_reviewed: $('artwork-reviewed')?.checked || false, public_note: pub.value, private_note: priv.value}); notice('Exact approval recorded.'); await reviews(r.id); }));
   }
   if (r.state === 'approved') box.append(button('Prepare protected publication PR', async () => { if (!await confirmAction('Create a public protected PR containing only the approved listing, artwork and policy changes?')) return; await api('publish', {id: r.id, digest: r.digest}); notice('PR preparation queued; refresh for its status.'); }));
   if (r.pr) box.append(button('Verify PR checks and deployment', async () => { const status = await api('publication?id=' + r.id); box.append(el('pre', JSON.stringify(status, null, 2))); if (status.url) box.append(link(status.url, 'Open protected PR')); if (status.live_url) box.append(link(status.live_url, 'Open live listing')); }));

@@ -1,5 +1,11 @@
 # Changelog
 
+## LOG-HUB-017 Phase 1: optional artwork
+
+- Allow artwork-free manifests and managed listings through private preparation, exact approval, catalogue generation, signed publication and recovery.
+- Reuse the built-in artwork placeholder in cards, details and Featured while preserving supplied artwork validation, normalization and exact approvals.
+- Add deliberate administrator artwork omission and independent screenshot handling, with isolated preparation, approval, signing, recovery and browser regressions.
+
 ## LOG-HUB-017 Phase 0: authority contract and migration plan
 
 - Audit current approval, artwork, publication-status and protected-workflow boundaries at the deployed baseline.

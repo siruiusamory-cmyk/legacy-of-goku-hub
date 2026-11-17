@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {readJSON} from './records.js';
-import {MAX_IMAGE_BYTES, boundedBody, imageHash, normalizeImage} from './images.js';
+import {MAX_IMAGE_BYTES, boundedBody, imageHash, normalizeImage, imageEntries} from './images.js';
 import {repositoryInfo, releaseInfo} from './github.js';
 import {hostedManifest, hostedRawURL, hostedRepository, hostedSupported} from './hosted.js';
 import {checkManifest, digest} from './intake.js';
@@ -36,10 +36,10 @@ async function sourceBytes(ref, dir, fetcher) {
 }
 export async function inspectListingImages(record, dir, fetcher = fetch, capture = false) {
   const outputs = []; const artwork = []; const inputs = [];
-  for (const [i, ref] of [record.cover, ...(record.screenshots || [])].entries()) {
-    const bytes = await sourceBytes(ref, dir, fetcher);
+  for (const image of imageEntries(record)) {
+    const bytes = await sourceBytes(image.ref, dir, fetcher);
     if (capture) inputs.push(bytes);
-    const normalized = await normalizeImage(bytes, i === 0 ? 'cover' : 'screenshot');
+    const normalized = await normalizeImage(bytes, image.kind);
     outputs.push(normalized); artwork.push({source_sha256: imageHash(bytes), sha256: imageHash(normalized)});
   }
   return {outputs, artwork, ...(capture ? {inputs} : {})};
@@ -47,7 +47,8 @@ export async function inspectListingImages(record, dir, fetcher = fetch, capture
 function fromManifest(listing, manifest) {
   const metadata = checkManifest(manifest.metadata);
   const record = {...listing, title: metadata.title, developer: metadata.developer, description: metadata.description, game: metadata.game, category: metadata.category, status: metadata.status,
-    cover: hostedRawURL(manifest, metadata.cover), screenshots: (metadata.screenshots || []).map(s => hostedRawURL(manifest, s))};
+    screenshots: listing.omit_artwork ? [] : (metadata.screenshots || []).map(s => hostedRawURL(manifest, s))};
+  if (!listing.omit_artwork && metadata.cover) record.cover = hostedRawURL(manifest, metadata.cover); else delete record.cover;
   if (metadata.links?.length) record.links = metadata.links; else delete record.links;
   for (const link of record.links || []) publicURL(link.url, 'links');
   return validateListing(record);

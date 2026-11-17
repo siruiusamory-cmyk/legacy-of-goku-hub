@@ -12,6 +12,8 @@ The Worker independently validates RS256 signatures, issuer, audience, app-token
 
 ## Owner workflow
 
+Artwork is optional in the LOG-HUB-017 Phase 1 candidate. New listings may be prepared without any image address. To deliberately discard supplied or repository-manifest artwork, select **Omit all artwork** before preparation. The exact package records that selection and public pages use the built-in placeholder. If artwork remains in the package, inspect its normalized previews and acknowledge artwork review before approval. Artwork-free packages require exact content review and approval. Supplied images that fail safety or normalization checks remain blocked until deliberately omitted.
+
 Featured placement (LOG-HUB-015) is managed under **Existing listings**. The panel shows the currently published Featured project. Choose **Manage**, then **Feature**, **Replace Featured**, or **Remove from Featured**. Only approved projects present in the published catalog are eligible. Review the actual published title, description, links and approved normalized cover in the private package, approve it, then prepare its protected publication PR. Replacement clears the previous selection in the same policy file. Clearing restores the existing empty homepage frame. The dashboard reports completion only after the signed deployment shows the requested selection. Suspension or delisting clears that project's selection. These controls require deployment of LOG-HUB-015 after owner authorization.
 
 1. Open the protected administrator origin, authenticate by allowed email PIN and select **Sign in**.

@@ -36,7 +36,7 @@ export function validateRecord(record, existing = []) {
     const url = new URL(link.url);
     if (url.protocol !== 'https:' || url.username || url.password || url.port || url.hash || !/^(github\.com|[a-z0-9-]+\.github\.io|discord\.gg|discord\.com|(?:www\.)?youtube\.com)$/.test(url.hostname) || /\.(gba|gbc?|nds|rom|iso|bin|zip|7z|exe|msi|bps|ips|ups|xdelta)(?:$|[/?])/i.test(url.pathname)) throw Error('links: use an HTTPS project/community page on an allowed host, never a download or game file');
   }
-  for (const url of [record.cover, ...(record.screenshots || [])]) imageURL(url, record.repository);
+  for (const url of [...(record.cover ? [record.cover] : []), ...(record.screenshots || [])]) imageURL(url, record.repository);
   if (record.asset_name && /\.(gba|gb|gbc|nds|rom|bin)$/i.test(record.asset_name)) throw Error('asset_name: ROM files are forbidden');
   if (existing.some(p => p.id === record.id || p.repository.toLowerCase() === record.repository.toLowerCase())) throw Error('duplicate project ID or GitHub repository');
   return record;

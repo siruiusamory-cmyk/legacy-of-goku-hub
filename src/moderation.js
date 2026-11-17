@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import Ajv from 'ajv';
 import {readJSON} from './records.js';
-import {imageHash} from './images.js';
+import {imageHash, imageEntries} from './images.js';
 import {digest} from './intake.js';
 
 const check = new Ajv({allErrors: true}).compile(await readJSON(new URL('../schema/policy.schema.json', import.meta.url)));
@@ -38,7 +38,7 @@ export function entryApproved(entry, policy) {
     artworkApproved(rule, entry.id, entry.moderation?.artwork);
 }
 export async function verifyEntryArtwork(entry) {
-  const names = ['cover.webp', ...(entry.record.screenshots || []).map((_, i) => `screenshot-${i + 1}.webp`)];
+  const names = imageEntries(entry.record).map(image => image.name);
   if (entry.moderation?.artwork?.length !== names.length) throw Error('missing artwork moderation receipt');
   for (const [i, name] of names.entries()) {
     if (imageHash(await fs.readFile(path.join(entry.files, 'assets', entry.id, name))) !== entry.moderation.artwork[i].sha256) throw Error('approved artwork checksum mismatch');
