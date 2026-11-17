@@ -56,6 +56,8 @@ If your project has a public repository, you can optionally maintain its metadat
 
 This repository contains the source for the Legacy of Goku Hub website and its submission, moderation, catalogue, and publication tooling. The site uses Astro, Cloudflare Pages, Cloudflare Workers/D1, and GitHub Actions. Catalogue updates go through a moderated, protected publication process.
 
+The administrator Worker stays disabled in the committed default configuration; authorized production deploys use the explicit `admin/wrangler.production.jsonc`.
+
 For those contributing to or operating the Hub:
 
 - [Contributing to the Hub](CONTRIBUTING.md)
