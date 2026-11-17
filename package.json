@@ -19,10 +19,7 @@
     "site:build": "node tools/site/build.js",
     "site:serve": "node tools/site/serve.js",
     "test:browser": "playwright test",
-    "test:site": "node --test tests/site/*.test.js",
-    "site:real:ingest": "node tools/site/real-repositories.js --live",
-    "site:real": "node tools/site/build.js --real-preview .review/004a/real-input",
-    "test:real": "playwright test --config playwright.real.config.js"
+    "test:site": "node --test tests/site/*.test.js"
   },
   "dependencies": {
     "ajv": "8.20.0",

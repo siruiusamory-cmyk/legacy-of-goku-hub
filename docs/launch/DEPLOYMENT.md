@@ -1,6 +1,6 @@
 # Cloudflare Pages deployment and rollback checklist
 
-Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake` and `ratings` custom subdomains. See [domain migration](DOMAIN-MIGRATION.md). Earlier activation instructions and hostname references below are historical; production is already enabled.
+Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake` and `ratings` custom subdomains. See live Cloudflare configuration. Earlier activation instructions and hostname references below are historical; production is already enabled.
 
 **Current public destination:** https://legacyofgokuhub.com/ on the existing Cloudflare Pages project `loghub`. The site and separate intake, ratings, and administrator services have since been activated; the original prelaunch instructions below are retained for historical reference and must not be rerun as a new setup. For current releases, use the protected signed `catalog.yml` workflow, verify the deployed manifest, and confirm current production configuration. This document does not itself authorize a deployment.
 
