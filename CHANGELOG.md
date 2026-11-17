@@ -1,5 +1,11 @@
 # Changelog
 
+## LOG-HUB-017 Phase 0: authority contract and migration plan
+
+- Audit current approval, artwork, publication-status and protected-workflow boundaries at the deployed baseline.
+- Define pinned Access-owner authority, one publication-attempt lifecycle and exact private authorization verification across dashboard, CLI, policy and manifest paths.
+- Plan additive D1 migrations, legacy provenance, state-version/audit consistency and a coordinated compatibility cutover before later implementation phases.
+
 ## LOG-HUB-015: administrator Featured project management
 
 - Add administrator Feature, Replace Featured and Remove from Featured actions with published-project eligibility and actual approved cover/details in private review.
