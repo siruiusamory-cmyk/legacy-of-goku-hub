@@ -133,6 +133,26 @@
         []
       ],
       "featured": false
+    },
+    {
+      "project_id": "gh-1418576969",
+      "owner_id": 306419822,
+      "decision": "approved",
+      "content_digests": [
+        "60ff7656b4ce98e9d10aaad8c4c3891d5ca24c2b92f97e6259d0ddb927ebef92"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "b35d3c431b2ab0e9f359f125307e1ea40e4872c7224c926f5cf05f581d76a6c0",
+            "sha256": "5e487c588fce875df0012e3b4ac7f407f76a96053680eda0c1aa3cca452a3da9"
+          },
+          {
+            "source_sha256": "1c9ad273babc2432283629fa8680a3c9c04ff3c8edbf363305fce85b9c1f622a",
+            "sha256": "d0a72b488d6665d07a890a1ccdb04a7a5f8273e1f57bf9e91ac94a407c11dedb"
+          }
+        ]
+      ]
     }
   ]
 }

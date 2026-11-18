@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "id": "gh-1418576969",
+  "title": "Legacy of Goku II Online",
+  "developer": "Divinakra & Puni Puni",
+  "description": "Online multiplayer Coop, PVP and Story Mode in a seamless connected open world where you can fly anywhere. Earth with Heroes vs Villians, Brawl and “Hero of Earth” New Custom Story with Attainable Halo reward and 15 playable characters including playable Villians like Frieza, Mecha Frieza, Cooler, Androids and General Tao.",
+  "game": "legacy-of-goku-2",
+  "category": "fan-project",
+  "status": "released",
+  "source": {
+    "type": "github",
+    "url": "https://github.com/Divinakra140/Legacy-of-Goku-II-Online"
+  },
+  "distribution": {
+    "label": "Patch Page",
+    "url": "https://github.com/Divinakra140/Legacy-of-Goku-II-Online/releases",
+    "kind": "page"
+  },
+  "screenshots": [
+    "screenshot-1.jpg"
+  ],
+  "cover": "cover.jpg",
+  "approved_at": "2026-11-18T06:19:30Z"
+}
