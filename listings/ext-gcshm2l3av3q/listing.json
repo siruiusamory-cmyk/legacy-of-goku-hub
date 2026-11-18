@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "ext-gcshm2l3av3q",
+  "title": "Dragon Ball Z - Bulma's Wish",
+  "developer": "Aikado",
+  "description": "Dragon Ball Z - Bulma's Wish is a fan game based on the Dragon Ball universe created by Akira Toriyama. Cell, an evil bio android created by Dr. Gero, has been defeated by Son-Gohan and the world is at peace again. His father, Son-Goku, who had rescued the Earth several times, died in the fight against Cell. He decides that he does not want to be brought back by the Dragon Balls. It would be better for everyone if he stayed in the Other World. A year after the events of the Cell Games... . A mysterious warrior from space ends up on planet Earth. Why did he come to Earth? What are his intentions? Is he good or evil? Will he be a threat to the Z-Warriors? Play Dragon Ball Z - Bulma's Wish to find out!",
+  "game": "multiple",
+  "category": "fan-project",
+  "status": "released",
+  "source": {
+    "type": "website",
+    "url": "https://gamedev.aikaarmy.de/"
+  },
+  "distribution": {
+    "label": "Patch Page",
+    "url": "https://aikado.itch.io/dragon-ball-z-bulmas-wish",
+    "kind": "page"
+  },
+  "screenshots": [
+    "screenshot-1.png",
+    "screenshot-2.png",
+    "screenshot-3.png"
+  ],
+  "cover": "cover.webp",
+  "approved_at": "2026-11-18T05:27:27Z"
+}
