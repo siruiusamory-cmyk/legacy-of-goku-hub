@@ -45,8 +45,8 @@
   gap: 4px;
   padding: 14px 14px 14px 46px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-control);
-  background: linear-gradient(var(--surface), var(--surface-low));
+  border-radius: 2px;
+  background: var(--menu-fill);
   cursor: pointer;
 }
 .kind-option input {
@@ -58,7 +58,7 @@
   accent-color: var(--gold);
 }
 .kind-option:has(input:checked) {
-  border: 3px solid var(--gold);
+  border: 3px solid var(--frame-gold);
   padding: 12px 12px 12px 44px;
   background: color-mix(in srgb, var(--gold) 12%, var(--surface));
 }
@@ -95,7 +95,7 @@
   margin-left: 10px;
   padding: 1px 8px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 2px;
   font-size: .75rem;
   font-weight: 400;
   color: var(--ice);
@@ -109,7 +109,7 @@
   min-height: 44px;
   padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-control);
+  border-radius: 2px;
   background: var(--surface-low);
   color: var(--paper);
 }
@@ -137,7 +137,7 @@
 }
 .error-summary {
   border: 3px solid var(--orange);
-  border-radius: var(--radius-control);
+  border-radius: 2px;
   padding: 14px 18px;
   background: color-mix(in srgb, var(--orange) 14%, var(--surface-low));
 }
@@ -175,7 +175,7 @@
 }
 .more {
   border: 1px solid var(--line);
-  border-radius: var(--radius-control);
+  border-radius: 2px;
   padding: 4px 16px 16px;
   display: grid;
   gap: 16px;
@@ -192,7 +192,7 @@
 }
 .duplicate-note {
   border: 3px solid var(--gold);
-  border-radius: var(--radius-control);
+  border-radius: 2px;
   padding: 12px 14px;
   background: color-mix(in srgb, var(--gold) 12%, var(--surface-low));
 }
@@ -253,7 +253,7 @@
   justify-items: start;
   padding: 16px;
   border: 3px solid var(--gold);
-  border-radius: var(--radius-control);
+  border-radius: 2px;
   background: var(--surface-low);
 }
 .receipt-label {
@@ -270,7 +270,7 @@
 }
 .claim-steps {
   border: 1px solid var(--border);
-  border-radius: var(--radius-control);
+  border-radius: 2px;
   padding: 14px 16px;
   display: grid;
   gap: 8px;
@@ -296,7 +296,7 @@
   height: 38px;
   padding-inline: 8px;
   border: 3px solid var(--gold);
-  border-radius: 999px;
+  border-radius: 2px;
   font-weight: 700;
 }
 .status-note {
