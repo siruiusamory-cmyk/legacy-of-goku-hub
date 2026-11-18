@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "ext-mkclhutzqjew",
+  "title": "Dragon Ball: Legacy of Saiyans",
+  "developer": "Unknown creator",
+  "description": "Play as the Z Warriors, including Goku, Gohan, Vegeta, Piccolo and more, and explore iconic places from the sagas, from Earth to Namek and out into space. Master their legendary techniques (Kamehameha, Masenko, Galick Gun, Spirit Bomb, etc), unlock their transformations and take on fearsome enemies like Frieza, Great Ape Vegeta and Majin Buu.",
+  "game": "multiple",
+  "category": "fan-project",
+  "status": "in-development",
+  "source": {
+    "type": "none"
+  },
+  "distribution": {
+    "label": "Patch Page",
+    "url": "https://www.mediafire.com/file/kjpzvmbh53pdfpg/DragonBallKingOnline-Setup-0.1.0.exe/file",
+    "kind": "page"
+  },
+  "links": [
+    {
+      "label": "Zerrok",
+      "url": "https://discord.gg/bECZ3wQzX"
+    },
+    {
+      "label": "@DbzLOS",
+      "url": "https://www.youtube.com/@DbzLOS"
+    }
+  ],
+  "screenshots": [],
+  "approved_at": "2026-11-18T05:30:24Z"
+}
