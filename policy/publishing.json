@@ -69,6 +69,33 @@
   ],
   "external_projects": [
     {
+      "project_id": "ext-gcshm2l3av3q",
+      "decision": "approved",
+      "content_digests": [
+        "3e38831a5d9cf0e3421bc2b396c8c1a242709deca2f735ed2d70eee1ff87cb82"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "1cca787c5094fde8f2af2a2ff0446c41ca02f08f6d98507f0ff49eeb5248303b",
+            "sha256": "f50ec1086049bc27a78b5c3e736f41e292779746b2f43716d9af769820201f23"
+          },
+          {
+            "source_sha256": "1f249a1ead0819aad457ecca17827351aef94d38655563d28435212380168a1f",
+            "sha256": "8f4c8ee10dffd20a4da6092f317694d54eeaaa90714bae785575095485343b3a"
+          },
+          {
+            "source_sha256": "6265bab351cd1f3855583d2d34d6a65d031b6ad25014c4eff6563363794b7987",
+            "sha256": "810c1338cd79a58df3a762bfa75d4b596a8392ebc5994ae06eb3f5c25ce147a1"
+          },
+          {
+            "source_sha256": "d1e003b5966ec43489ec358ca0bfa8289b28502c7867ccf0ec2361668bd17549",
+            "sha256": "e9c618162ca70b08b4db1a5e45c7e468db94f77090ad1a32fd95f314381b4196"
+          }
+        ]
+      ]
+    },
+    {
       "project_id": "ext-gvp2t5evruov",
       "decision": "approved",
       "content_digests": [
