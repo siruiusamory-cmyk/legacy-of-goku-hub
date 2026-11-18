@@ -112,6 +112,16 @@
       "featured": true
     },
     {
+      "project_id": "ext-mkclhutzqjew",
+      "decision": "approved",
+      "content_digests": [
+        "3b57ffd3abf3351c30fec37ce749e6f7757900b4630ad6529325abb67464868b"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
       "project_id": "gh-1131874995",
       "owner_id": 127344248,
       "decision": "approved",
