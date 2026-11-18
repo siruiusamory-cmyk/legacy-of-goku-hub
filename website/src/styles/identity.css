@@ -268,6 +268,14 @@ body {
   .directory-heading h2 {padding:8px 23px 8px 9px;}
   .panel-title,.about .panel-title {font-size:clamp(17px,5vw,23px);}
   .spotlight-copy h1::before,.detail-intro h1::before {width:6px;margin-right:7px;}
-  .card-summary {font-size:13px;}
+  /* Phone directory: full-width project records, not cramped miniature cards. */
+  .project-grid {grid-template-columns:minmax(0,1fr);gap:14px;}
+  .project-card .card-art {height:auto;aspect-ratio:16/9;}
+  .project-card .card-content {padding:12px 14px;}
+  .project-card h3 {font-size:clamp(21px,5.5vw,26px);}
+  .project-card .card-summary {font-size:14px;-webkit-line-clamp:2;}
+  .project-card .compact .dragon-ball {width:24px;height:24px;font-size:24px;}
+  .project-card .compact .rating-balls {gap:4px;}
+  .project-card .compact .rating-value strong {font-size:15px;}
 }
 @media(prefers-reduced-motion:reduce){.project-card {transition:none;}}
