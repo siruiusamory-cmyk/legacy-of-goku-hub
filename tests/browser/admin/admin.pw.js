@@ -29,14 +29,14 @@ for (const width of [390, 1280]) test(`owner browser workflow, safe content, acc
     await page.getByRole('button', {name: 'Review submission 1'}).click();
     await page.getByRole('button', {name: 'Start review', exact: true}).click();
     await expect(page.locator('#details')).toContainText('revision 2');
-    await page.getByLabel('Public receipt note', {exact: true}).fill('Please correct the description.');
+    await page.getByLabel('Message to the submitter (shown on their receipt)', {exact: true}).fill('Please correct the description.');
     await page.getByLabel('Private moderation note').fill('Private browser training evidence');
     await page.getByRole('button', {name: 'Request corrections', exact: true}).click(); await page.getByRole('button', {name: 'Confirm', exact: true}).click();
     await expect(page.locator('#details')).toContainText('Awaiting corrections');
     x.db.prepare("UPDATE submissions SET state='received',revision=revision+1 WHERE id=1").run();
     await page.getByRole('button', {name: 'Submission inbox', exact: true}).click(); await page.getByRole('button', {name: 'Review submission 1'}).click();
     await page.getByLabel('Project name', {exact: true}).fill('Fictional Training');
-    await page.getByRole('button', {name: 'Prepare private review', exact: true}).click();
+    await page.getByRole('button', {name: 'Prepare preview', exact: true}).click();
     await expect(page.locator('#notice')).toContainText('Private preparation queued');
     const row = (await (await x.call('/api/reviews')).json()).items[0];
     await x.processCall(row.id, '/claim', {action: 'prepare'});
@@ -50,7 +50,7 @@ for (const width of [390, 1280]) test(`owner browser workflow, safe content, acc
     await expect(page.getByRole('img', {name: 'Prepared cover artwork'})).toBeVisible();
     await expect.poll(() => page.getByRole('img', {name: 'Prepared cover artwork'}).evaluate(img => img.complete && img.naturalWidth === 640)).toBe(true);
     await page.getByLabel('I reviewed the exact content', {exact: false}).check();
-    await page.getByLabel('I inspected all normalized artwork', {exact: false}).check();
+    await page.getByLabel('I inspected all prepared images', {exact: false}).check();
     await page.getByLabel('Public receipt decision note').fill('Approved fictional training content.');
     const a11y = await new AxeBuilder({page}).analyze(); expect(a11y.violations).toEqual([]);
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

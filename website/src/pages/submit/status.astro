@@ -6,7 +6,7 @@ import {href, intakeAPI, submitURL, advancedSubmitURL} from '../../lib/catalog.j
 ---
 <Layout title="Submission status | Legacy of Goku Hub" description="Check on a project submission with your receipt."><main id="main" class="container submit-main">
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href={submitURL}><Icon name="back"/>Submit</a><span aria-hidden="true">/</span><span aria-current="page">Status</span></nav>
-  <header class="submit-heading"><h1>Check a submission</h1><p>Paste the receipt you were given when you submitted. We keep no account or email, so the receipt is the only key.</p></header>
+  <header class="submit-heading"><h1>Check a submission</h1><p>Paste the receipt you were given when you submitted. We keep no account or email, so the receipt is the only key. Replies from the moderators appear on this page.</p></header>
   {!intakeAPI && <p class="availability-note" role="note"><strong>Submissions are not open yet.</strong> There is nothing to check. The <a href={advancedSubmitURL} rel="noopener noreferrer">GitHub route</a> is available in the meantime.</p>}
   <div data-status data-api={intakeAPI}>
     <form id="status-form" class="panel submit-panel" novalidate autocomplete="off"><div class="field" data-field="receipt"><label for="f-receipt">Receipt<span class="req">Required</span></label><p class="hint" id="h-receipt">A code of 43 letters, numbers, dashes and underscores.</p><input id="f-receipt" name="receipt" type="text" spellcheck="false" autocapitalize="off" aria-describedby="h-receipt e-receipt"/><p class="error" id="e-receipt" hidden></p></div><div class="actions"><button class="button primary" type="submit">Check status<Icon name="arrow"/></button></div></form>

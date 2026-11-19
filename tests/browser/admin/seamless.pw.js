@@ -39,7 +39,7 @@ for (const width of [390, 1280]) test(`cleanup and hands-off publication trackin
     await expect(card('Original').locator('.compare li')).toHaveCount(2);
     await expect(card('Original').locator('.compare')).toContainText('#1 Original (this one)');
     await expect(card('Original').locator('.compare')).toContainText('#2 Copy');
-    await expect(card('Original').locator('.compare').getByRole('link', {name: 'https://fiction.example.org/project'})).toHaveCount(2);
+    await expect(card('Original').locator('.compare').getByRole('link', {name: 'Project page (fiction.example.org)'})).toHaveCount(2);
     await fits(page);
     expect((await new AxeBuilder({page}).analyze()).violations).toEqual([]);
     await page.screenshot({path: `.review/025/inbox-${width}.png`, fullPage: true});
@@ -52,6 +52,7 @@ for (const width of [390, 1280]) test(`cleanup and hands-off publication trackin
     await card('Original').getByRole('button', {name: 'Delete duplicate #2', exact: true}).click();
     await page.getByRole('button', {name: 'Delete submission', exact: true}).click();
     await expect(page.locator('#notice')).toHaveText('Deleted 1 submission.');
+    await expect(page.locator('#queue-title')).toBeFocused();
     await expect(card('Copy')).toHaveCount(0); await expect(card('Original')).toHaveCount(1);
     await expect(card('Original').getByText('Possible duplicate')).toHaveCount(0);
     await expect(page.getByRole('button', {name: 'Delete selected', exact: true})).toBeDisabled();
@@ -62,6 +63,7 @@ for (const width of [390, 1280]) test(`cleanup and hands-off publication trackin
     await expect(page.locator('#confirmation-text')).toContainText('Permanently delete 2 submissions?');
     await page.getByRole('button', {name: 'Delete 2 submissions', exact: true}).click();
     await expect(page.locator('#notice')).toHaveText('Deleted 2 submissions.');
+    await expect(page.locator('#queue-title')).toBeFocused();
     expect(x.db.prepare('SELECT id FROM submissions ORDER BY id').all().map(r => r.id)).toEqual([1, 5, 6]);
     await expect(page.locator('#selected-count')).toHaveText('0 selected');
     await expect(card('Arrived later')).toHaveCount(1);
@@ -75,10 +77,13 @@ for (const width of [390, 1280]) test(`cleanup and hands-off publication trackin
 
     const r = await insert('t'.repeat(24), 'ready', {submission_id: 1, revision: 1});
     await page.getByRole('button', {name: 'Publication reviews', exact: true}).click();
+    await expect(page.locator('#review-detail .review-stage [aria-current=step]')).toHaveText('Your review');
     await page.getByLabel('I reviewed the exact content', {exact: false}).check();
     await page.getByRole('button', {name: 'Approve & Expedite', exact: true}).click(); await page.getByRole('button', {name: 'Confirm', exact: true}).click();
     const status = page.locator('#publication-status');
     await expect(status).toContainText('Publication is starting.');
+    await expect(page.locator('#notice')).toHaveText('Exact approval recorded; publication started.');
+    await expect(page.locator('#count-publishing .count')).toHaveText('1');
     await expect(page.getByRole('button', {name: 'Publish now'})).toHaveCount(0);
     await expect(page.getByRole('button', {name: /Prepare protected|Verify PR/})).toHaveCount(0);
     expect(x.state.dispatched.map(d => d.inputs.action)).toEqual(['publish']);
@@ -89,6 +94,7 @@ for (const width of [390, 1280]) test(`cleanup and hands-off publication trackin
     await page.clock.fastForward(21000);
     await expect(status).toContainText('Automated checks are running.');
     await expect(status.locator('[aria-current=step]')).toHaveText('Waiting for checks');
+    await expect(page.locator('#notice')).toHaveText('');
     x.state.pr = {...x.state.pr, state: 'closed', merged: true, merge_commit_sha: main};
     await page.clock.fastForward(21000);
     await expect(status).toContainText('The approved change is being published.');
@@ -99,6 +105,7 @@ for (const width of [390, 1280]) test(`cleanup and hands-off publication trackin
     await expect(status).toContainText('The change is live.');
     await expect(status.getByRole('link', {name: 'Open the live page'})).toHaveAttribute('href', 'https://site.example/projects/ext-abcdefghijkl/');
     await expect(page.locator('#review-list .tag')).toHaveText('Published');
+    await expect(page.locator('#count-publishing .count')).toHaveText('0');
     const polls = x.state.github.length;
     await page.clock.fastForward(65000);
     expect(x.state.github.length).toBe(polls);
@@ -109,6 +116,7 @@ for (const width of [390, 1280]) test(`cleanup and hands-off publication trackin
     await page.screenshot({path: `.review/025/published-${width}.png`, fullPage: true});
 
     await page.reload();
+    await page.locator('#state').selectOption('');
     await expect(card('Original').locator('.tag')).toHaveText('Published');
     await page.getByRole('button', {name: 'Publication reviews', exact: true}).click();
     await expect(page.locator('#publication-status')).toContainText('The change is live.');

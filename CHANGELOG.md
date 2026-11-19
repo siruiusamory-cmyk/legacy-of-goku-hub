@@ -6,6 +6,11 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
+- The dashboard uses plain words throughout: project names instead of ids, "preview" and "publication" instead of package and pull request terms, links shown as their label with the site name, and field errors shown as "Label: message" with the cursor on that field. The message to the submitter sits with the decision buttons, and a missing message or review tick is pointed out before any confirmation.
+- Correction requests open with the live listing's details and list each field the visitor proposed with **Use this**. Only the fields the owner changed are sent, and a change that would leave the listing as published is refused.
+- **Suspend**, **Delist** and **Restore** are offered only where they apply, so a suspended listing can be delisted directly.
+- The public submission form says plainly that pictures are given as links, marks each folded section as open or closed, and shows option names such as "ROM hack" on the review step. The receipt and status pages explain that moderator replies appear on the status page, and say when the visitor's own reply has arrived.
+- Historical command-line moderation procedures are marked as superseded by the dashboard, and the documentation states that automatic merge of owner-approved publications is on in production.
 - The administrator dashboard starts its own session whenever Cloudflare Access has already proved who you are, and renews it when it runs out, so the header no longer shows a session expiry time. The **Sign in** button now appears only if that fails or after you sign out.
 - The public site has a new look modelled on a Game Boy Advance pause menu. The commissioned energy banner is the masthead at its native 960x160, and the fourteen commissioned Dragon Ball sprites show every rating at exact pixel sizes (48, 24 or 16).
 - The four menu tabs are equal width and sit together like folder tabs.
@@ -16,12 +21,20 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Added
 
+- An owner runbook, [docs/OWNER-RUNBOOK.md](docs/OWNER-RUNBOOK.md), covers day-to-day running of the Hub from the dashboard and the rare jobs that still need GitHub or Cloudflare.
+- Each submission shows the visitor's original message, every reply and every message sent to them, in date order. Submissions that came back with a reply carry the tag "Reply received".
+- A row of five counts under the dashboard navigation: new submissions, waiting on the visitor, ready for review, publishing and needs attention. Each opens the matching list, and a failing check on an open publication shows under needs attention without opening another page. The inbox opens on "Needs action".
+- The owner can get one email when the number of new submissions rises. It holds only the count and the dashboard address, and is sent once the address is set in the private configuration.
+- "Also make this the Featured project" when preparing a new listing, and "Prepare again as Featured" on a ready preview. The Featured choice is part of the preview the owner approves.
+- "Changes to this listing" shows each listing's past changes, with date, outcome, reason and approver.
+- When an image fails, **Prepare without artwork** and **Back to the submission** are offered. When the site changed after approval, a fresh preview is prepared automatically, and nothing is approved until the owner reviews it.
+- A Ratings tab shows each project's community rating and score spread, flags many one-time ratings of the same score as worth a look, and lets the owner stop counting such a group of five or more and count it again later. It never shows who voted.
 - The administrator dashboard follows a publication by itself after approval. One panel moves through Approved, Publishing, Waiting for checks, Deploying and Published, and shows the live link once the deployment has been verified. The **Verify PR checks and deployment** button and the leftover publication button after **Approve & Expedite** are gone.
 - When a publication cannot finish, the dashboard says why in plain words and offers the fitting next step: **Try again**, **Prepare a new review**, **Check publication** or **Discard unfinished review**. A failed site deployment is repeated once automatically.
 - The owner can permanently delete submissions from the dashboard: one at a time, a chosen duplicate, or many at once with **Select all matching** and **Delete selected**. Deleting removes the private submission and its receipt and never removes a published listing.
 - Submissions that share a project address are shown side by side with their names, addresses, dates and statuses. Nothing is deleted automatically.
 - The inbox shows how many submissions are new, under review, awaiting corrections and approved.
-- Owner-approved publications can merge by themselves once the required checks pass, so the owner no longer has to press Merge on GitHub. Off by default; the owner turns it on separately. The publication job checks that the pull request holds exactly the approved content before asking GitHub to merge it, and never merges anything itself.
+- Owner-approved publications can merge by themselves once the required checks pass, so the owner no longer has to press Merge on GitHub. Off by default; the owner turns it on separately. On in production since 2026-11-18. The publication job checks that the pull request holds exactly the approved content before asking GitHub to merge it, and never merges anything itself.
 - The dashboard says whether GitHub will merge an open publication by itself, and shows the reason when automatic merge could not be turned on.
 - Directory cards show a short project summary and the date the listing was last updated (screens wider than 580px).
 - A Recently Updated list on the home page links to the three most recently updated projects.

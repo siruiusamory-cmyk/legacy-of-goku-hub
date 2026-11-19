@@ -70,6 +70,10 @@ Duplicate detection only compares project addresses and is advisory. Nothing is 
 
 Deployment note: apply `intake/migrations/0004_publication_tracking.sql` (one added column) before deploying the administrator Worker from this change.
 
+## Ratings connection (LOG-HUB-026)
+
+The dashboard's Ratings tab reads and changes ratings through a second D1 binding, `RATINGS_DB`, the second entry of `d1_databases` in both `admin/wrangler.jsonc` and `admin/wrangler.production.jsonc`: database `loghub-ratings`, id `a90fe4fa-dc7f-4b9a-8d26-51c2e968f72c`, no `migrations_dir`. The ratings Worker is not changed or redeployed. Without the binding the tab shows "Ratings are not connected to the dashboard". Owner use is described in the [owner runbook](../OWNER-RUNBOOK.md#managing-ratings).
+
 ## Private processor and authority
 
 The default-off `admin-review.yml` runs only from protected main, in `admin-processing`. Inputs contain only an opaque review ID and action. It pulls data from authenticated private `/processor/` endpoints. No submission artifacts are uploaded. Exceptions go to the private dashboard; public logs get a constant failure message. Temporary files are deleted in `finally`.
@@ -80,7 +84,9 @@ Approval binds complete package JSON, ordered original/normalized hashes, projec
 
 Up to six unfinished packages bound raw-image storage within Free D1's 500 MB limit. Stale/failed artwork is cleared before new preparation. Original chunks are deleted after PR creation. Previews last seven days (at most the latest twenty PR previews); cleanup runs during preparation. Existing intake expiry cascades to its reviews. An interrupted processing job can be replaced by preparing again from its inbox/listing. PR creation interruption can leave an already-approved public branch/PR: inspect `admin/<review-id>` before repeating. No automatic merge occurs unless the owner has activated it as described below.
 
-## Automatic merge after owner approval (LOG-HUB-023, default off)
+## Automatic merge after owner approval (LOG-HUB-023, on in production)
+
+Production state: on since LOG-HUB-023-ADDENDUM-001 (2026-11-18). It is turned off by removing the Actions variable `ADMIN_AUTO_MERGE_ENABLED`; see "To turn it off" below. The code default without that variable is still manual merging.
 
 Automatic merge removes one step only: pressing Merge on GitHub. It does not remove moderation. The owner still signs in, reviews the exact content and artwork, and approves the exact package. Nothing is merged that the owner did not approve.
 

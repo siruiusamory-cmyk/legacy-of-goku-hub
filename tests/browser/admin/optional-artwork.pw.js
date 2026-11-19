@@ -26,7 +26,7 @@ test('administrator deliberately omits supplied artwork and approves the exact a
     await page.getByRole('button', {name: 'Review submission 1', exact: true}).click();
     await page.locator('#more-metadata summary').click();
     await page.getByLabel('Omit all artwork', {exact: false}).check();
-    await page.getByRole('button', {name: 'Prepare private review', exact: true}).click();
+    await page.getByRole('button', {name: 'Prepare preview', exact: true}).click();
     await expect(page.locator('#notice')).toContainText('Private preparation queued');
     const row = (await (await x.call('/api/reviews')).json()).items[0];
     expect(row.payload.omit_artwork).toBe(true);
@@ -36,7 +36,7 @@ test('administrator deliberately omits supplied artwork and approves the exact a
     expect((await x.processCall(row.id, '/ready', {package: prepared.package})).status).toBe(200);
     await page.getByRole('button', {name: 'Refresh reviews', exact: true}).click();
     await expect(page.getByText('No cover supplied.', {exact: false})).toBeVisible();
-    await expect(page.getByLabel('I inspected all normalized artwork', {exact: false})).toHaveCount(0);
+    await expect(page.getByLabel('I inspected all prepared images', {exact: false})).toHaveCount(0);
     await page.getByLabel('I reviewed the exact content', {exact: false}).check();
     expect((await new AxeBuilder({page}).analyze()).violations).toEqual([]);
     await page.getByRole('button', {name: 'Approve exact content', exact: true}).click();

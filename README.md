@@ -60,13 +60,14 @@ The administrator Worker stays disabled in the committed default configuration; 
 
 For those contributing to or operating the Hub:
 
+- [Owner runbook](docs/OWNER-RUNBOOK.md): running the Hub day to day from the administrator dashboard
 - [Contributing to the Hub](CONTRIBUTING.md)
 - [Documentation index](docs/README.md)
 - [Changelog](CHANGELOG.md)
 - [Visual design notes and artist reference pack](docs/reviews/log-hub-019/review.md)
 - [Moderation and content policy](docs/moderation.md)
 - [Maintainer operations and recovery](docs/OPERATIONS.md)
-- [Administrator documentation](docs/launch/ADMIN.md), including automatic publication tracking, failure recovery, submission deletion and optional automatic merging of owner-approved publications (off by default)
+- [Administrator documentation](docs/launch/ADMIN.md), including automatic publication tracking, failure recovery, submission deletion and automatic merging of owner-approved publications (on in production since 2026-11-18; turned off by removing `ADMIN_AUTO_MERGE_ENABLED`)
 - [Auto-merge integration evidence and owner decision report](docs/reviews/log-hub-023/REPORT.md)
 - [Deployment documentation](docs/launch/DEPLOYMENT.md)
 

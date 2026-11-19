@@ -9,7 +9,8 @@ import {validateListing} from '../../src/listing-schema.js';
 import {IntakeAPI, adoptListing, applyClaim, manualClaim, prepareListing, setDecision, verifyPageClaim} from '../../src/intake-admin.js';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
-const USAGE = `usage:
+const USAGE = `Superseded by the administrator dashboard, see docs/OWNER-RUNBOOK.md.
+usage:
   queue [state]
   show ID
   prepare ID PRIVATE-DIRECTORY [--game G] [--status S] [--developer NAME] [--cover FILE]

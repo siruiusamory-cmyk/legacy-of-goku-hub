@@ -39,7 +39,7 @@ For a genuinely new empty hub, manually dispatch **Initialize durable recovery (
 
 Developers use the manifest registration or guided Issue Form described in README.md. The daily workflow and issue changes refresh eligible projects without routine PR merges. New/untrusted sources and sensitive claims/transfers require explicit protected publishing-policy changes. Owners approve exceptions by merging the policy PR after checking numeric IDs and exact submission/metadata digests. Delisting and revocation remain effective after recovery because current policy is reapplied.
 
-Publications approved in the administrator dashboard can merge by themselves once the required checks pass. This is off by default and is controlled by the Actions variable `ADMIN_AUTO_MERGE_ENABLED`; deleting it returns to manual merging. Activation steps, what blocks a merge, failure messages and recovery are in [Administrator documentation](launch/ADMIN.md#automatic-merge-after-owner-approval-log-hub-023-default-off).
+Publications approved in the administrator dashboard can merge by themselves once the required checks pass. This is on in production since LOG-HUB-023-ADDENDUM-001 (2026-11-18) and is controlled by the Actions variable `ADMIN_AUTO_MERGE_ENABLED`; deleting it turns it off and returns to manual merging. Activation steps, what blocks a merge, failure messages and recovery are in [Administrator documentation](launch/ADMIN.md#automatic-merge-after-owner-approval-log-hub-023-on-in-production).
 
 ## Monitoring
 
