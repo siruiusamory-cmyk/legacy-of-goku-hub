@@ -21,7 +21,7 @@ Featured placement (LOG-HUB-015) is managed under **Existing listings**. The pan
 3. Start review, request corrections or reject with a public reason. Receipt holders see public notes; private notes stay in the dashboard. Reload after the anonymous submitter revises. Stale revisions are rejected.
 4. Correct the form fields, then **Prepare private review**. Preparation fetches artwork through the existing DNS-pinned, bounded HTTPS fetcher, rejects redirects/private addresses and normalizes with Sharp. The browser never loads submitted artwork URLs directly.
 5. Refresh Publication reviews. Inspect every normalized image, metadata field, link, warning, proposed policy and hash. Acknowledge content/artwork review and approve the exact package. Approval is distinct from publication.
-6. Select **Prepare protected publication PR** and confirm. Only approved listing files, original artwork and policy enter the public branch. Receipts, submitter notes, manual evidence and unapproved material are excluded. Open the PR in GitHub's browser UI; normal protection governs merge. The dashboard cannot merge.
+6. Select **Prepare protected publication PR** and confirm. Only approved listing files, original artwork and policy enter the public branch. Receipts, submitter notes, manual evidence and unapproved material are excluded. Normal protection governs merge. The dashboard cannot merge. With automatic merge off (the default), open the PR in GitHub's browser UI and merge it there. With automatic merge on, GitHub merges it once the required checks pass; see "Automatic merge after owner approval" below.
 7. **Verify PR checks and deployment** requires a merged PR, a successful catalog run with successful synchronize/backup/anchor/publish/website/deploy jobs, the live manifest's exact build revision, merge ancestry and expected catalog presence/absence. Only then does it report publication/withdrawal and supply a live URL. Receipt lookup performs no GitHub operations.
 8. Existing listings includes live catalog identities plus withdrawn identities from policy. Edit metadata/HTTPS artwork references, or prepare suspension/delisting/restoration with a reason. Repeat exact review and protected PR. IDs and ratings keys remain unchanged.
 
@@ -35,7 +35,38 @@ Preparation uses a read-only GitHub token. Publication uses a **separate source-
 
 Approval binds complete package JSON, ordered original/normalized hashes, project identity, proposed policy and base commit. Publication rehashes bytes before sending them to GitHub. If main moved, preparation/approval must be repeated; reviewed policy is never automatically rebased. Existing branch protection, signed backups, recovery anchors and deployment remain final authority; `catalog.yml` is unchanged.
 
-Up to six unfinished packages bound raw-image storage within Free D1's 500 MB limit. Stale/failed artwork is cleared before new preparation. Original chunks are deleted after PR creation. Previews last seven days (at most the latest twenty PR previews); cleanup runs during preparation. Existing intake expiry cascades to its reviews. An interrupted processing job can be replaced by preparing again from its inbox/listing. PR creation interruption can leave an already-approved public branch/PR: inspect `admin/<review-id>` before repeating. No automatic merge/deployment occurs.
+Up to six unfinished packages bound raw-image storage within Free D1's 500 MB limit. Stale/failed artwork is cleared before new preparation. Original chunks are deleted after PR creation. Previews last seven days (at most the latest twenty PR previews); cleanup runs during preparation. Existing intake expiry cascades to its reviews. An interrupted processing job can be replaced by preparing again from its inbox/listing. PR creation interruption can leave an already-approved public branch/PR: inspect `admin/<review-id>` before repeating. No automatic merge occurs unless the owner has activated it as described below.
+
+## Automatic merge after owner approval (LOG-HUB-023, default off)
+
+Automatic merge removes one step only: pressing Merge on GitHub. It does not remove moderation. The owner still signs in, reviews the exact content and artwork, and approves the exact package. Nothing is merged that the owner did not approve.
+
+What happens after approval when it is on:
+
+1. The publication job creates the pull request from branch `admin/<review-id>`, exactly as before.
+2. The job re-reads the pull request from GitHub and compares it with the approved package: it must target `main` from `admin/<review-id>` in this repository, be one commit on the approved base commit, change no file outside the approved listing, artwork and `policy/publishing.json`, and carry exactly the approved bytes.
+3. The job confirms a repository ruleset forbids updating `admin/**` branches. Without that lock it refuses.
+4. The job asks GitHub to merge the pull request by squash once branch protection allows it (GitHub's own auto-merge, bound to the approved commit). The job never merges anything itself and has no code path that does.
+5. GitHub merges only when the required `test` check passes on a branch that is up to date with `main`. Linear history and administrator enforcement still apply. `browser` runs but is not a required check; this change does not alter that.
+6. The merge starts the same signed backup, publication and deployment pipeline as a manual merge.
+
+What stops a merge: a failing or pending required check; a merge conflict; `main` moving after the package was prepared (the branch is locked, so it cannot be brought up to date; prepare and approve a fresh package); the pull request being closed.
+
+How failures are reported: if automatic merge cannot be turned on, publication still succeeds up to the open pull request. The review shows "Automatic merge was not turned on (reason). Merge the pull request on GitHub." **Verify PR checks and deployment** states whether GitHub will merge by itself. A failed attempt never falls back to a direct merge.
+
+Manual merging always remains available: open the pull request on GitHub and merge it, as before.
+
+Activation needs separate owner authorization. In order:
+
+1. Merge and deploy this change (workflow, administrator Worker, dashboard).
+2. Repository Settings, Rules, Rulesets: add a branch ruleset targeting `admin/**` with the single rule **Restrict updates** and no bypass. Creation and deletion stay allowed.
+3. Repository Settings, General: turn on **Allow auto-merge**. This also lets anyone with write access turn on auto-merge by hand for any pull request; the publication job only ever does so for approved publication pull requests.
+4. Repository Settings, Actions variables: set `ADMIN_AUTO_MERGE_ENABLED` to `true`.
+5. Publish one low-risk change and confirm on GitHub that the pull request merged by itself and that the catalog workflow ran for the merge.
+
+To turn it off: delete `ADMIN_AUTO_MERGE_ENABLED` or set it to anything but `true`. New publications go back to manual merging at once. To stop a pull request already waiting, choose **Disable auto-merge** on that pull request, or turn off **Allow auto-merge**, which cancels every pending one. The ruleset can stay; it only protects.
+
+Still requires GitHub or Cloudflare: merging when automatic merge is off or was refused, closing a pull request that can no longer merge, reading a failed workflow run, administrator changes, pausing intake or publishing, backups and recovery.
 
 ## Activation: separate owner authorization required
 

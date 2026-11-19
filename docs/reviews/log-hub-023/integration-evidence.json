@@ -1,0 +1,256 @@
+{
+  "repository": "siruiusamory-cmyk/loghub-automerge-test",
+  "ran": "2026-11-19T06:39:18.191Z",
+  "protection": {
+    "required_checks": [
+      {
+        "context": "test",
+        "app_id": 15368
+      }
+    ],
+    "strict": true,
+    "linear_history": true,
+    "enforce_admins": true,
+    "approvals": 0
+  },
+  "ruleset": {
+    "name": "Publication branches cannot change after creation",
+    "include": [
+      "refs/heads/admin/**"
+    ],
+    "rules": [
+      "update"
+    ],
+    "bypass_actors": []
+  },
+  "merge_methods": {
+    "squash": true
+  },
+  "results": [
+    {
+      "scenario": "Owner has not approved",
+      "expected": "No pull request, no branch, auto-merge not enabled",
+      "observed": {
+        "ok": false,
+        "error": "Approval digest mismatch",
+        "branch_exists": false
+      },
+      "pass": true
+    },
+    {
+      "scenario": "Package digest differs",
+      "expected": "Publication refused",
+      "observed": {
+        "ok": false,
+        "error": "Approval digest mismatch"
+      },
+      "pass": true
+    },
+    {
+      "scenario": "Publication branches not locked",
+      "expected": "Auto-merge refused; pull request left for manual merge",
+      "observed": {
+        "ok": false,
+        "error": "Publication branches are not locked against later changes",
+        "pr": 5,
+        "state": "open",
+        "merged": false,
+        "auto_merge": null,
+        "mergeable_state": "blocked",
+        "head": "6e112fef"
+      },
+      "pass": true
+    },
+    {
+      "scenario": "Pull request content differs from the approved package",
+      "expected": "Auto-merge refused",
+      "observed": {
+        "ok": false,
+        "error": "Pull request content differs from the approved package"
+      },
+      "pass": true
+    },
+    {
+      "scenario": "Auto-merge API fails (repository setting off)",
+      "expected": "Safe failure, no direct merge, pull request stays open after checks pass",
+      "observed": {
+        "ok": false,
+        "error": "GitHub refused automatic merge: Auto merge is not allowed for this repository",
+        "check": "success",
+        "pr": 5,
+        "state": "open",
+        "merged": false,
+        "auto_merge": null,
+        "mergeable_state": "clean",
+        "head": "6e112fef"
+      },
+      "pass": true
+    },
+    {
+      "scenario": "Checks already passed before auto-merge was requested",
+      "expected": "GitHub either merges under protection or refuses; a manual squash merge remains possible",
+      "observed": {
+        "ok": false,
+        "error": "GitHub refused automatic merge: Pull request Pull request is in clean status",
+        "before_manual": {
+          "pr": 5,
+          "state": "open",
+          "merged": false,
+          "auto_merge": null,
+          "mergeable_state": "clean",
+          "head": "6e112fef"
+        },
+        "after": {
+          "pr": 5,
+          "state": "closed",
+          "merged": true,
+          "auto_merge": null,
+          "mergeable_state": "unknown",
+          "head": "6e112fef"
+        }
+      },
+      "pass": true
+    },
+    {
+      "scenario": "Duplicate activation request",
+      "expected": "No duplicate pull request; second enable is a no-op",
+      "observed": {
+        "first": {
+          "ok": true
+        },
+        "second": {
+          "ok": true
+        },
+        "recreate": {
+          "ok": false,
+          "error": "GitHub HTTP 422; rate limit/retry time 1795073252; check public visibility or retry later"
+        },
+        "pull_requests_for_branch": 1
+      },
+      "pass": true
+    },
+    {
+      "scenario": "Approved PR content changes",
+      "expected": "GitHub rejects the push; head stays the approved commit",
+      "observed": {
+        "ok": false,
+        "error": "GitHub HTTP 422; rate limit/retry time 1795073252; check public visibility or retry later",
+        "head_unchanged": true
+      },
+      "pass": true
+    },
+    {
+      "scenario": "Approved PR, checks pending",
+      "expected": "Remains open with auto-merge on",
+      "observed": {
+        "check": "in_progress",
+        "pr": 6,
+        "state": "open",
+        "merged": false,
+        "auto_merge": "squash",
+        "mergeable_state": "blocked",
+        "head": "6e46bc81"
+      },
+      "pass": true
+    },
+    {
+      "scenario": "Approved PR, checks pass",
+      "expected": "Automatically squash-merges exactly the approved content",
+      "observed": {
+        "check": "success",
+        "merged": true,
+        "merged_by": "siruiusamory-cmyk",
+        "parents": 1,
+        "on_base": true,
+        "content_matches": true
+      },
+      "pass": true
+    },
+    {
+      "scenario": "Ordinary development PR",
+      "expected": "Unaffected: stays open, no auto-merge",
+      "observed": {
+        "check": "success",
+        "pr": 7,
+        "state": "open",
+        "merged": false,
+        "auto_merge": null,
+        "mergeable_state": "behind",
+        "head": "0748590a"
+      },
+      "pass": true
+    },
+    {
+      "scenario": "Required check fails",
+      "expected": "Does not merge",
+      "observed": {
+        "enable": {
+          "ok": true
+        },
+        "check": "failure",
+        "pr": 8,
+        "state": "open",
+        "merged": false,
+        "auto_merge": "squash",
+        "mergeable_state": "blocked",
+        "head": "97a93e78"
+      },
+      "pass": true
+    },
+    {
+      "scenario": "PR has merge conflict",
+      "expected": "Does not merge",
+      "observed": {
+        "enable": {
+          "ok": true
+        },
+        "earlier_merged": true,
+        "check": "success",
+        "pr": 10,
+        "state": "open",
+        "merged": false,
+        "auto_merge": "squash",
+        "mergeable_state": "dirty",
+        "head": "ead6db14"
+      },
+      "pass": true
+    },
+    {
+      "scenario": "Base branch becomes outdated",
+      "expected": "Up-to-date rule keeps it unmerged; the locked branch cannot be updated",
+      "observed": {
+        "enable": {
+          "ok": true
+        },
+        "check": "success",
+        "pr": 11,
+        "state": "open",
+        "merged": false,
+        "auto_merge": "squash",
+        "mergeable_state": "behind",
+        "head": "974a2e83"
+      },
+      "pass": true
+    },
+    {
+      "scenario": "Control: lock removed, auto-merge forced on by hand, then a writer pushes",
+      "expected": "Shows what the lock prevents. The publisher itself refuses to enable auto-merge without the lock.",
+      "observed": {
+        "publisher": {
+          "ok": false,
+          "error": "Publication branches are not locked against later changes"
+        },
+        "forced": true,
+        "push_accepted": true,
+        "pr": 12,
+        "state": "closed",
+        "merged": true,
+        "auto_merge": "squash",
+        "mergeable_state": "unknown",
+        "head": "4cb1b7db",
+        "unreviewed_content_merged": true
+      },
+      "pass": true
+    }
+  ]
+}

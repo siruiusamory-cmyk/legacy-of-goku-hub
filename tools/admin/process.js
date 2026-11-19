@@ -169,6 +169,35 @@ export async function createPublicationPR({row, api, repo, loadFile}) {
   return pr.number;
 }
 
+const blob = bytes => '100644' + createHash('sha1').update(`blob ${bytes.length}\0`).update(bytes).digest('hex');
+async function blobs(api, repo, commit) {
+  const {tree, parents} = await api.request(`/repos/${repo}/git/commits/${commit}`);
+  const listed = await api.request(`/repos/${repo}/git/trees/${tree.sha}?recursive=1`);
+  assert(!listed.truncated, 'Repository tree is too large to verify');
+  return {parents, files: new Map(listed.tree.filter(entry => entry.type !== 'tree').map(entry => [entry.path, entry.mode + entry.sha]))};
+}
+
+export async function enableAutoMerge({row, api, repo, pr: number, loadFile}) {
+  assert(row.state === 'publishing' && row.digest === row.approved_digest && hash(JSON.stringify(row.package)) === row.digest, 'Approval digest mismatch');
+  const pkg = row.package, branch = 'admin/' + row.id;
+  const pr = await api.request(`/repos/${repo}/pulls/${number}`);
+  assert(pr.state === 'open' && !pr.draft && pr.base.ref === 'main' && pr.base.repo.full_name === repo && pr.head.repo?.full_name === repo && pr.head.ref === branch, 'Pull request does not belong to this approved review');
+  const [base, head] = await Promise.all([blobs(api, repo, pkg.base_commit), blobs(api, repo, pr.head.sha)]);
+  assert(head.parents.length === 1 && head.parents[0].sha === pkg.base_commit, 'Pull request is not one commit on the approved base');
+  const approved = new Map([['policy/publishing.json', blob(Buffer.from(text(pkg.policy)))]]);
+  if (pkg.listing) {
+    approved.set(`listings/${pkg.project_id}/listing.json`, blob(Buffer.from(text(pkg.listing))));
+    for (const f of pkg.files.filter(f => !f.name.startsWith('preview-'))) approved.set(`listings/${pkg.project_id}/${f.name}`, blob(await loadFile(f)));
+  }
+  for (const path of new Set([...base.files.keys(), ...head.files.keys()])) assert(base.files.get(path) === head.files.get(path) || approved.has(path), 'Pull request changes a file outside the approved package');
+  for (const [path, expected] of approved) assert(head.files.get(path) === expected, 'Pull request content differs from the approved package');
+  const rules = await api.request(`/repos/${repo}/rules/branches/${branch}`);
+  assert(rules.some(rule => rule.type === 'update'), 'Publication branches are not locked against later changes');
+  if (pr.auto_merge) { assert(pr.auto_merge.merge_method === 'squash', 'Automatic merge is set to an unexpected method'); return; }
+  const result = await api.request('/graphql', {method: 'POST', body: {query: 'mutation($id:ID!,$head:GitObjectID!){enablePullRequestAutoMerge(input:{pullRequestId:$id,mergeMethod:SQUASH,expectedHeadOid:$head}){pullRequest{autoMergeRequest{enabledAt}}}}', variables: {id: pr.node_id, head: pr.head.sha}}});
+  assert(!result.errors && result.data?.enablePullRequestAutoMerge?.pullRequest.autoMergeRequest, 'GitHub refused automatic merge: ' + (result.errors?.[0]?.message || 'no reason given'));
+}
+
 async function main() {
   const id = process.env.REVIEW_ID, action = process.env.REVIEW_ACTION;
   assert(/^[A-Za-z0-9_-]{24}$/.test(id || '') && ['prepare', 'publish'].includes(action), 'Invalid job');
@@ -196,7 +225,9 @@ async function main() {
         return Buffer.from(data, 'base64');
       };
       const pr = await createPublicationPR({row, api, repo: process.env.GITHUB_REPOSITORY, loadFile});
-      await call('/published-pr', {pr});
+      let auto_merge = 'off';
+      if (process.env.ADMIN_AUTO_MERGE === 'true') auto_merge = await enableAutoMerge({row, api, repo: process.env.GITHUB_REPOSITORY, pr, loadFile}).then(() => 'enabled', error => String(error.message).replace(/[<>\x00-\x1f]/g, ' ').slice(0, 300));
+      await call('/published-pr', {pr, auto_merge});
     }
   } catch (error) {
     if (claimed) await call('/failed', {error: String(error.message).replace(/[<>\x00-\x1f]/g, ' ').slice(0, 1000)}).catch(() => {});

@@ -35,9 +35,13 @@ test('artwork-free Featured, cards and detail use the built-in placeholder while
     await expect(page.locator('.detail-art .artwork-unavailable')).toBeVisible();
     await expect(page.locator('.detail-art img')).toHaveCount(0);
     await expect(page.locator('.screenshot-gallery')).toHaveCount(0);
-    if(width===1448)expect(await page.locator('.detail-art').evaluate(node=>node.getBoundingClientRect().height)).toBe(276);
+    const placeholderBox=await page.locator('.detail-art').evaluate(node=>{const box=node.getBoundingClientRect();return [box.width,box.height];});
     expect((await new AxeBuilder({page}).analyze()).violations).toEqual([]);
     await page.screenshot({path:path.join(root,'.review/017-phase-1',`placeholder-detail-${width}.png`),fullPage:true});
+    await page.goto('https://site.example/projects/fixture-2/');
+    await expect(page.locator('.detail-art img')).toBeVisible();
+    expect(await page.locator('.detail-art').evaluate(node=>{const box=node.getBoundingClientRect();return [box.width,box.height];})).toEqual(placeholderBox);
+    expect(placeholderBox[1]).toBeGreaterThan(150);
     await page.goto('https://site.example/projects/fixture-1/');
     await expect(page.locator('.detail-art .artwork-unavailable')).toBeVisible();
     await expect(page.locator('.screenshot-gallery img')).toHaveAttribute('src','/assets/fixture-1/screenshot-1.webp');

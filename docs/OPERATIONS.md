@@ -39,6 +39,8 @@ For a genuinely new empty hub, manually dispatch **Initialize durable recovery (
 
 Developers use the manifest registration or guided Issue Form described in README.md. The daily workflow and issue changes refresh eligible projects without routine PR merges. New/untrusted sources and sensitive claims/transfers require explicit protected publishing-policy changes. Owners approve exceptions by merging the policy PR after checking numeric IDs and exact submission/metadata digests. Delisting and revocation remain effective after recovery because current policy is reapplied.
 
+Publications approved in the administrator dashboard can merge by themselves once the required checks pass. This is off by default and is controlled by the Actions variable `ADMIN_AUTO_MERGE_ENABLED`; deleting it returns to manual merging. Activation steps, what blocks a merge, failure messages and recovery are in [Administrator documentation](launch/ADMIN.md#automatic-merge-after-owner-approval-log-hub-023-default-off).
+
 ## Monitoring
 
 Every failed protected publication is an Actions failure and must not be described as backed up. **Verify backup health** independently runs daily: it checks signed durable recovery plus a successful final publication/verification within 48 hours. Maintainers must subscribe to Actions failure emails; the workflow itself does not send third-party messages. Inspect the failed step and the `validation-report`/protected receipt artifacts. During a complete GitHub/Actions outage the monitor cannot send an alert; retain off-platform exports and monitor GitHub availability through ordinary maintainer practice.
