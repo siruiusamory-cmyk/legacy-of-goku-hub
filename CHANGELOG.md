@@ -42,6 +42,7 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Fixed
 
+- A publication that a later one replaced before the dashboard had confirmed it, such as a Featured choice changed again the same day, is now shown as Published. It used to stay at Deploying and keep the Publishing count at one.
 - Game, category, status and repository are shown once on a project page instead of being repeated in the side column.
 - The release panel appears only for projects that have a release.
 - Lit and grey rating balls now line up. The sprites sit off-centre in their files, so the site shows only the 48x48 ball.
