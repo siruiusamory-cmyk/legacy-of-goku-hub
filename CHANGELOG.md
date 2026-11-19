@@ -26,3 +26,9 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 - Game, category, status and repository are shown once on a project page instead of being repeated in the side column.
 - The release panel appears only for projects that have a release.
 - Lit and grey rating balls now line up. The sprites sit off-centre in their files, so the site shows only the 48x48 ball.
+
+## Administrator runtime repair
+
+- Deploy the current administrator Worker instead of the stale bundle whose Access certificate request used `redirect: "error"`, a mode Cloudflare Workers rejects.
+- Keep the committed `admin/wrangler.jsonc` disabled by default and add the explicit `admin/wrangler.production.jsonc` for authorized deployments, with the permanent origins, custom domain, D1 binding and disabled preview URLs.
+- Log only the failing request stage when an unexpected administrator exception is caught, without exception text, identities or request data.

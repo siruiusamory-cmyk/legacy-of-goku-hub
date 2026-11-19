@@ -15,6 +15,19 @@ const main = 'a'.repeat(40);
 async function setup(t) { const x = await fixture(); const original = globalThis.fetch; globalThis.fetch = x.fetcher; t.after(() => { globalThis.fetch = original; x.db.close(); }); return x; }
 const data = async res => { assert.equal(res.ok, true, await res.clone().text()); return res.json(); };
 
+test('Unexpected administrator exceptions log only the failing stage', async t => {
+  const x = await setup(t);
+  const logs = [], previous = console.error;
+  console.error = (...args) => logs.push(args.join(' '));
+  t.after(() => { console.error = previous; });
+  x.env.DB = {prepare() { throw Error('Private internal database detail'); }};
+  const res = await x.call('/');
+  assert.equal(res.status, 503);
+  assert.deepEqual(await res.json(), {error: 'Administration unavailable; retry later'});
+  assert.match(logs.join(' '), /Unexpected admin failure at stage: database-rate-limit/);
+  assert.doesNotMatch(logs.join(' '), /Private internal database detail/);
+});
+
 test('Workers-compatible fetch rejects certificate and GitHub redirects without following them', async t => {
   const x = await setup(t);
   globalThis.fetch = async (url, opts) => {
