@@ -6,6 +6,7 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
+- The administrator dashboard starts its own session whenever Cloudflare Access has already proved who you are, and renews it when it runs out. The **Sign in** button now appears only if that fails or after you sign out.
 - The public site has a new look modelled on a Game Boy Advance pause menu. The commissioned energy banner is the masthead at its native 960x160, and the fourteen commissioned Dragon Ball sprites show every rating at exact pixel sizes (48, 24 or 16).
 - The four menu tabs are equal width and sit together like folder tabs.
 - Panels, cards and the featured project use cut-corner menu frames with gold tab titles.

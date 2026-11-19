@@ -23,7 +23,7 @@ for (const width of [390, 1280]) test(`owner browser workflow, safe content, acc
       await route.fulfill({status: response.status, headers: Object.fromEntries(response.headers), body: Buffer.from(await response.arrayBuffer())});
     });
     await page.goto(origin);
-    await page.getByRole('button', {name: 'Sign in', exact: true}).click();
+    await expect(page.getByRole('button', {name: 'Sign in', exact: true})).toBeHidden(); await expect(page.locator('#workspace')).toBeVisible();
     await expect(page.getByRole('button', {name: 'Review submission 1'})).toBeVisible();
     await expect(page.locator('#items img')).toHaveCount(0);
     await page.getByRole('button', {name: 'Review submission 1'}).click();

@@ -14,9 +14,11 @@ const show = id => {
     else $(name).removeAttribute('aria-current');
   }
 };
-async function api(path, data) {
+async function api(path, data, retried) {
   const response = await fetch('/api/' + path, {method: data ? 'POST' : 'GET', headers: data ? {'Content-Type': 'application/json', 'X-CSRF-Token': csrf} : {}, body: data ? JSON.stringify(data) : undefined, redirect: 'error'});
-  const result = await response.json(); if (!response.ok) { if (response.status === 401) $('login').hidden = false; throw Error(result.error || 'Request failed'); } return result;
+  const result = await response.json();
+  if (response.status === 401 && path !== 'login' && path !== 'logout' && !retried) { signedIn(await api('login', {})); return api(path, data, true); }
+  if (!response.ok) { if (response.status === 401) $('login').hidden = false; throw Error(result.error || 'Request failed'); } return result;
 }
 const run = fn => async event => { event?.preventDefault(); try { await fn(); } catch (e) { notice(e.message, true); } };
 function button(text, fn) { const n = el('button', text); n.type = 'button'; n.addEventListener('click', run(fn)); return n; }

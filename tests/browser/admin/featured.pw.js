@@ -55,7 +55,7 @@ test('owner features, replaces and clears GitHub/community projects through priv
       await home.goto('https://site.example/');
     }
     await page.setViewportSize({width: 390, height: 900});
-    await page.goto(origin); await page.getByRole('button', {name: 'Sign in', exact: true}).click();
+    await page.goto(origin); await expect(page.getByRole('button', {name: 'Sign in', exact: true})).toBeHidden(); await expect(page.locator('#workspace')).toBeVisible();
     await page.getByRole('button', {name: 'Existing listings', exact: true}).click();
     await expect(page.getByText('Currently Featured: none', {exact: true})).toBeVisible();
     for (const [id, action] of [['gh-123', 'Feature'], ['ext-abcdefghijkl', 'Replace Featured'], ['ext-abcdefghijkl', 'Remove from Featured']]) {
