@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "id": "ext-pvjzivq7r6wq",
+  "title": "Z Warriors: Universal",
+  "developer": "Nachorl250",
+  "description": "A Windows fan game made as a tribute to the Legacy of Goku series. Version 1.1.x covers the Saiyan Saga with three playable characters, Goku, Gohan and Piccolo, and uses an updatable launcher.",
+  "game": "multiple",
+  "category": "fan-project",
+  "status": "released",
+  "source": {
+    "type": "platform",
+    "url": "https://nachorl250.itch.io/z-warriors-universal"
+  },
+  "links": [
+    {
+      "label": "ModDB",
+      "url": "https://www.moddb.com/games/z-warriors-universal"
+    }
+  ],
+  "screenshots": [
+    "screenshot-1.png"
+  ],
+  "cover": "cover.png",
+  "approved_at": "2026-11-19T19:15:11Z"
+}
