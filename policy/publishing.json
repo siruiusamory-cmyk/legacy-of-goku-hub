@@ -69,6 +69,16 @@
   ],
   "external_projects": [
     {
+      "project_id": "ext-24utakxngwg4",
+      "decision": "approved",
+      "content_digests": [
+        "7e5b858011cee4f7ae65878ee45ee9be1ef3fd746bb1f0cc4bac12f5ec0c2313"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
       "project_id": "ext-db2tm2uibxbu",
       "decision": "approved",
       "content_digests": [
