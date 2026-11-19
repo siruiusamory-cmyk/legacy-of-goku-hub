@@ -182,6 +182,21 @@
       ]
     },
     {
+      "project_id": "ext-tuk6ramku6ni",
+      "decision": "approved",
+      "content_digests": [
+        "c4593af16dfc62105f7c64ae4ddada8df546d9f89ed694b251ed860e59dce153"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "aa36613689925139c7c8809ebe53c8fd9c82ffef9429b7a7c44b31361d250db6",
+            "sha256": "93e2a9be5dc25ca7515c979354c96b945669f680f7474092941839f04601a08b"
+          }
+        ]
+      ]
+    },
+    {
       "project_id": "ext-yz2uy2jy3ewf",
       "decision": "approved",
       "content_digests": [
