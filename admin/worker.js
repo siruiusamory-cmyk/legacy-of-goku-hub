@@ -139,9 +139,11 @@ async function publication(env, row) {
   if (!['synchronize', 'backup', 'anchor', 'publish', 'website', 'deploy-website'].every(name => jobs.jobs.some(j => j.name === name && j.conclusion === 'success'))) return deploying;
   const projects = await catalog(env), listed = projects.find(p => p.id === row.project_id);
   const absent = ['suspend', 'delist'].includes(row.operation);
-  if (absent ? Boolean(listed) : !listed) return deploying;
-  if (!absent && (row.operation === 'feature' || JSON.parse(row.package).rule?.featured === true) && (!listed.featured || projects.filter(project => project.featured).length !== 1)) return deploying;
-  if (row.operation === 'unfeature' && projects.some(project => project.featured)) return deploying;
+  const pending = (absent ? Boolean(listed) : !listed)
+    || (!absent && (row.operation === 'feature' || JSON.parse(row.package).rule?.featured === true) && (!listed.featured || projects.filter(project => project.featured).length !== 1))
+    || (row.operation === 'unfeature' && projects.some(project => project.featured));
+  // Publications merge in pull-request order, so once a later one is verified live, a mismatch means it replaced this change, not that this one is still deploying.
+  if (pending && !await sql(env, "SELECT 1 FROM admin_reviews WHERE pr>? AND state IN ('published','withdrawn') LIMIT 1", row.pr).first()) return deploying;
   const changes = [sql(env, "UPDATE admin_reviews SET state=?,version=version+1,updated=? WHERE id=? AND state='pr-open'", absent ? 'withdrawn' : 'published', seconds(), row.id), sql(env, "INSERT INTO admin_history(submission_id,review_id,actor,action,created) SELECT ?,?,'verifier','verified-live',? WHERE changes()=1", row.submission_id, row.id, seconds())];
   if (row.submission_id && !absent) changes.push(sql(env, "UPDATE submissions SET state='published',updated=? WHERE id=? AND revision=? AND state='approved'", seconds(), row.submission_id, row.revision));
   await env.DB.batch(changes);
