@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "ext-fz776bgnkfc6",
+  "title": "DBZ: Legacy of Goku Reborn",
+  "developer": "hellspell1",
+  "description": "A Windows fan remake of the Legacy of Goku series. As of version 0.7 it had the five playable characters from Legacy of Goku II, story and movie bosses through the Cell saga, two transformations and four skills per character, a training stage, and keyboard and gamepad support.",
+  "game": "multiple",
+  "category": "fan-project",
+  "status": "in-development",
+  "source": {
+    "type": "website",
+    "url": "https://gamejolt.com/games/legacyofgokureborn/529626"
+  },
+  "links": [
+    {
+      "label": "Gameplay video",
+      "url": "https://www.youtube.com/watch?v=L2LGdU_jfus"
+    }
+  ],
+  "screenshots": [],
+  "cover": "cover.png",
+  "approved_at": "2026-11-19T19:36:37Z"
+}

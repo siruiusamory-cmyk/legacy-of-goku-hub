@@ -79,6 +79,21 @@
       ]
     },
     {
+      "project_id": "ext-fz776bgnkfc6",
+      "decision": "approved",
+      "content_digests": [
+        "8f14808d516b9f13ccb23e7a3e7967176991491fcff9d2dc505c044568158403"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "9801d099eeb214bad322272466912ce9e8299b8a05f12be9313b776c3e4517e1",
+            "sha256": "c98d83eaf0ec2df17777a25390b46daf9e0ad38e4fce67d17ccc6bb29ef12a45"
+          }
+        ]
+      ]
+    },
+    {
       "project_id": "ext-gcshm2l3av3q",
       "decision": "approved",
       "content_digests": [
