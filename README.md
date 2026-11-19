@@ -2,7 +2,7 @@
 
 **A community directory for projects inspired by the *Dragon Ball Z: Legacy of Goku* games.**
 
-Discover and share ROM hacks, fan projects, modding tools, disassemblies, and resources for *The Legacy of Goku*, *The Legacy of Goku II*, and *Buu's Fury*.
+Discover and share ROM hacks, translations, fan projects, modding tools, disassemblies, and resources for *The Legacy of Goku*, *The Legacy of Goku II*, and *Buu's Fury*.
 
 **[Explore projects](https://legacyofgokuhub.com/)** · **[Submit a project](https://legacyofgokuhub.com/submit/)** · [Check submission status](https://legacyofgokuhub.com/submit/status/) · [Join the community](https://discord.gg/P8qC69G3sU)
 

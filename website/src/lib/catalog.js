@@ -7,7 +7,7 @@ export const artwork = JSON.parse(await fs.readFile(path.join(input, 'artwork.js
 export const provenance = JSON.parse(await fs.readFile(path.join(input, 'provenance.json'), 'utf8'));
 export const base = import.meta.env.BASE_URL;
 export const href = relative => base + relative;
-export const names = {'legacy-of-goku': 'LoG 1', 'legacy-of-goku-2': 'LoG II', 'buus-fury': "Buu’s Fury", multiple: 'LoG series', 'rom-hack': 'ROM Hack', 'fan-project': 'Fan Project', tool: 'Tools', resource: 'Resource', released: 'Released', 'in-development': 'In Development', 'on-hold': 'On Hold', discontinued: 'Discontinued'};
+export const names = {'legacy-of-goku': 'LoG 1', 'legacy-of-goku-2': 'LoG II', 'buus-fury': "Buu’s Fury", multiple: 'LoG series', 'rom-hack': 'ROM Hack', translation: 'Translation', 'fan-project': 'Fan Project', tool: 'Tools', resource: 'Resource', released: 'Released', 'in-development': 'In Development', 'on-hold': 'On Hold', discontinued: 'Discontinued'};
 export const fullGame = {'legacy-of-goku': 'Legacy of Goku', 'legacy-of-goku-2': 'Legacy of Goku II', 'buus-fury': "Buu’s Fury", multiple: 'Multiple games'};
 export const projectURL = project => href('projects/' + project.id + '/');
 export const submitURL = import.meta.env.PUBLIC_INTAKE_ENABLED === 'true' ? href('submit/') : 'https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/issues/new/choose';

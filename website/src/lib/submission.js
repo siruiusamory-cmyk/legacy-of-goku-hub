@@ -2,7 +2,7 @@ import {parseHttps, urlKey, sourceKind} from './urlkey.js';
 
 export const KINDS = ['add', 'suggest', 'correct', 'claim'];
 export const GAMES = ['legacy-of-goku', 'legacy-of-goku-2', 'buus-fury', 'multiple'];
-export const CATEGORIES = ['rom-hack', 'fan-project', 'tool', 'resource'];
+export const CATEGORIES = ['rom-hack', 'translation', 'fan-project', 'tool', 'resource'];
 export const STATUSES = ['in-development', 'released', 'on-hold', 'discontinued'];
 export const LISTING_ID = /^(?:ext-[a-z0-9]{12}|gh-[0-9]{1,15})$/;
 export const RECEIPT = /^[A-Za-z0-9_-]{43}$/;

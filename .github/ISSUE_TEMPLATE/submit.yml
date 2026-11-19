@@ -67,7 +67,7 @@ body:
     id: category
     attributes:
       label: Category
-      options: [rom-hack, fan-project, tool, resource]
+      options: [rom-hack, translation, fan-project, tool, resource]
     validations:
       required: true
   - type: dropdown
