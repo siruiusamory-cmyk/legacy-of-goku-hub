@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "ext-oq7jsaap3ozw",
+  "title": "Buu's Fury Hacking Documents",
+  "developer": "Miksy91",
+  "description": "A small set of ROM hacking documents for Buu's Fury, published on Romhacking.net in 2011.",
+  "game": "buus-fury",
+  "category": "resource",
+  "status": "released",
+  "source": {
+    "type": "platform",
+    "url": "https://www.romhacking.net/documents/537/"
+  },
+  "screenshots": [],
+  "approved_at": "2026-11-19T19:57:24Z"
+}
