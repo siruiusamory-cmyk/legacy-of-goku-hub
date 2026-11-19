@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "id": "gh-803617920",
+  "title": "LOGExtractor",
+  "developer": "mainant",
+  "description": "Data extraction tools for the Legacy of Goku GBA games, written in C#. Includes a map viewer, an image scanner and a character sprite extractor. Buu's Fury is currently the only supported ROM. Source only; bring your own ROM.",
+  "game": "buus-fury",
+  "category": "tool",
+  "status": "in-development",
+  "source": {
+    "type": "github",
+    "url": "https://github.com/mainant/LOGExtractor"
+  },
+  "screenshots": [
+    "screenshot-1.png",
+    "screenshot-2.png"
+  ],
+  "cover": "cover.png",
+  "approved_at": "2026-11-19T18:48:27Z"
+}

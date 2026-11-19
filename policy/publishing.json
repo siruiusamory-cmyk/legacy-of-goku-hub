@@ -185,6 +185,30 @@
       "artwork_sets": [
         []
       ]
+    },
+    {
+      "project_id": "gh-803617920",
+      "owner_id": 83682740,
+      "decision": "approved",
+      "content_digests": [
+        "24f522fb2d1d1b9dfa0006f45e4e848843e00b600dbeb914c8d9df60d0ebbed9"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "f377aedc1e955fa0f038684b1138e063303c7c3e2a020dd56b6549cf0c1f33a9",
+            "sha256": "5d8c21cdedde769dc79922ad6c9148551f370fe91f3ead2db3917e78b0d5f062"
+          },
+          {
+            "source_sha256": "61a29d345f3b39f5d2c23ec1c888b8f5083c15bd85782c7553fe02e7f87ba0a6",
+            "sha256": "6ba1c336218c1908d074020da5a367ae7d46f82ff5eeaa23f819dc4d99a4dcc6"
+          },
+          {
+            "source_sha256": "ea511ce30b83247a8c26077c3690e261db010fbd32ef078ac0603b9d000dbef9",
+            "sha256": "3c25ca027ac8bea0b235ddd257dce72ff8a1f8b53825292293ba4e165968478d"
+          }
+        ]
+      ]
     }
   ]
 }
