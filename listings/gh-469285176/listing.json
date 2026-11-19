@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "gh-469285176",
+  "title": "dbzLog2StatsRng",
+  "developer": "aldelaro5",
+  "description": "A command-line simulator of how The Legacy of Goku II generates character stats on level-up. Given a character, level range and starting seed it outputs the stat gains per frame as CSV, with presets for speedrun RNG manipulation. Needs the .NET runtime.",
+  "game": "legacy-of-goku-2",
+  "category": "tool",
+  "status": "released",
+  "source": {
+    "type": "github",
+    "url": "https://github.com/aldelaro5/dbzLog2StatsRng"
+  },
+  "distribution": {
+    "label": "Patch Page",
+    "url": "https://github.com/aldelaro5/dbzLog2StatsRng/releases",
+    "kind": "page"
+  },
+  "screenshots": [],
+  "approved_at": "2026-11-19T19:01:47Z"
+}
