@@ -6,7 +6,7 @@ Date: 2026-11-19. Scope: verify the deployed system after LOG-HUB-023, 025 and 0
 
 **OPERATIONALLY ACCEPTED WITH PENDING EVENTS.**
 
-The owner can run the Hub from the administrator dashboard without an AI agent, GitHub, Cloudflare or a terminal for ordinary tasks. Every check that could be run against production passed, with one exception: a publication review that will stay at Deploying (finding 1). It does not block any task, and its fix is prepared in pull request #69, waiting for the owner's approval to merge and deploy. Two checks wait for a genuine event.
+The owner can run the Hub from the administrator dashboard without an AI agent, GitHub, Cloudflare or a terminal for ordinary tasks. Every check that could be run against production passed, with one exception: a publication review that will stay at Deploying (finding 1). It does not block any task, and its fix (pull request #69) is merged as `82cb7de` and takes effect with the next administrator Worker deploy. Two checks wait for a genuine event.
 
 | Result | Meaning |
 | --- | --- |
@@ -59,7 +59,7 @@ Production evidence: the dashboard was opened in the owner's own browser under t
 
 The review "Legacy of Goku Engine · Make Featured" (merged 2026-11-17) reads Deploying and keeps the Publishing count at one. Another project was made Featured later, and the tracker waits for a home page state that can no longer occur. The same would happen to any change that a later publication replaces before the dashboard has confirmed it. It blocks nothing, but the count is wrong and the owner cannot clear it.
 
-Fix: pull request #69. Once a later publication is verified live, the earlier one is recorded as published. One new test; 35 of 35 tests in the four publication test files pass. After merge and an administrator Worker deploy, the stuck review resolves itself with no data edit. Merge and deploy wait for the owner.
+Fix: pull request #69. Once a later publication is verified live, the earlier one is recorded as published. One new test; 35 of 35 tests in the four publication test files pass. It is merged. After an administrator Worker deploy, the stuck review resolves itself with no data edit. The deploy waits for the owner.
 
 ### Observation: one failed review is waiting for the owner
 
@@ -138,7 +138,7 @@ Corrected in the same change as this report:
 
 | Item | Status | Who |
 | --- | --- | --- |
-| Pull request #69 | Merge, then deploy the administrator Worker | Owner approval |
+| Pull request #69 | Merged as `82cb7de`; deploy the administrator Worker | Owner approval |
 | First automatic publication | PENDING EVENT | Owner, at the next real approval |
 | Session renewal after expiry | PENDING EVENT | Seen in normal use |
 | Failed review in Needs attention | Press **Discard unfinished review** | Owner |
