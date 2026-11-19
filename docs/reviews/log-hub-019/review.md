@@ -95,7 +95,22 @@ Against the mock-ups themselves: frames, tabs, badges, cream overview box and ti
 - `npm test`: 166 of 166 pass.
 - Browser suite: 38 of 38 pass. Covers no sideways scroll at 320, 390, 430, 760, 941, 1024 and 1448; automated accessibility checks on home, detail, empty and submit pages; keyboard skip link; 44px touch targets; no outside requests; page weight limits.
 - One test file changed: `tests/site/typography.test.js`, where the list of shipped font files now names Kanit. No assertion was loosened.
-- The browser suite was run on ports 5321 to 5324 from a temporary copy of the config, because older preview servers from 17 November are still holding 4321 to 4323 on this machine. The test files themselves are unchanged.
+- Administrator browser suite: 5 of 5 pass.
+
+## Release candidate (LOG-HUB-020)
+
+The approved design is commit `64e9f10`. The release candidate branch `log-hub-020-release-candidate` adds, without changing the approved look:
+
+- From the public discovery branch (PR #60): a two-line summary and the last-updated date on directory cards, and a Recently Updated list of three projects between the featured project and the directory. They use the same steel frames, ribbon heading and type as the rest of the page. On screens 580px and narrower the summary and date are hidden so phone rows keep their fixed height.
+- From PR #62, wording only: the empty catalogue says "No approved projects yet" under the title "Legacy of Goku Community Directory", and the not-found page says "Project not found". The two browser assertions that quote that wording were updated to match.
+- Not taken from PR #62: its palette, square framing, form restyling, the "About this directory" strip under the menu, the footer rewording and the removal of the missing-artwork symbol. The approved design supersedes them.
+- One administrator browser test pinned the old layout's artwork height (276px). It now checks that the missing-artwork box is exactly the size of a real artwork box, which is what the fixed number stood for.
+
+The candidate was also built from the live public catalogue (eight projects, read-only) and checked for search, filters, sorting, ratings, links, the submission and status pages, and the phone menu.
+
+Seen with live data, accepted as known limits: long titles wrap to two lines beside the icon buttons, which makes some rows taller (phone rows 151px or 176px); wide logo artwork is cropped to its centre in phone thumbnails.
+
+The pictures in the artist pack show the approved design before the Recently Updated list and card summaries were added. Every artwork measurement in it still holds; only the card height differs (435px instead of 364px on desktop).
 
 ## Known limits
 
