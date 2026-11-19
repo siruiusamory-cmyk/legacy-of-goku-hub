@@ -145,6 +145,17 @@
       "featured": false
     },
     {
+      "project_id": "gh-1300911360",
+      "owner_id": 50032825,
+      "decision": "approved",
+      "content_digests": [
+        "992ce91cd079e9ac325f8c18f80ae627e9a2990bc8ff5a9e5cc1dccb956a2bf3"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
       "project_id": "gh-1418576969",
       "owner_id": 306419822,
       "decision": "approved",
