@@ -231,6 +231,17 @@
           }
         ]
       ]
+    },
+    {
+      "project_id": "gh-951040392",
+      "owner_id": 160562170,
+      "decision": "approved",
+      "content_digests": [
+        "929ce327734b94c2d1f7125c7d34b61e26f02bd430000a62db3bfcc8325fa11d"
+      ],
+      "artwork_sets": [
+        []
+      ]
     }
   ]
 }
