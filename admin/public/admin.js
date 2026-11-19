@@ -24,7 +24,7 @@ const run = fn => async event => { event?.preventDefault(); try { await fn(); } 
 function button(text, fn) { const n = el('button', text); n.type = 'button'; n.addEventListener('click', run(fn)); return n; }
 function link(address, label = address) { try { const u = new URL(address); if (u.protocol !== 'https:' || u.username || u.password) return el('span', address); const a = el('a', label); a.href = u.href; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; } catch { return el('span', address); } }
 function confirmAction(text) { $('confirmation-text').textContent = text; $('confirmation').showModal(); return new Promise(resolve => $('confirmation').addEventListener('close', () => resolve($('confirmation').returnValue === 'confirm'), {once: true})); }
-function signedIn(s) { csrf = s.csrf; $('identity').textContent = s.email + ' · session expires ' + new Date(s.expires * 1000).toLocaleTimeString(); $('workspace').hidden = false; $('logout').hidden = false; $('login').hidden = true; }
+function signedIn(s) { csrf = s.csrf; $('identity').textContent = s.email; $('workspace').hidden = false; $('logout').hidden = false; $('login').hidden = true; }
 function tag(state, text = labels[state] || state) { const item = el('span', text); item.className = 'tag'; item.dataset.state = state; return item; }
 function line(text, className = '') { const item = el('p', text); item.className = className; return item; }
 function detailLinks(payload) {
