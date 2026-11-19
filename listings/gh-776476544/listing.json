@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "gh-776476544",
+  "title": "Buu's Fury Disassembly (2genkidev)",
+  "developer": "2genkidev",
+  "description": "A disassembly of Buu's Fury (USA) that rebuilds the original ROM. Building needs ARM Developer Suite 1.2, grit, CMake and your own copy of the game as the base ROM. No game ROM is included.",
+  "game": "buus-fury",
+  "category": "resource",
+  "status": "in-development",
+  "source": {
+    "type": "github",
+    "url": "https://github.com/2genkidev/buusfury"
+  },
+  "screenshots": [],
+  "approved_at": "2026-11-19T18:43:23Z"
+}
