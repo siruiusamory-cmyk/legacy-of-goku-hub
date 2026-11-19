@@ -4,24 +4,93 @@ import fs from 'node:fs/promises';
 test.beforeEach(async ({context}) => {
   await context.route('**/*',route => /^http:\/\/127\.0\.0\.1:(4321|4322|4323)\//.test(route.request().url()) ? route.continue() : route.abort());
 });
-test('search, combined filters, reset and deterministic sorting work', async ({page}) => {
+const shown = page => page.locator('.project-card:visible').evaluateAll(cards => cards.map(card => card.dataset.id));
+test('search, filters, clear and deterministic sorting work inside the selected category', async ({page}) => {
   await page.goto('/');
   await expect(page.locator('.project-card')).toHaveCount(7);
+  await expect(page.locator('.project-card:visible')).toHaveCount(4);
   await page.getByRole('searchbox').fill('CapsuleWorks');
-  await expect(page.locator('.project-card:visible')).toHaveCount(1);
-  await page.getByRole('button',{name:'Show all projects and reset filters'}).click();
-  await page.getByLabel('Base game',{exact:true}).selectOption('legacy-of-goku-2');
-  await page.getByLabel('Project category',{exact:true}).selectOption('tool');
-  await expect(page.locator('.project-card:visible')).toHaveCount(1);
+  await expect(page.getByText('No matching projects',{exact:true})).toBeVisible();
+  await page.locator('.category-tabs a[data-category="tool"]').click();
+  expect(await shown(page)).toEqual(['fixture-4']);
+  await expect(page.getByRole('searchbox')).toHaveValue('CapsuleWorks');
   await page.getByLabel('Development status',{exact:true}).selectOption('in-development');
   await expect(page.getByText('No matching projects',{exact:true})).toBeVisible();
   await page.getByRole('button',{name:'Clear filters'}).click();
+  expect(await shown(page)).toEqual(['fixture-4']);
+  await page.locator('.category-tabs a[data-category="rom-hack"]').click();
+  await page.getByLabel('Base game',{exact:true}).selectOption('buus-fury');
+  expect(await shown(page)).toEqual(['fixture-5']);
+  await page.getByLabel('Base game',{exact:true}).selectOption('');
   await page.getByLabel('Sort projects',{exact:true}).selectOption('updated');
-  await expect(page.locator('.project-card').first()).toHaveAttribute('data-id','fixture-6');
+  expect(await shown(page)).toEqual(['fixture-6','fixture-5','fixture-1','fixture-0']);
   await page.getByLabel('Sort projects',{exact:true}).selectOption('release');
-  await expect(page.locator('.project-card').first()).toHaveAttribute('data-id','fixture-6');
+  expect(await shown(page)).toEqual(['fixture-6','fixture-5','fixture-0','fixture-1']);
   await page.getByLabel('Sort projects',{exact:true}).selectOption('name');
-  await expect(page.locator('.project-card').first()).toHaveAttribute('data-id','fixture-4');
+  expect(await shown(page)).toEqual(['fixture-5','fixture-6','fixture-1','fixture-0']);
+});
+test('five category tabs replace the combined listing and match the catalogue', async ({page}) => {
+  await page.goto('/');
+  const tabs = page.locator('.category-tabs a');
+  await expect(tabs).toHaveText(['ROM Hacks 4 projects','Translations 1 project','Fan Projects 1 project','Tools 1 project','Resources 0 projects']);
+  await expect(page.locator('.category-tabs [aria-current]')).toHaveText(/^ROM Hacks/);
+  await expect(page.locator('#directory').getByText(/^(all|all projects|all categories|everything)$/i)).toHaveCount(0);
+  await expect(page.locator('#category')).toHaveCount(0);
+  const catalogue = await (await page.request.get('/catalog.json')).json();
+  await page.evaluate(() => {window.stayedOnPage = true;});
+  for (const category of ['translation','fan-project','tool','resource','rom-hack']) {
+    await page.locator(`.category-tabs a[data-category="${category}"]`).click();
+    await expect(page).toHaveURL(new RegExp('\\?category=' + category + '#directory$'));
+    const expected = catalogue.projects.filter(project => project.category === category).map(project => project.id).sort();
+    expect((await shown(page)).sort()).toEqual(expected);
+    await expect(page.locator('.category-tabs [aria-current]')).toHaveAttribute('data-category', category);
+    await expect(page.locator(`.category-tabs a[data-category="${category}"] .tab-count`)).toHaveText(new RegExp('^' + expected.length + ' '));
+  }
+  expect(await page.evaluate(() => window.stayedOnPage)).toBe(true);
+  await page.locator('.category-tabs a[data-category="resource"]').click();
+  await expect(page.getByText('Nothing in this category yet',{exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Clear filters'})).toBeHidden();
+});
+test('category links are shareable and follow Back, Forward and the keyboard', async ({page}) => {
+  await page.goto('/?category=tool#directory');
+  await expect(page.locator('.category-tabs [aria-current]')).toHaveAttribute('data-category','tool');
+  expect(await shown(page)).toEqual(['fixture-4']);
+  await page.locator('.category-tabs a[data-category="translation"]').focus();
+  await page.keyboard.press('Enter');
+  expect(await shown(page)).toEqual(['fixture-2']);
+  await page.keyboard.press('Tab');
+  await expect(page.locator('.category-tabs a[data-category="fan-project"]')).toBeFocused();
+  await page.goBack();
+  await expect(page.locator('.category-tabs [aria-current]')).toHaveAttribute('data-category','tool');
+  expect(await shown(page)).toEqual(['fixture-4']);
+  await page.goForward();
+  await expect(page.locator('.category-tabs [aria-current]')).toHaveAttribute('data-category','translation');
+  await page.goto('/?category=everything');
+  await expect(page.locator('.category-tabs [aria-current]')).toHaveAttribute('data-category','rom-hack');
+  await expect(page.locator('.project-card:visible')).toHaveCount(4);
+});
+test('category tabs carry the main navigation styling and fit a phone', async ({page}) => {
+  await page.goto('/');
+  const style = selector => page.locator(selector).first().evaluate(element => {
+    const computed = getComputedStyle(element);
+    return Object.fromEntries(['fontFamily','fontSize','fontWeight','fontStyle','textTransform','letterSpacing','lineHeight','color','backgroundColor','borderTopColor','borderTopWidth','borderRightWidth','borderBottomWidth','paddingTop','paddingBottom','paddingLeft','paddingRight','clipPath','height'].map(key => [key, computed[key]]));
+  });
+  expect(await style('.category-tabs a:not([aria-current])')).toEqual(await style('.desktop-nav a:not(.active)'));
+  expect(await style('.category-tabs [aria-current]')).toEqual(await style('.desktop-nav a.active'));
+  await page.locator('.category-tabs a:not([aria-current])').first().hover();
+  const hovered = await style('.category-tabs a:not([aria-current])');
+  await page.locator('.desktop-nav a:not(.active)').first().hover();
+  expect(hovered).toEqual(await style('.desktop-nav a:not(.active)'));
+  for (const width of [390, 320]) {
+    await page.setViewportSize({width, height: 844});
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(await page.locator('.card-art img').first().evaluate(image => getComputedStyle(image).objectFit)).toBe('contain');
+    for (const tab of await page.locator('.category-tabs a').all()) {
+      const box = await tab.boundingBox();
+      expect(box.height).toBeGreaterThanOrEqual(44);
+      expect(await tab.evaluate(element => element.scrollWidth <= element.clientWidth && element.scrollHeight <= element.clientHeight)).toBe(true);
+    }
+  }
 });
 test('stable detail navigation, actual metadata and safe external actions', async ({page}) => {
   await page.goto('/');await page.getByRole('link',{name:'View Project',exact:true}).click();

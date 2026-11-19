@@ -10,7 +10,7 @@ Discover and share ROM hacks, translations, fan projects, modding tools, disasse
 
 The [public catalogue](https://legacyofgokuhub.com/) brings community work together in one searchable place. You can:
 
-- Browse by game, project type, or development status.
+- Browse by project type with five tabs (ROM Hacks, Translations, Fan Projects, Tools, Resources), each showing how many projects it holds, then narrow by game or development status.
 - Search for specific projects and follow links to their repositories, websites, or approved download pages.
 - Discover featured projects, see what was recently updated, and read a short summary of what each one does.
 - Rate listed projects with the site's seven-Dragon-Ball rating system, without creating an account.
