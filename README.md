@@ -68,7 +68,7 @@ For those contributing to or operating the Hub:
 - [Visual design notes and artist reference pack](docs/reviews/log-hub-019/review.md)
 - [Moderation and content policy](docs/moderation.md)
 - [Maintainer operations and recovery](docs/OPERATIONS.md)
-- [Administrator documentation](docs/launch/ADMIN.md), including automatic publication tracking, failure recovery, submission deletion and automatic merging of owner-approved publications (on in production since 2026-11-18; turned off by removing `ADMIN_AUTO_MERGE_ENABLED`)
+- [Administrator documentation](docs/launch/ADMIN.md), including automatic publication tracking (a change replaced by a later one counts as published), failure recovery, submission deletion and automatic merging of owner-approved publications (on in production since 2026-11-18; turned off by removing `ADMIN_AUTO_MERGE_ENABLED`)
 - [Auto-merge integration evidence and owner decision report](docs/reviews/log-hub-023/REPORT.md)
 - [Deployment documentation](docs/launch/DEPLOYMENT.md)
 

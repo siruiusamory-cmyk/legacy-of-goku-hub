@@ -264,3 +264,16 @@ test('deletion and discarding reject forged, unauthorized and malformed requests
   assert.equal((await x.call('/api/discard', {id: r.id}, asModerator)).status, 403);
   assert.equal(x.db.prepare('SELECT count(*) n FROM submissions').get().n, 1); assert.equal(reviewRow(x, r.id).state, 'ready');
 });
+
+test('a Featured change replaced by a later verified publication is reported published, not deploying forever', async t => {
+  const x = await setup(t);
+  const r = await review(x, 'pr-open', {operation: 'feature', pr: 42});
+  x.state.pr = openPR({state: 'closed', merged: true, merge_commit_sha: main});
+  deployed(x); x.state.projects = [{id: 'ext-abcdefghijkl'}, {id: 'gh-123', featured: true}];
+  assert.equal((await stage(x, r.id)).stage, 'deploying');
+  await review(x, 'published', {operation: 'feature', project_id: 'gh-123', pr: 41});
+  assert.equal((await stage(x, r.id)).stage, 'deploying');
+  await review(x, 'published', {operation: 'feature', project_id: 'gh-123', pr: 43});
+  assert.equal((await stage(x, r.id)).stage, 'published');
+  assert.equal(reviewRow(x, r.id).state, 'published');
+});
