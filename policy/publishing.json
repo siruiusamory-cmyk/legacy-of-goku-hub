@@ -152,6 +152,21 @@
       ]
     },
     {
+      "project_id": "ext-yz2uy2jy3ewf",
+      "decision": "approved",
+      "content_digests": [
+        "8bae10a7a39c81e1c4afc572a8198aee14b0629f64048b967c89596acc4206db"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "0983a916071383deed61e20fcf7e1ea3b952ab16754f6039c9b4afca4a8e9302",
+            "sha256": "04de35893dbbcb35467b2b66ffa7e20ebf5bf5f2e0df48caa28e0cf3464e4ce1"
+          }
+        ]
+      ]
+    },
+    {
       "project_id": "gh-1131874995",
       "owner_id": 127344248,
       "decision": "approved",

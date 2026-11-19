@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "ext-yz2uy2jy3ewf",
+  "title": "Legacy Of Godot",
+  "developer": "helewrer3",
+  "description": "An HD-2D remake of The Legacy of Goku II built in Godot. It currently features the fighting mechanics only: movement, melee, guarding, ki blasts and ki waves. Playable in the browser, with Windows and Linux downloads.",
+  "game": "legacy-of-goku-2",
+  "category": "fan-project",
+  "status": "released",
+  "source": {
+    "type": "platform",
+    "url": "https://helewrer3.itch.io/legacy-of-godot"
+  },
+  "screenshots": [],
+  "cover": "cover.png",
+  "approved_at": "2026-11-19T19:23:12Z"
+}
