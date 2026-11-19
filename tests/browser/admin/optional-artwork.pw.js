@@ -42,9 +42,8 @@ test('administrator deliberately omits supplied artwork and approves the exact a
     await page.getByRole('button', {name: 'Approve exact content', exact: true}).click();
     await page.getByRole('button', {name: 'Confirm', exact: true}).click();
     await expect(page.locator('#notice')).toContainText('Exact approval recorded');
-    await page.getByRole('button', {name: 'Prepare protected publication PR', exact: true}).click();
-    await page.getByRole('button', {name: 'Confirm', exact: true}).click();
-    await expect(page.locator('#notice')).toContainText('PR preparation queued');
+    await page.getByRole('button', {name: 'Publish now', exact: true}).click();
+    await expect(page.locator('#notice')).toContainText('Publication started');
     expect(x.state.dispatched.at(-1).inputs.action).toBe('publish');
   } finally { globalThis.fetch = original; x.db.close(); await fs.rm(root, {recursive: true, force: true}); }
 });

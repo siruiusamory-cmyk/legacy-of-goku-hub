@@ -49,6 +49,13 @@
         <label>Order<select id="sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></label>
         <button type="submit" class="button-secondary">Apply filters</button>
       </form>
+      <p id="queue-summary" class="muted" aria-live="polite"></p>
+      <div class="bulk-bar" role="group" aria-label="Selected submissions">
+        <button id="select-all" type="button">Select all matching</button>
+        <button id="clear-selection" type="button">Clear selection</button>
+        <p id="selected-count" aria-live="polite">0 selected</p>
+        <button id="delete-selected" type="button" class="button-danger" disabled>Delete selected</button>
+      </div>
       <div id="items" class="card-list"></div>
       <div class="pagination">
         <p id="pagination" aria-live="polite"></p>
@@ -132,11 +139,16 @@
         </div>
       </div>
       <details id="history-panel" class="disclosure"><summary>Moderation history and earlier reviews</summary><div id="history" class="disclosure-body"></div></details>
+      <div id="delete-panel" class="action-panel danger-zone">
+        <h3>Delete submission</h3>
+        <p>Permanently removes this submission, its notes and its receipt. A published listing is never removed this way; use Delist listing for that.</p>
+        <div class="action-row"><button id="delete-submission" type="button" class="button-danger">Delete submission</button></div>
+      </div>
     </section>
 
     <section id="publication" class="workspace-panel" hidden aria-labelledby="publication-title">
       <div class="section-intro"><div><span class="eyebrow">Step 2 · Approve and publish</span><h2 tabindex="-1" id="publication-title">Publication reviews</h2>
-        <p>Inspect the prepared result, approve it, then publish through the protected pipeline. Approval alone does not make a listing live.</p></div>
+        <p>Inspect the prepared result and approve it. Publication then runs by itself and this page follows it until the change is live.</p></div>
       </div>
       <div class="review-layout"><div id="review-list" class="review-list"></div><div id="review-detail" class="review-detail"></div></div>
     </section>
@@ -152,7 +164,7 @@
     <form method="dialog">
       <h2 id="confirmation-title">Confirm moderation action</h2>
       <p id="confirmation-text"></p>
-      <div class="dialog-actions"><button value="cancel" autofocus>Cancel</button><button value="confirm" class="button-primary">Confirm</button></div>
+      <div class="dialog-actions"><button value="cancel" autofocus>Cancel</button><button id="confirm-button" value="confirm" class="button-primary">Confirm</button></div>
     </form>
   </dialog>
 </body>

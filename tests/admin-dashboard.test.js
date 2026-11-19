@@ -105,12 +105,12 @@ test('owner lifecycle: anonymous correction, exact artwork approval, protected P
   const manual = (await data(await x.call('/api/reviews'))).items.find(item => item.id === r.id);
   assert.equal(manual.state, 'pr-open'); assert.match(manual.error, /Automatic merge was not turned on \(GitHub refused automatic merge: .+\)\. Merge the pull request on GitHub\./);
   x.state.pr = {head: {sha: main}, merged: true, state: 'closed', merge_commit_sha: main, html_url: 'https://github.com/fictional/hub/pull/42'};
-  let status = await data(await x.call('/api/publication?id=' + r.id)); assert.equal(status.status, 'awaiting-deployment');
+  let status = await data(await x.call('/api/publication?id=' + r.id)); assert.equal(status.stage, 'deploying');
   assert.equal((await data(await publicCall('/status', {receipt: sub.receipt}))).status, 'approved');
-  x.state.manifest = {build_commit: main}; x.state.runs = [{id: 1, head_sha: main, event: 'push', html_url: 'https://github.com/fictional/hub/actions/runs/1'}];
+  x.state.manifest = {build_commit: main}; x.state.runs = [{id: 1, head_sha: main, event: 'push', status: 'completed', conclusion: 'success', html_url: 'https://github.com/fictional/hub/actions/runs/1'}];
   x.state.jobs = ['synchronize', 'backup', 'anchor', 'publish', 'website', 'deploy-website'].map(name => ({name, conclusion: 'success'}));
   x.state.projects = [{id: r.project_id}];
-  status = await data(await x.call('/api/publication?id=' + r.id)); assert.equal(status.status, 'published');
+  status = await data(await x.call('/api/publication?id=' + r.id)); assert.equal(status.stage, 'published');
   assert.equal((await data(await publicCall('/status', {receipt: sub.receipt}))).status, 'published');
   for (const file of tree) { const target = path.join(root, file.path); await fs.mkdir(path.dirname(target), {recursive: true}); await fs.writeFile(target, file.content || result.buffers[0].bytes); }
   const initial = await publish({root, output: path.join(root, 'initial'), api: {}, issues: [], fetcher}); assert.equal(initial.catalog.projects[0].id, r.project_id);

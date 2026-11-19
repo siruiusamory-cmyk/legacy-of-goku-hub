@@ -16,6 +16,11 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Added
 
+- The administrator dashboard follows a publication by itself after approval. One panel moves through Approved, Publishing, Waiting for checks, Deploying and Published, and shows the live link once the deployment has been verified. The **Verify PR checks and deployment** button and the leftover publication button after **Approve & Expedite** are gone.
+- When a publication cannot finish, the dashboard says why in plain words and offers the fitting next step: **Try again**, **Prepare a new review**, **Check publication** or **Discard unfinished review**. A failed site deployment is repeated once automatically.
+- The owner can permanently delete submissions from the dashboard: one at a time, a chosen duplicate, or many at once with **Select all matching** and **Delete selected**. Deleting removes the private submission and its receipt and never removes a published listing.
+- Submissions that share a project address are shown side by side with their names, addresses, dates and statuses. Nothing is deleted automatically.
+- The inbox shows how many submissions are new, under review, awaiting corrections and approved.
 - Owner-approved publications can merge by themselves once the required checks pass, so the owner no longer has to press Merge on GitHub. Off by default; the owner turns it on separately. The publication job checks that the pull request holds exactly the approved content before asking GitHub to merge it, and never merges anything itself.
 - The dashboard says whether GitHub will merge an open publication by itself, and shows the reason when automatic merge could not be turned on.
 - Directory cards show a short project summary and the date the listing was last updated (screens wider than 580px).

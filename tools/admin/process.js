@@ -198,15 +198,21 @@ export async function enableAutoMerge({row, api, repo, pr: number, loadFile}) {
   assert(!result.errors && result.data?.enablePullRequestAutoMerge?.pullRequest.autoMergeRequest, 'GitHub refused automatic merge: ' + (result.errors?.[0]?.message || 'no reason given'));
 }
 
+export async function patiently(operation, attempts = 3, pause = 3000) {
+  for (let left = attempts; ; await new Promise(resolve => setTimeout(resolve, pause))) {
+    try { return await operation(); } catch (error) { if (error.final || !--left) throw error; }
+  }
+}
+
 async function main() {
   const id = process.env.REVIEW_ID, action = process.env.REVIEW_ACTION;
   assert(/^[A-Za-z0-9_-]{24}$/.test(id || '') && ['prepare', 'publish'].includes(action), 'Invalid job');
   const base = process.env.ADMIN_API;
   assert(/^https:\/\/[a-z0-9.-]+$/.test(base || ''), 'Invalid processor origin');
-  const call = async (suffix = '', data) => {
+  const call = (suffix = '', data) => patiently(async () => {
     const response = await fetch(`${base}/processor/${id}${suffix}`, {method: data ? 'POST' : 'GET', headers: {Authorization: 'Bearer ' + process.env.ADMIN_PROCESSOR_TOKEN, 'CF-Access-Client-Id': process.env.ACCESS_CLIENT_ID, 'CF-Access-Client-Secret': process.env.ACCESS_CLIENT_SECRET, ...(data ? {'Content-Type': 'application/json'} : {})}, body: data ? JSON.stringify(data) : undefined, redirect: 'error', signal: AbortSignal.timeout(20000)});
-    if (!response.ok) throw Error('Private processor API rejected operation'); return response.json();
-  };
+    if (!response.ok) throw Object.assign(Error('Private processor API rejected operation'), {final: response.status < 500}); return response.json();
+  });
   let claimed = false;
   try {
     await call('/claim', {action}); claimed = true;
@@ -226,7 +232,7 @@ async function main() {
       };
       const pr = await createPublicationPR({row, api, repo: process.env.GITHUB_REPOSITORY, loadFile});
       let auto_merge = 'off';
-      if (process.env.ADMIN_AUTO_MERGE === 'true') auto_merge = await enableAutoMerge({row, api, repo: process.env.GITHUB_REPOSITORY, pr, loadFile}).then(() => 'enabled', error => String(error.message).replace(/[<>\x00-\x1f]/g, ' ').slice(0, 300));
+      if (process.env.ADMIN_AUTO_MERGE === 'true') auto_merge = await patiently(() => enableAutoMerge({row, api, repo: process.env.GITHUB_REPOSITORY, pr, loadFile})).then(() => 'enabled', error => String(error.message).replace(/[<>\x00-\x1f]/g, ' ').slice(0, 300));
       await call('/published-pr', {pr, auto_merge});
     }
   } catch (error) {

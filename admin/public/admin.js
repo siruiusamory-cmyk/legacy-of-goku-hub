@@ -2,6 +2,12 @@ const $ = id => document.getElementById(id);
 let csrf = '', page = 1, total = 0, selected = null, listing = null, selectedReview;
 let lastList = 'queue', catalogItems = [], searchTimer, reviewTimer;
 const labels = {received: 'New submission', 'in-review': 'Under review', 'needs-changes': 'Awaiting corrections', approved: 'Approved', published: 'Published', rejected: 'Rejected'};
+const reviewLabels = {queued: 'Preparing', processing: 'Preparing', ready: 'Ready for your review', approved: 'Approved', publishing: 'Publishing', 'pr-open': 'Publishing', published: 'Published', withdrawn: 'Published', failed: 'Needs attention', 'dispatch-failed': 'Needs attention', stale: 'Replaced', expired: 'Expired', discarded: 'Discarded'};
+const stageLabels = {approved: 'Approved', publishing: 'Publishing', checks: 'Waiting for checks', deploying: 'Deploying', published: 'Published', attention: 'Needs attention'};
+const TRACKED = ['queued', 'processing', 'approved', 'publishing', 'pr-open', 'failed', 'dispatch-failed', 'published', 'withdrawn'];
+const MOVING = ['preparing', 'publishing', 'checks', 'deploying'];
+const picked = new Set(), watch = new Map();
+let trackTimer;
 const notice = (text, error = false) => { $('notice').textContent = text; $('notice').classList.toggle('error', error); };
 const el = (tag, text) => { const n = document.createElement(tag); if (text !== undefined) n.textContent = text; return n; };
 const show = id => {
@@ -23,7 +29,10 @@ async function api(path, data, retried) {
 const run = fn => async event => { event?.preventDefault(); try { await fn(); } catch (e) { notice(e.message, true); } };
 function button(text, fn) { const n = el('button', text); n.type = 'button'; n.addEventListener('click', run(fn)); return n; }
 function link(address, label = address) { try { const u = new URL(address); if (u.protocol !== 'https:' || u.username || u.password) return el('span', address); const a = el('a', label); a.href = u.href; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; } catch { return el('span', address); } }
-function confirmAction(text) { $('confirmation-text').textContent = text; $('confirmation').showModal(); return new Promise(resolve => $('confirmation').addEventListener('close', () => resolve($('confirmation').returnValue === 'confirm'), {once: true})); }
+function confirmAction(text, deleteLabel) {
+  $('confirmation-title').textContent = deleteLabel ? 'Delete permanently?' : 'Confirm moderation action';
+  $('confirm-button').textContent = deleteLabel || 'Confirm'; $('confirm-button').className = deleteLabel ? 'button-danger' : 'button-primary';
+  $('confirmation-text').textContent = text; $('confirmation').showModal(); return new Promise(resolve => $('confirmation').addEventListener('close', () => resolve($('confirmation').returnValue === 'confirm'), {once: true})); }
 function signedIn(s) { csrf = s.csrf; $('identity').textContent = s.email; $('workspace').hidden = false; $('logout').hidden = false; $('login').hidden = true; }
 function tag(state, text = labels[state] || state) { const item = el('span', text); item.className = 'tag'; item.dataset.state = state; return item; }
 function line(text, className = '') { const item = el('p', text); item.className = className; return item; }
@@ -33,28 +42,147 @@ function detailLinks(payload) {
   for (const address of [...new Set(sources)]) wrapper.append(link(address, address));
   return wrapper;
 }
+function reviewTag(r) { const item = tag(r.state, reviewLabels[r.state] || r.state); item.dataset.review = r.id; return item; }
+function track(r) {
+  if (!TRACKED.includes(r.state)) return;
+  const known = watch.get(r.id);
+  if (known?.state === r.state) { if (known.status) paint(r, known.status); return; }
+  watch.set(r.id, {state: r.state, review: r, fails: 0});
+  clearTimeout(trackTimer); trackTimer = setTimeout(tick, 0);
+}
+async function tick() {
+  clearTimeout(trackTimer);
+  let moving = 0;
+  for (const [id, w] of watch) {
+    if (w.status && !MOVING.includes(w.status.stage)) continue;
+    try { w.status = await api('publication?id=' + id); w.fails = 0; }
+    catch (e) { if (++w.fails >= 5) w.status = {stage: 'attention', message: 'The publication status could not be checked. ' + e.message, actions: [{action: 'check', label: 'Check publication'}]}; }
+    if (w.status) paint(w.review, w.status);
+    if (!w.status || MOVING.includes(w.status.stage)) moving++;
+  }
+  // 20 seconds keeps six tracked publications near 18 dashboard requests a minute, under the 120 limit.
+  if (moving) trackTimer = setTimeout(tick, document.hidden ? 60000 : 20000);
+}
+const recover = {
+  check: async () => {},
+  publish: async r => { await api('publish', {id: r.id, digest: r.digest}); notice('Publication started.'); },
+  redeploy: async r => { await api('redeploy', {id: r.id}); notice('Publishing restarted.'); },
+  discard: async r => {
+    if (!await confirmAction('Discard this unfinished review? Nothing from it will be published. The submission or listing itself is kept.')) return false;
+    await api('discard', {id: r.id}); notice('Unfinished review discarded.');
+  },
+  reprepare: async r => {
+    const request = {operation: r.operation, payload: r.payload.value, reason: r.payload.reason, transfer: r.payload.transfer, omit_artwork: r.payload.omit_artwork};
+    if (r.submission_id) Object.assign(request, {submission_id: r.submission_id, revision: (await api('detail?id=' + r.submission_id)).submission.revision});
+    else request.project_id = r.project_id;
+    const made = await api('prepare', request);
+    notice('A new review is being prepared. Nothing is approved until you review it.');
+    return made.id;
+  }
+};
+function paint(r, s) {
+  if (stageLabels[s.stage]) for (const item of document.querySelectorAll(`[data-review="${r.id}"]`)) { item.textContent = stageLabels[s.stage]; item.dataset.state = s.stage === 'attention' ? 'failed' : s.stage; }
+  const panel = $('publication-status');
+  if (!panel || selectedReview?.id !== r.id) return;
+  r = selectedReview;
+  panel.hidden = !stageLabels[s.stage];
+  if (panel.hidden) return;
+  const steps = el('div'); steps.className = 'review-stage';
+  const order = ['approved', 'publishing', 'checks', 'deploying', 'published'];
+  for (const name of order) { const part = el('span', stageLabels[name]); if (name === s.stage) { part.className = 'current'; part.setAttribute('aria-current', 'step'); } steps.append(part); }
+  panel.replaceChildren(el('h3', 'Publication: ' + stageLabels[s.stage]));
+  if (s.stage !== 'attention') panel.append(steps);
+  panel.append(line(s.message, s.stage === 'attention' ? 'warning' : ''));
+  const links = el('div'); links.className = 'summary-links';
+  if (s.live_url) links.append(link(s.live_url, 'Open the live page'));
+  if (s.detail_url) links.append(link(s.detail_url, 'See what failed'));
+  if (s.stage === 'attention' && s.url) links.append(link(s.url, 'Open the publication request'));
+  if (links.childNodes.length) panel.append(links);
+  const actions = el('div'); actions.className = 'action-row';
+  for (const a of s.actions || []) {
+    const b = button(a.label, async () => { const next = await recover[a.action](r); if (next === false) return; watch.delete(r.id); await reviews(next || r.id); });
+    if (a.action === 'discard') b.className = 'button-danger';
+    actions.append(b);
+  }
+  if (actions.childNodes.length) panel.append(actions);
+}
+function updateSelection() {
+  $('selected-count').textContent = picked.size + ' selected';
+  $('delete-selected').disabled = !picked.size;
+  for (const box of document.querySelectorAll('input[data-pick]')) box.checked = picked.has(Number(box.dataset.pick));
+}
+function pick(id, text) {
+  const label = el('label'), box = el('input'); label.className = 'inline-check';
+  box.type = 'checkbox'; box.dataset.pick = id; box.checked = picked.has(id);
+  box.addEventListener('change', () => { if (box.checked) picked.add(id); else picked.delete(id); updateSelection(); });
+  label.append(box, document.createTextNode(text)); return label;
+}
+async function removeSubmissions(ids) {
+  const name = p => '#' + p.id + ' ' + p.title, checked = [];
+  for (let i = 0; i < ids.length; i += 10) checked.push(...(await api('delete', {ids: ids.slice(i, i + 10), preview: true})).items);
+  const ready = checked.filter(p => !p.blocked && !p.gone), held = checked.filter(p => p.blocked);
+  for (const p of checked.filter(p => p.gone)) picked.delete(p.id);
+  if (!ready.length) { notice(held.length ? 'Nothing was deleted. ' + held[0].blocked : 'Already deleted.', held.length > 0); return queue(); }
+  let text = (ready.length === 1 ? 'Permanently delete submission ' + name(ready[0]) + '?' : 'Permanently delete ' + ready.length + ' submissions?') + ' The submitted details and notes are removed and the receipt stops working. Published listings stay online. This cannot be undone.';
+  if (held.length) text += '\n\n' + held.length + ' cannot be deleted now and will be kept: ' + held.map(name).join(', ') + '. ' + held[0].blocked;
+  if (!await confirmAction(text, ready.length === 1 ? 'Delete submission' : 'Delete ' + ready.length + ' submissions')) return;
+  const failed = []; let deleted = 0;
+  for (let i = 0; i < ready.length; i += 10) {
+    const part = ready.slice(i, i + 10);
+    try { for (const p of (await api('delete', {ids: part.map(p => p.id)})).items) { if (p.deleted || p.gone) { deleted++; picked.delete(p.id); } else failed.push(p); } }
+    catch (e) { failed.push(...part.map(p => ({...p, blocked: e.message}))); }
+  }
+  page = Math.max(1, Math.min(page, Math.ceil((total - deleted) / 25)));
+  await queue();
+  notice('Deleted ' + deleted + (deleted === 1 ? ' submission.' : ' submissions.') + (failed.length ? ' Not deleted: ' + failed.map(p => name(p) + ' (' + p.blocked + ')').join('; ') : '') + (held.length ? ' Kept: ' + held.map(name).join(', ') + '.' : ''), failed.length > 0);
+}
+function duplicateBlock(item, open) {
+  const box = el('details'); box.className = 'disclosure duplicates'; box.open = open;
+  box.append(el('summary', 'Compare ' + (item.possible_duplicates.length + 1) + ' submissions with the same project address'));
+  const body = el('div'); body.className = 'disclosure-body';
+  body.append(line('These may be duplicates. Nothing is removed automatically: delete the ones you do not want and keep the original.', 'muted'));
+  const list = el('ul'); list.className = 'compare';
+  const self = {id: item.id, title: item.payload.title || 'Untitled submission', url: item.payload.url || '', created: item.created, state: item.state};
+  for (const s of [self, ...item.possible_duplicates]) {
+    const row = el('li'), head = el('div'); head.className = 'summary-row';
+    head.append(el('strong', '#' + s.id + ' ' + s.title + (s === self ? ' (this one)' : '')), tag(s.state));
+    row.append(head, line('Submitted ' + new Date(s.created * 1000).toLocaleString(), 'card-meta'));
+    row.append(s.url ? link(s.url) : line('No project address', 'muted'));
+    const actions = el('div'); actions.className = 'action-row';
+    const remove = button('Delete duplicate #' + s.id, () => removeSubmissions([s.id])); remove.className = 'button-danger';
+    actions.append(pick(s.id, 'Select #' + s.id), remove);
+    row.append(actions); list.append(row);
+  }
+  body.append(list); box.append(body); return box;
+}
 async function queue() {
   clearTimeout(reviewTimer);
   show('queue'); lastList = 'queue';
   const result = await api('queue?page=' + page + '&q=' + encodeURIComponent($('search').value) + '&state=' + encodeURIComponent($('state').value) + '&sort=' + $('sort').value);
   total = result.total;
   $('queue-count').textContent = total + (total === 1 ? ' submission' : ' submissions');
+  $('queue-summary').textContent = ['received', 'in-review', 'needs-changes', 'approved'].filter(state => result.counts[state]).map(state => labels[state] + ': ' + result.counts[state]).join(' · ') || 'Nothing is waiting for you.';
+  $('select-all').textContent = 'Select all ' + total + ' matching';
+  $('select-all').disabled = !total;
   $('items').replaceChildren();
   for (const item of result.items) {
     const article = el('article'); article.className = 'item-card';
     const head = el('div'); head.className = 'card-head';
-    head.append(el('h3', item.payload.title || item.listing_id || 'Untitled submission'), tag(item.state));
+    const following = item.state === 'approved' && item.review;
+    head.append(el('h3', item.payload.title || item.listing_id || 'Untitled submission'), following ? reviewTag(item.review) : tag(item.state));
     article.append(head, line(item.kind + ' · ' + new Date(item.created * 1000).toLocaleString(), 'card-meta'));
     if (item.payload.url) article.append(link(item.payload.url, 'View source'));
     else article.append(line('No source page provided', 'muted'));
-    if (item.possible_duplicates.length || item.existing.length) {
-      article.append(line('Possible duplicate: ' + [...item.possible_duplicates.map(id => 'submission ' + id), ...item.existing.map(p => p.title)].join(', '), 'warning'));
-    }
+    if (item.existing.length) article.append(line('Already listed: ' + item.existing.map(p => p.title).join(', '), 'warning'));
+    if (item.possible_duplicates.length) article.append(line('Possible duplicate of ' + item.possible_duplicates.map(d => 'submission ' + d.id).join(', '), 'warning'), duplicateBlock(item, false));
+    article.append(pick(item.id, 'Select submission ' + item.id));
+    if (following) track(item.review);
     const actions = el('div'); actions.className = 'card-actions';
     actions.append(button('Review submission ' + item.id, () => detail(item.id)));
     article.append(actions); $('items').append(article);
   }
   if (!result.items.length) $('items').append(line('No matching submissions. Try another status or search term.', 'muted'));
+  updateSelection();
   $('pagination').textContent = 'Page ' + page + ' · ' + total + ' submissions';
   $('previous').disabled = page === 1;
   $('next').disabled = page * 25 >= total;
@@ -93,8 +221,9 @@ async function detail(id) {
   if (sources.childNodes.length) summary.append(sources);
   if (selected.challenge) summary.append(line('Ownership challenge: ' + selected.challenge));
   summary.append(line('Artwork is verified in the prepared preview, not from untrusted source links.', 'muted'));
+  if (selected.possible_duplicates.length) summary.append(line('Possible duplicate of ' + selected.possible_duplicates.map(d => 'submission ' + d.id).join(', '), 'warning'), duplicateBlock(selected, true));
   fill(selected.payload);
-  $('submission-actions').hidden = false; $('listing-actions').hidden = true;
+  $('submission-actions').hidden = false; $('listing-actions').hidden = true; $('delete-panel').hidden = false;
   $('prepare').textContent = selected.kind === 'claim' ? 'Prepare ownership verification' : 'Prepare private review';
   $('metadata').hidden = false; $('prepare').disabled = false;
   $('more-metadata').open = false;
@@ -104,7 +233,7 @@ async function detail(id) {
   for (const h of data.history) {
     $('history').append(line(new Date(h.created * 1000).toLocaleString() + ' · ' + h.actor + ' · ' + h.action), line('Public: ' + (h.public_note || '—')), line('Private: ' + (h.private_note || '—')));
   }
-  for (const r of data.reviews) $('history').append(button('Open review ' + r.id + ' · ' + r.state, () => showReview(r)));
+  for (const r of data.reviews) $('history').append(button('Open review · ' + (reviewLabels[r.state] || r.state), () => showReview(r)));
 }
 async function decide(state) {
   if (!selected) return;
@@ -167,7 +296,7 @@ async function manageListing(p) {
   $('feature').hidden = !p.feature_eligible || Boolean(p.featured);
   $('feature').textContent = catalogItems.some(item => item.featured) ? 'Replace Featured' : 'Feature';
   $('unfeature').hidden = !p.featured || !p.feature_eligible;
-  $('submission-actions').hidden = true; $('listing-actions').hidden = false;
+  $('submission-actions').hidden = true; $('listing-actions').hidden = false; $('delete-panel').hidden = true;
   $('prepare').textContent = 'Prepare metadata / artwork changes';
   $('history').replaceChildren();
 }
@@ -196,9 +325,10 @@ async function reviews(id) {
     item.className = 'review-item';
     if (r.id === (id || selectedReview?.id)) item.classList.add('active');
     const name = el('span', (r.package?.listing?.title || r.package?.featured_preview?.title || r.project_id || 'New listing') + ' · ' + r.operation); name.className = 'review-name';
-    item.append(name, tag(r.state));
+    item.append(name, reviewTag(r));
     list.append(item);
   }
+  for (const r of data.items.filter(r => ['approved', 'publishing', 'pr-open'].includes(r.state)).slice(0, 6)) track(r);
   const target = data.items.find(r => r.id === id) ||
     data.items.find(r => r.id === selectedReview?.id) ||
     data.items.find(r => ['ready', 'approved', 'queued', 'processing'].includes(r.state)) ||
@@ -213,18 +343,15 @@ async function showReview(r) {
   box.replaceChildren();
   const head = el('div'); head.className = 'section-intro';
   const top = el('div'); top.append(el('h3', (r.project_id || 'New listing') + ' · ' + r.operation), line('Review ' + r.id, 'card-meta'));
-  head.append(top, tag(r.state)); box.append(head);
-  const steps = el('div'); steps.className = 'review-stage';
-  const phases = [['queued', 'Preparing'], ['ready', 'Review'], ['approved', 'Approved'], ['pr-open', 'Publishing']];
-  const stage = ['queued', 'processing', 'ready', 'approved', 'publishing', 'pr-open'].indexOf(r.state);
-  for (const [state, text] of phases) {
-    const part = el('span', text);
-    const at = ['queued', 'ready', 'approved', 'pr-open'].indexOf(state);
-    if (stage >= 0 && at >= 0 && stage >= [0, 2, 3, 5][at]) part.className = stage >= [2, 3, 5, 6][at] ? '' : 'current';
-    steps.append(part);
+  head.append(top, reviewTag(r)); box.append(head);
+  if (['queued', 'processing', 'ready'].includes(r.state)) {
+    const steps = el('div'); steps.className = 'review-stage';
+    for (const [text, current] of [['Preparing', r.state !== 'ready'], ['Your review', r.state === 'ready'], ['Publishing', false]]) { const part = el('span', text); if (current) part.className = 'current'; steps.append(part); }
+    box.append(steps);
   }
-  box.append(steps);
-  if (r.error) box.append(line('Validation issue: ' + r.error, 'warning'));
+  const panel = el('div'); panel.id = 'publication-status'; panel.className = 'action-panel'; panel.setAttribute('role', 'status'); panel.hidden = true;
+  box.append(panel); track(r);
+  if (r.error && !TRACKED.includes(r.state)) box.append(line('This review stopped: ' + r.error, 'warning'));
   if (!r.package) {
     box.append(line(['queued', 'processing', 'publishing'].includes(r.state)
       ? 'Preparation is underway. This view refreshes automatically—no need to navigate away.'
@@ -234,7 +361,7 @@ async function showReview(r) {
   }
   const pkg = r.package;
   if (r.state === 'ready') box.append(line('Ready for your exact content and artwork review. Nothing has been published yet.'));
-  else box.append(line('Status: ' + r.state));
+  else if (!TRACKED.includes(r.state)) box.append(line('Status: ' + (reviewLabels[r.state] || r.state)));
   for (const warning of pkg.warnings || []) box.append(line(warning, 'warning'));
   if (['feature', 'unfeature'].includes(pkg.operation)) {
     box.append(el('h3', 'Proposed homepage Featured project'));
@@ -288,8 +415,8 @@ async function showReview(r) {
     const extra = el('div'); extra.className = 'disclosure-body'; extra.append(wl); exceptional.append(extra); approvals.append(exceptional);
     const approve = expedite => async () => {
       if (!await confirmAction(expedite ? 'Approve this exact package and start protected publication now? Checks still run; it is not live until deployment is verified.' : 'Approve this exact package? It remains unpublished until a protected PR is merged and deployment succeeds.')) return;
-      await api('approve', {id: r.id, version: r.version, digest: r.digest, content_reviewed: $('content-reviewed').checked, artwork_reviewed: $('artwork-reviewed')?.checked || false, public_note: pub.value, private_note: priv.value, override: why.value.trim().length > 0, reason: why.value, expedite});
-      notice(expedite ? 'Exact approval recorded; protected publication started.' : 'Exact approval recorded.');
+      const result = await api('approve', {id: r.id, version: r.version, digest: r.digest, content_reviewed: $('content-reviewed').checked, artwork_reviewed: $('artwork-reviewed')?.checked || false, public_note: pub.value, private_note: priv.value, override: why.value.trim().length > 0, reason: why.value, expedite});
+      notice(result.warning ? 'Exact approval recorded. ' + result.warning : expedite ? 'Exact approval recorded; protected publication started.' : 'Exact approval recorded.', Boolean(result.warning));
       await reviews(r.id);
     };
     const actions = el('div'); actions.className = 'review-actions';
@@ -297,30 +424,7 @@ async function showReview(r) {
       button(pkg.files.length ? 'Approve exact content and artwork' : 'Approve exact content', approve(false)));
     approvals.append(actions); box.append(approvals);
   }
-  if (r.state === 'approved') {
-    const actions = el('div'); actions.className = 'review-actions';
-    actions.append(button('Prepare protected publication PR', async () => {
-      if (!await confirmAction('Create a public protected PR containing only the approved listing, artwork and policy changes?')) return;
-      await api('publish', {id: r.id, digest: r.digest});
-      notice('PR preparation queued; refresh for its status.');
-      await reviews(r.id);
-    }));
-    box.append(actions);
-  }
-  if (r.pr) {
-    const actions = el('div'); actions.className = 'review-actions';
-    actions.append(button('Verify PR checks and deployment', async () => {
-      const status = await api('publication?id=' + r.id);
-      const report = el('div'); report.className = 'submission-summary';
-      report.append(line('Publication: ' + status.status));
-      if (status.status === 'open') report.append(line(status.auto_merge ? 'GitHub will merge this by itself once the required checks pass.' : 'Automatic merge is off for this change. Merge the pull request on GitHub.'));
-      if (status.url) report.append(link(status.url, 'Open protected PR'));
-      if (status.live_url) report.append(link(status.live_url, 'Open live listing'));
-      box.append(report);
-    }));
-    box.append(actions);
-  }
-  if (['queued', 'processing', 'publishing'].includes(r.state)) scheduleReview(r.id);
+  if (['queued', 'processing'].includes(r.state)) scheduleReview(r.id);
 }
 async function sessions() { show('session-panel'); const data = await api('sessions'); $('session-list').replaceChildren(); for (const s of data) $('session-list').appendChild(el('article')).append(el('p', s.email), button('Revoke sessions for ' + s.email, async () => { if (!await confirmAction('Revoke all active sessions for this administrator?')) return; await api('revoke', {subject: s.subject}); notice('Sessions revoked.'); await sessions(); })); }
 $('login').onclick = run(async () => { signedIn(await api('login', {})); await queue(); });
@@ -331,9 +435,17 @@ $('back-to-list').onclick = run(() => lastList === 'catalog-panel' ? catalog() :
 $('catalog-search').addEventListener('input', renderCatalog);
 for (const name of ['search', 'state', 'sort']) $(name).addEventListener(name === 'search' ? 'input' : 'change', () => {
   clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => run(async () => { page = 1; await queue(); })(), name === 'search' ? 300 : 0);
+  searchTimer = setTimeout(() => run(async () => { page = 1; picked.clear(); await queue(); })(), name === 'search' ? 300 : 0);
 });
-$('filters').onsubmit = run(async () => { page = 1; await queue(); }); $('previous').onclick = run(async () => { page--; await queue(); }); $('next').onclick = run(async () => { page++; await queue(); });
+$('select-all').onclick = run(async () => {
+  const found = (await api('queue?all=1&q=' + encodeURIComponent($('search').value) + '&state=' + encodeURIComponent($('state').value))).ids;
+  picked.clear(); for (const id of found) picked.add(id);
+  updateSelection();
+});
+$('clear-selection').onclick = () => { picked.clear(); updateSelection(); };
+$('delete-selected').onclick = run(() => removeSubmissions([...picked]));
+$('delete-submission').onclick = run(() => removeSubmissions([selected.id]));
+$('filters').onsubmit = run(async () => { page = 1; picked.clear(); await queue(); }); $('previous').onclick = run(async () => { page--; await queue(); }); $('next').onclick = run(async () => { page++; await queue(); });
 $('start').onclick = run(() => decide('in-review')); $('corrections').onclick = run(() => decide('needs-changes')); $('reject').onclick = run(() => decide('rejected'));
 $('prepare').onclick = run(() => prepare(selected?.kind === 'claim' ? 'claim' : selected ? 'submission' : 'edit'));
 for (const op of ['suspend', 'delist', 'restore', 'feature', 'unfeature']) $(op).onclick = run(() => prepare(op));
