@@ -90,7 +90,7 @@ If a preview would change nothing, it fails with "Nothing has changed from the p
 One project at a time is Featured on the home page.
 
 - **New listing:** tick "Also make this the Featured project" before you press **Prepare preview**. If you forgot, open the ready preview and press **Prepare again as Featured**. That makes a new preview for you to approve.
-- **Existing listing:** **Existing listings** shows the project that is Featured now. On a project's card, press **Make Featured**, or **Switch Featured to this project** when another project is Featured. On the Featured project's card, press **Clear Featured**. Only approved projects that are live on the site can be Featured.
+- **Existing listing:** **Existing listings** shows the project that is Featured now. On a project's card, press **Make Featured**, or **Switch Featured to this project** when another project is Featured. On the Featured project's card, press **Clear Featured**. Only approved projects that are live on the site can be Featured. The same choice is in the project's **Manage** view, where the buttons read **Feature** (**Replace Featured** when another project is Featured) and **Remove from Featured**.
 
 Choosing a new Featured project replaces the old one in the same change. Removing it leaves the home page's Featured frame empty. The status stays at Deploying until the home page shows the new choice as the only Featured project. Suspending or delisting a Featured project also removes it from Featured.
 
@@ -169,6 +169,7 @@ A failure shows under Needs attention with the reason in plain words and the but
 | "Nothing has changed from the published listing." | **Discard unfinished review**; there is nothing to publish |
 | "This could not finish. Try again, or discard it." | **Try again**, or **Discard unfinished review**. If you had ticked the Featured choice and it was refused, **Prepare without the Featured choice** makes a new preview without it. |
 | "The publication status could not be checked." | **Check publication** |
+| "Administration unavailable; retry later" or "Catalog unavailable" | Nothing was changed. Wait a minute and reload the page. If it lasts more than an hour, see "The dashboard stays unavailable" in the last section. |
 
 Where a button reads **Try again** before you approve, it reads **Prepare a new review** after you approve.
 
@@ -188,14 +189,7 @@ You get one email when the number of new submissions waiting for you rises. The 
 - Visitors never get email. They check the status page with their receipt.
 - The dashboard counts are always right, even if an email is late or missing. If no email comes, check your spam folder first.
 
-Your current address is already verified in Cloudflare. Only a new or changed address needs Cloudflare's verification.
-
-Turning email on is a one-time job, in this order:
-
-1. Approve the merge of the release that adds notifications.
-2. Approve the deploys. The operator then deploys the submission service with your address in a private settings file that is never put in the public repository.
-
-Until then, no email is sent and everything else works.
+Email notifications have been on since 2026-11-19. Your current address is already verified in Cloudflare. Only a new or changed address needs Cloudflare's verification.
 
 ## Exceptional situations requiring GitHub or Cloudflare
 
@@ -232,7 +226,7 @@ When: a flood of spam or an incident on the public form.
 
 `npx wrangler deploy --config intake/wrangler.jsonc` closes the form, because the committed setting keeps submissions off. To also send the site's Submit link back to the GitHub route, set the repository variable `INTAKE_ENABLED` to `false` and run the catalog workflow.
 
-`npx wrangler deploy --config intake/wrangler.private.jsonc --var INTAKE_ENABLED:true` opens the form again with notifications. Use `intake/wrangler.jsonc` in its place if notifications are not set up yet. Details: [Submissions service](launch/SUBMISSIONS.md#live-deployment-record).
+To open the form again with notifications, deploy the submission service as described in "Deploying an approved change" below.
 
 ### Pausing ratings
 
@@ -264,14 +258,36 @@ When: a publication was lost or damaged, or GitHub is unavailable.
 
 See [Restore and off-platform export](OPERATIONS.md#restore-and-off-platform-export-windows) and [Compromised credentials](OPERATIONS.md#compromised-credentials).
 
-### Setting up or changing the notification address
+### The dashboard stays unavailable
 
-When: turning email on, or changing the address that receives it. The current address is already registered and verified in Cloudflare Email Routing. Only a new address must first be registered there and verified through the link Cloudflare sends to it.
+When: "Administration unavailable; retry later" or "Catalog unavailable" lasts more than an hour.
 
-The operator writes the untracked `intake/wrangler.private.jsonc`: the committed `intake/wrangler.jsonc` plus `"send_email": [{"name": "NOTIFY_EMAIL", "destination_address": "<owner address>"}]`, and `"NOTIFY_TO": "<owner address>"` under `vars`. It is never committed. Then:
+Check https://www.cloudflarestatus.com first. If Cloudflare reports no incident and the dashboard broke right after a deploy, go back to the version before it: `npx wrangler deployments list --config admin/wrangler.production.jsonc` shows the versions, and `npx wrangler rollback <version id> --config admin/wrangler.production.jsonc` restores one. Submissions and the public site keep working while the dashboard is down.
 
-`npx wrangler deploy --config intake/wrangler.private.jsonc --var INTAKE_ENABLED:true` deploys the submission service with notifications on.
+### Deploying an approved change
 
-`npx wrangler deploy --config admin/wrangler.production.jsonc` deploys the dashboard, for example after a release that changes it.
+When: a merged change touches the submission service (`intake/`) or the dashboard (`admin/`). The public site deploys itself after every merge; only these two services are deployed by hand. Work in a clean, up-to-date checkout of `main`.
 
-If the private file has not been written, deploy the submission service with `intake/wrangler.jsonc` in place of it; everything works and no email is sent. Details: [Submissions service](launch/SUBMISSIONS.md#live-deployment-record).
+**The private notification settings.** Your notification address is never put in the public repository. It lives in one private file, kept outside every checkout:
+
+`%LOCALAPPDATA%\loghub-private\intake\wrangler.private.jsonc`
+
+That file is the committed `intake/wrangler.jsonc` plus two additions: `"send_email": [{"name": "NOTIFY_EMAIL", "destination_address": "<owner address>"}]`, and `"NOTIFY_TO": "<owner address>"` under `vars`. If the file is ever lost, write it again from that description; your address is the only private part. If a release changes `intake/wrangler.jsonc`, make the same change in the private file.
+
+**Submission service.** Copy the private file into the checkout's `intake` folder (Git ignores it there), then run:
+
+`npx wrangler deploy --config intake/wrangler.private.jsonc --var INTAKE_ENABLED:true`
+
+Both parts matter. Without the private file no email is sent. Without `--var INTAKE_ENABLED:true` the public form closes. Afterwards `npx wrangler deployments list --config intake/wrangler.jsonc` shows the new version, and `npx wrangler versions view <version id> --config intake/wrangler.jsonc` must list `NOTIFY_EMAIL`, `NOTIFY_TO` and `INTAKE_ENABLED ("true")`.
+
+**Dashboard.** `npx wrangler deploy --config admin/wrangler.production.jsonc`
+
+This command can end with "Could not find zone for admin.legacyofgokuhub.com" even though the new version is live. Do not repeat it. `npx wrangler deployments list --config admin/wrangler.production.jsonc` tells the truth: the newest entry at 100% is what is running. The dashboard's secrets and its address survive every deploy.
+
+**Going back.** `npx wrangler rollback <version id> --config <the same config>` restores an earlier version of either service.
+
+### Changing the notification address
+
+When: email should go to a different address.
+
+Register the new address in Cloudflare Email Routing and confirm it through the link Cloudflare sends to it. Put it in both places in the private file described above, then deploy the submission service. Details: [Submissions service](launch/SUBMISSIONS.md#live-deployment-record).

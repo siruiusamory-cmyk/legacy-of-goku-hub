@@ -6,6 +6,7 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
+- The owner runbook now matches production: email notifications are described as on, the deploy procedure for the submission service and the dashboard is written out with its private settings file, verification and rollback, and the dashboard's "unavailable" messages have a next step. An operational handoff and the production acceptance report are added.
 - The dashboard uses plain words throughout: project names instead of ids, "preview" and "publication" instead of package and pull request terms, links shown as their label with the site name, and field errors shown as "Label: message" with the cursor on that field. The message to the submitter sits with the decision buttons, and a missing message or review tick is pointed out before any confirmation.
 - Correction requests open with the live listing's details and list each field the visitor proposed with **Use this**. Only the fields the owner changed are sent, and a change that would leave the listing as published is refused.
 - **Suspend**, **Delist** and **Restore** are offered only where they apply, so a suspended listing can be delisted directly.
