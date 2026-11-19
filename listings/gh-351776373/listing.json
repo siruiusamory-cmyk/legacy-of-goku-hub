@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "gh-351776373",
+  "title": "Legacy of Not Dying to Wolves",
+  "developer": "fcard (phi)",
+  "description": "A balance and bug-fix hack for the first Legacy of Goku. Enemies deal a fraction of their original damage, flight regenerates while on the ground, level-up stats grow more gradually, attacks can no longer do zero damage, and the bug that let attacks heal and overflow a target's health is fixed. Raditz, Vegeta and Ginyu have more health. Distributed as IPS patches with assembly source.",
+  "game": "legacy-of-goku",
+  "category": "rom-hack",
+  "status": "released",
+  "source": {
+    "type": "github",
+    "url": "https://github.com/fcard/dbzlegacyofwolves"
+  },
+  "distribution": {
+    "label": "Patch Page",
+    "url": "https://www.romhacking.net/hacks/5838/",
+    "kind": "page"
+  },
+  "links": [
+    {
+      "label": "Romhacking.net",
+      "url": "https://www.romhacking.net/hacks/5838/"
+    }
+  ],
+  "screenshots": [],
+  "approved_at": "2026-11-19T18:27:48Z"
+}
