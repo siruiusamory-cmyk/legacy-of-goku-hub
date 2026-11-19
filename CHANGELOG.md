@@ -15,6 +15,8 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Added
 
+- Owner-approved publications can merge by themselves once the required checks pass, so the owner no longer has to press Merge on GitHub. Off by default; the owner turns it on separately. The publication job checks that the pull request holds exactly the approved content before asking GitHub to merge it, and never merges anything itself.
+- The dashboard says whether GitHub will merge an open publication by itself, and shows the reason when automatic merge could not be turned on.
 - Directory cards show a short project summary and the date the listing was last updated (screens wider than 580px).
 - A Recently Updated list on the home page links to the three most recently updated projects.
 - A measured reference pack for the artist in `docs/reviews/log-hub-019/`.

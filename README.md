@@ -64,7 +64,8 @@ For those contributing to or operating the Hub:
 - [Visual design notes and artist reference pack](docs/reviews/log-hub-019/review.md)
 - [Moderation and content policy](docs/moderation.md)
 - [Maintainer operations and recovery](docs/OPERATIONS.md)
-- [Administrator documentation](docs/launch/ADMIN.md)
+- [Administrator documentation](docs/launch/ADMIN.md), including optional automatic merging of owner-approved publications (off by default)
+- [Auto-merge integration evidence and owner decision report](docs/reviews/log-hub-023/REPORT.md)
 - [Deployment documentation](docs/launch/DEPLOYMENT.md)
 
 Legacy of Goku Hub is an **unofficial community project**. The games and associated trademarks belong to their respective owners.

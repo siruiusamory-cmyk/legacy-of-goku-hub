@@ -88,7 +88,9 @@ test('owner lifecycle: anonymous correction, exact artwork approval, protected P
   const pr = await createPublicationPR({row: r, api, repo: 'fictional/hub', loadFile: async f => result.buffers.find(b => b.name === f.name).bytes}); assert.equal(pr, 42);
   assert.equal(JSON.stringify(calls).includes('Never public'), false); assert.equal(JSON.stringify(calls).includes('Private training'), false);
   const tree = calls.find(c => c.endpoint.endsWith('/git/trees')).body.tree; assert.deepEqual(tree.map(f => f.path).sort(), [`listings/${r.project_id}/cover.png`, `listings/${r.project_id}/listing.json`, 'policy/publishing.json'].sort());
-  await data(await x.processCall(r.id, '/published-pr', {pr}));
+  await data(await x.processCall(r.id, '/published-pr', {pr, auto_merge: 'GitHub refused automatic merge: Auto merge is not allowed for this repository'}));
+  const manual = (await data(await x.call('/api/reviews'))).items.find(item => item.id === r.id);
+  assert.equal(manual.state, 'pr-open'); assert.match(manual.error, /Automatic merge was not turned on \(GitHub refused automatic merge: .+\)\. Merge the pull request on GitHub\./);
   x.state.pr = {head: {sha: main}, merged: true, state: 'closed', merge_commit_sha: main, html_url: 'https://github.com/fictional/hub/pull/42'};
   let status = await data(await x.call('/api/publication?id=' + r.id)); assert.equal(status.status, 'awaiting-deployment');
   assert.equal((await data(await publicCall('/status', {receipt: sub.receipt}))).status, 'approved');
