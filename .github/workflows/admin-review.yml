@@ -51,3 +51,4 @@ jobs:
           ACCESS_CLIENT_SECRET: ${{ secrets.ADMIN_ACCESS_CLIENT_SECRET }}
           REVIEW_ID: ${{ inputs.review }}
           REVIEW_ACTION: ${{ inputs.action }}
+          ADMIN_AUTO_MERGE: ${{ vars.ADMIN_AUTO_MERGE_ENABLED }}

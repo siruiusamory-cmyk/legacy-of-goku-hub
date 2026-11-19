@@ -311,6 +311,7 @@ async function showReview(r) {
       const status = await api('publication?id=' + r.id);
       const report = el('div'); report.className = 'submission-summary';
       report.append(line('Publication: ' + status.status));
+      if (status.status === 'open') report.append(line(status.auto_merge ? 'GitHub will merge this by itself once the required checks pass.' : 'Automatic merge is off for this change. Merge the pull request on GitHub.'));
       if (status.url) report.append(link(status.url, 'Open protected PR'));
       if (status.live_url) report.append(link(status.live_url, 'Open live listing'));
       box.append(report);

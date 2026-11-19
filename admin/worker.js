@@ -55,7 +55,7 @@ async function publication(env, row) {
   if (!row.pr) return {status: row.state};
   const pr = await github(env, '/pulls/' + row.pr);
   const [checks, combined, required] = await Promise.all([github(env, `/commits/${pr.head.sha}/check-runs`), github(env, `/commits/${pr.head.sha}/status`), github(env, '/branches/main/protection/required_status_checks')]);
-  const result = {status: pr.merged ? 'awaiting-deployment' : pr.state, url: pr.html_url, required_checks: [...new Set([...(required.contexts || []), ...(required.checks || []).map(c => c.context)])], strict: required.strict, checks: checks.check_runs.map(c => ({name: c.name, status: c.status, conclusion: c.conclusion, url: c.html_url})), combined: combined.state};
+  const result = {status: pr.merged ? 'awaiting-deployment' : pr.state, url: pr.html_url, auto_merge: Boolean(pr.auto_merge), required_checks: [...new Set([...(required.contexts || []), ...(required.checks || []).map(c => c.context)])], strict: required.strict, checks: checks.check_runs.map(c => ({name: c.name, status: c.status, conclusion: c.conclusion, url: c.html_url})), combined: combined.state};
   if (!pr.merged) return result;
   const runs = await github(env, '/actions/workflows/catalog.yml/runs?branch=main&status=success&per_page=20');
   const manifestResponse = await fetch(env.SITE_ORIGIN + '/deployment-manifest.json', {cache: 'no-store', redirect: 'manual', signal: AbortSignal.timeout(6000)});
@@ -116,7 +116,8 @@ async function processor(request, env, path) {
   }
   if (path.endsWith('/published-pr')) {
     check(row.state === 'publishing' && row.approved_digest === row.digest && Number.isInteger(data.pr) && data.pr > 0, 409);
-    await env.DB.batch([sql(env, "UPDATE admin_reviews SET pr=?,state='pr-open',version=version+1,updated=? WHERE id=? AND state='publishing'", data.pr, seconds(), id), sql(env, "DELETE FROM admin_files WHERE review_id=? AND name NOT LIKE 'preview-%'", id), sql(env, "DELETE FROM admin_files WHERE review_id IN (SELECT id FROM admin_reviews WHERE state='pr-open' ORDER BY created DESC LIMIT -1 OFFSET 20)"), history(env, 'processor', 'publication-pr', row.submission_id, id)]); return json({ok: true});
+    const manual = ['off', 'enabled', undefined].includes(data.auto_merge) ? null : 'Automatic merge was not turned on (' + note(data.auto_merge, 300) + '). Merge the pull request on GitHub.';
+    await env.DB.batch([sql(env, "UPDATE admin_reviews SET pr=?,state='pr-open',error=?,version=version+1,updated=? WHERE id=? AND state='publishing'", data.pr, manual, seconds(), id), sql(env, "DELETE FROM admin_files WHERE review_id=? AND name NOT LIKE 'preview-%'", id), sql(env, "DELETE FROM admin_files WHERE review_id IN (SELECT id FROM admin_reviews WHERE state='pr-open' ORDER BY created DESC LIMIT -1 OFFSET 20)"), history(env, 'processor', 'publication-pr', row.submission_id, id)]); return json({ok: true});
   }
   if (path.endsWith('/failed')) {
     check(['processing', 'publishing'].includes(row.state), 409);
