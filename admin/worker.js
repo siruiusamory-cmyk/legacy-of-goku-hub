@@ -12,13 +12,32 @@ const review = row => row && ({...row, payload: JSON.parse(row.payload), package
 const history = (env, user, action, submission = null, id = null, pub = '', priv = '') => sql(env, 'INSERT INTO admin_history(submission_id,review_id,actor,action,public_note,private_note,created) VALUES(?,?,?,?,?,?,?)', submission, id, user, action, pub, priv, seconds());
 async function github(env, path, method = 'GET', data, missing = false) {
   check(env.GH_DISPATCH_TOKEN && /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(env.SOURCE_REPO), 503, 'GitHub connection is not configured');
-  const response = await fetch(`https://api.github.com/repos/${env.SOURCE_REPO}${path}`, {method, headers: {Authorization: 'Bearer ' + env.GH_DISPATCH_TOKEN, Accept: 'application/vnd.github+json', 'User-Agent': 'loghub-admin', 'X-GitHub-Api-Version': '2022-11-28', ...(data ? {'Content-Type': 'application/json'} : {})}, body: data ? JSON.stringify(data) : undefined, redirect: 'manual', signal: AbortSignal.timeout(10000)});
-  if (missing && response.status === 404) return null;
-  check(response.ok, 503, 'GitHub request failed; retry later');
+  let response;
+  for (let readAttempts = method === 'GET' ? 2 : 1; readAttempts--;) {
+    response = await fetch(`https://api.github.com/repos/${env.SOURCE_REPO}${path}`, {method, headers: {Authorization: 'Bearer ' + env.GH_DISPATCH_TOKEN, Accept: 'application/vnd.github+json', 'User-Agent': 'loghub-admin', 'X-GitHub-Api-Version': '2022-11-28', ...(data ? {'Content-Type': 'application/json'} : {})}, body: data ? JSON.stringify(data) : undefined, redirect: 'manual', signal: AbortSignal.timeout(10000)}).catch(() => null);
+    if (response && response.status < 500) break;
+  }
+  if (missing && response?.status === 404) return null;
+  check(response?.ok, 503, 'GitHub request failed; retry later');
   return response.status === 204 ? null : response.json();
 }
 async function dispatch(env, id, action) {
-  await github(env, '/actions/workflows/admin-review.yml/dispatches', 'POST', {ref: 'main', inputs: {review: id, action}});
+  for (let left = 3; ; await new Promise(resolve => setTimeout(resolve, 300))) {
+    try { return await github(env, '/actions/workflows/admin-review.yml/dispatches', 'POST', {ref: 'main', inputs: {review: id, action}}); }
+    catch (error) { if (!--left) throw error; }
+  }
+}
+async function startPublication(env, id) {
+  const started = await sql(env, "UPDATE admin_reviews SET dispatched=?,error=NULL WHERE id=? AND state='approved' AND (dispatched IS NULL OR dispatched<?)", seconds(), id, seconds() - STALLED).run();
+  check(started.meta.changes, 409, 'Publication has already started');
+  try { await dispatch(env, id, 'publish'); } catch {
+    await sql(env, "UPDATE admin_reviews SET dispatched=NULL,error='Publication could not start.' WHERE id=? AND state='approved'", id).run();
+    check(false, 503, 'Publication could not start. Try again in a moment.');
+  }
+}
+async function requireOwner(env, user, message) {
+  const control = await sql(env, 'SELECT c.authority_epoch,c.owner_config_hash FROM publication_control c JOIN publication_authorities a ON a.epoch=c.authority_epoch AND a.config_hash=c.owner_config_hash WHERE c.id=1').first();
+  check(await isOwner(user, env, control), 403, message);
 }
 async function catalog(env) {
   const response = await fetch(env.SITE_ORIGIN + '/catalog.json', {redirect: 'manual', signal: AbortSignal.timeout(6000), cache: 'no-store'});
@@ -51,31 +70,79 @@ async function fresh(env, row) {
   const sub = await sql(env, 'SELECT revision FROM submissions WHERE id=?', row.submission_id).first();
   check(sub && sub.revision === row.revision, 409, 'Submission changed; prepare a fresh review');
 }
+const STALLED = 300;
+const act = (action, label) => ({action, label});
+const attention = (message, actions, more = {}) => ({stage: 'attention', message, actions, ...more});
+const plain = error => /Main changed/.test(error || '') ? 'The site changed after this was approved, so the approval no longer matches it. Nothing was published.'
+  : /Artwork (?:unavailable|changed)/.test(error || '') ? 'An image could not be downloaded or no longer matches what was reviewed.'
+  : 'This could not finish: ' + (error || 'no reason was recorded') + '.';
 async function publication(env, row) {
-  if (!row.pr) return {status: row.state};
-  const pr = await github(env, '/pulls/' + row.pr);
-  const [checks, combined, required] = await Promise.all([github(env, `/commits/${pr.head.sha}/check-runs`), github(env, `/commits/${pr.head.sha}/status`), github(env, '/branches/main/protection/required_status_checks')]);
-  const result = {status: pr.merged ? 'awaiting-deployment' : pr.state, url: pr.html_url, auto_merge: Boolean(pr.auto_merge), required_checks: [...new Set([...(required.contexts || []), ...(required.checks || []).map(c => c.context)])], strict: required.strict, checks: checks.check_runs.map(c => ({name: c.name, status: c.status, conclusion: c.conclusion, url: c.html_url})), combined: combined.state};
-  if (!pr.merged) return result;
-  const runs = await github(env, '/actions/workflows/catalog.yml/runs?branch=main&status=success&per_page=20');
+  const age = seconds() - row.updated, retry = act('reprepare', row.approved_digest ? 'Prepare a new review' : 'Try again'), discard = act('discard', 'Discard unfinished review'), recheck = act('check', 'Check publication');
+  const live = {stage: 'published', message: row.error ? 'The change is live. It was merged by hand on GitHub because automatic merge could not be turned on.' : 'The change is live.', live_url: ['feature', 'unfeature'].includes(row.operation) ? env.SITE_ORIGIN + '/' : env.SITE_ORIGIN + '/projects/' + row.project_id + '/'};
+  const withdrawn = {stage: 'published', message: 'The change is live. The listing is no longer shown on the site.'};
+  if (row.state === 'published') return live;
+  if (row.state === 'withdrawn') return withdrawn;
+  if (row.state === 'ready') return {stage: 'review'};
+  if (row.state === 'queued' || row.state === 'processing') return age < STALLED * (row.state === 'queued' ? 1 : 3) ? {stage: 'preparing'} : attention(row.state === 'queued' ? 'Preparation has not started after 5 minutes.' : 'Preparation has not finished after 15 minutes.', [retry, discard]);
+  if (row.state === 'dispatch-failed') return attention('Preparation could not start.', [retry, discard]);
+  if (row.state === 'failed') return attention(plain(row.error), [retry, discard]);
+  if (row.state === 'approved') {
+    if (!row.dispatched) return row.error ? attention(row.error, [act('publish', 'Try again'), discard]) : {stage: 'approved', message: 'Your approval has been recorded.', actions: [act('publish', 'Publish now'), discard]};
+    return seconds() - row.dispatched < STALLED ? {stage: 'publishing', message: 'Publication is starting.'} : attention('Publication has not started after 5 minutes.', [act('publish', 'Try again'), discard]);
+  }
+  if (row.state === 'publishing') {
+    if (age < STALLED * 2) return {stage: 'publishing', message: 'Publication is starting.'};
+    const found = (await github(env, `/pulls?state=all&head=${env.SOURCE_REPO.split('/')[0]}%3Aadmin/${row.id}`)).find(p => p.base.ref === 'main' && p.head.repo?.full_name === env.SOURCE_REPO);
+    if (!found) return attention('Publication stopped before it finished. Nothing was published.', [retry, discard]);
+    const manual = found.auto_merge ? null : 'Automatic merge was not turned on. Merge the pull request on GitHub.';
+    await sql(env, "UPDATE admin_reviews SET pr=?,state='pr-open',error=?,version=version+1,updated=? WHERE id=? AND state='publishing'", found.number, manual, seconds(), row.id).run();
+    row = {...row, pr: found.number, state: 'pr-open', error: manual};
+  }
+  if (row.state !== 'pr-open') return {stage: 'closed'};
+  const pr = await github(env, '/pulls/' + row.pr), links = {url: pr.html_url};
+  if (!pr.merged) {
+    if (pr.state !== 'open') return attention('The publication request was closed before anything was published.', [retry, discard], links);
+    if (['behind', 'dirty'].includes(pr.mergeable_state)) return attention('The site changed after this was approved, so this approval can no longer be published.', [retry, discard], links);
+    const [checks, combined, required] = await Promise.all([github(env, `/commits/${pr.head.sha}/check-runs`), github(env, `/commits/${pr.head.sha}/status`), github(env, '/branches/main/protection/required_status_checks')]);
+    const names = [...(required.contexts || []), ...(required.checks || []).map(c => c.context)];
+    const failed = checks.check_runs.find(c => names.includes(c.name) && c.status === 'completed' && !['success', 'neutral', 'skipped'].includes(c.conclusion)) || (combined.statuses || []).find(s => names.includes(s.context) && ['failure', 'error'].includes(s.state));
+    if (failed) return attention(`The automated check “${failed.name || failed.context}” failed, so nothing was published.`, [recheck, retry], {...links, detail_url: failed.html_url || failed.target_url});
+    if (!pr.auto_merge) return attention(row.error || 'Automatic merge is off for this change. Merge the pull request on GitHub.', [recheck, retry], links);
+    return {stage: 'checks', message: 'Automated checks are running.'};
+  }
+  const deploying = {stage: 'deploying', message: 'The approved change is being published.'};
+  const runs = (await github(env, '/actions/workflows/catalog.yml/runs?branch=main&per_page=20')).workflow_runs.filter(r => r.event !== 'pull_request');
+  const covers = async run => ['identical', 'ahead'].includes((await github(env, `/compare/${pr.merge_commit_sha}...${run.head_sha}`)).status);
+  const latest = runs[0];
+  if (latest?.status === 'completed' && latest.conclusion !== 'success' && await covers(latest)) {
+    if (latest.run_attempt === 1) { await github(env, `/actions/runs/${latest.id}/rerun-failed-jobs`, 'POST').catch(() => {}); return deploying; }
+    const job = (await github(env, `/actions/runs/${latest.id}/jobs?per_page=100`)).jobs.find(j => j.conclusion && !['success', 'skipped'].includes(j.conclusion));
+    return attention(`Publishing the site failed${job ? ` at the “${job.name}” step` : ''}. The live site is unchanged.`, [latest.run_attempt < 3 ? act('redeploy', 'Try again') : recheck], {detail_url: latest.html_url, run: latest.id});
+  }
   const manifestResponse = await fetch(env.SITE_ORIGIN + '/deployment-manifest.json', {cache: 'no-store', redirect: 'manual', signal: AbortSignal.timeout(6000)});
-  if (!manifestResponse.ok) return result;
+  if (!manifestResponse.ok) return deploying;
   const manifest = await manifestResponse.json();
-  const run = runs.workflow_runs.find(r => r.head_sha === manifest.build_commit && r.event !== 'pull_request');
-  if (!run) return result;
-  const comparison = await github(env, `/compare/${pr.merge_commit_sha}...${run.head_sha}`);
-  if (!['identical', 'ahead'].includes(comparison.status)) return result;
+  const run = runs.find(r => r.conclusion === 'success' && r.head_sha === manifest.build_commit);
+  if (!run || !await covers(run)) return deploying;
   const jobs = await github(env, `/actions/runs/${run.id}/jobs?per_page=100`);
-  if (!['synchronize', 'backup', 'anchor', 'publish', 'website', 'deploy-website'].every(name => jobs.jobs.some(j => j.name === name && j.conclusion === 'success'))) return result;
-  const projects = await catalog(env), live = projects.find(p => p.id === row.project_id);
+  if (!['synchronize', 'backup', 'anchor', 'publish', 'website', 'deploy-website'].every(name => jobs.jobs.some(j => j.name === name && j.conclusion === 'success'))) return deploying;
+  const projects = await catalog(env), listed = projects.find(p => p.id === row.project_id);
   const absent = ['suspend', 'delist'].includes(row.operation);
-  if (absent ? Boolean(live) : !live) return result;
-  if (row.operation === 'feature' && (!live.featured || projects.filter(project => project.featured).length !== 1)) return result;
-  if (row.operation === 'unfeature' && projects.some(project => project.featured)) return result;
-  result.status = absent ? 'withdrawn' : 'published'; result.run = run.html_url;
-  if (live) result.live_url = ['feature', 'unfeature'].includes(row.operation) ? env.SITE_ORIGIN + '/' : env.SITE_ORIGIN + '/projects/' + row.project_id + '/';
-  if (row.submission_id && !absent) await sql(env, "UPDATE submissions SET state='published',updated=? WHERE id=? AND revision=? AND state='approved'", seconds(), row.submission_id, row.revision).run();
-  return result;
+  if (absent ? Boolean(listed) : !listed) return deploying;
+  if (row.operation === 'feature' && (!listed.featured || projects.filter(project => project.featured).length !== 1)) return deploying;
+  if (row.operation === 'unfeature' && projects.some(project => project.featured)) return deploying;
+  const changes = [sql(env, "UPDATE admin_reviews SET state=?,version=version+1,updated=? WHERE id=? AND state='pr-open'", absent ? 'withdrawn' : 'published', seconds(), row.id), sql(env, "INSERT INTO admin_history(submission_id,review_id,actor,action,created) SELECT ?,?,'verifier','verified-live',? WHERE changes()=1", row.submission_id, row.id, seconds())];
+  if (row.submission_id && !absent) changes.push(sql(env, "UPDATE submissions SET state='published',updated=? WHERE id=? AND revision=? AND state='approved'", seconds(), row.submission_id, row.revision));
+  await env.DB.batch(changes);
+  return absent ? withdrawn : live;
+}
+const BUSY = "NOT EXISTS (SELECT 1 FROM admin_reviews WHERE submission_id=?1 AND state IN ('approved','publishing','pr-open'))";
+const BUSY_TEXT = 'A publication for this submission is still in progress. Wait for it to finish, or discard its unfinished review first.';
+const marks = list => list.map(() => '?').join(',');
+async function twins(env, rows) {
+  const keys = [...new Set(rows.map(row => row.url_key).filter(Boolean))];
+  const found = keys.length ? (await sql(env, `SELECT id,url_key,payload,state,created FROM submissions WHERE url_key IN (${marks(keys)}) ORDER BY id LIMIT 200`, ...keys).all()).results : [];
+  return row => found.filter(other => other.id !== row.id && other.url_key === row.url_key).map(other => { const payload = JSON.parse(other.payload); return {id: other.id, title: payload.title || 'Untitled submission', url: payload.url || '', created: other.created, state: other.state}; });
 }
 
 async function processor(request, env, path) {
@@ -117,7 +184,7 @@ async function processor(request, env, path) {
   if (path.endsWith('/published-pr')) {
     check(row.state === 'publishing' && row.approved_digest === row.digest && Number.isInteger(data.pr) && data.pr > 0, 409);
     const manual = ['off', 'enabled', undefined].includes(data.auto_merge) ? null : 'Automatic merge was not turned on (' + note(data.auto_merge, 300) + '). Merge the pull request on GitHub.';
-    await env.DB.batch([sql(env, "UPDATE admin_reviews SET pr=?,state='pr-open',error=?,version=version+1,updated=? WHERE id=? AND state='publishing'", data.pr, manual, seconds(), id), sql(env, "DELETE FROM admin_files WHERE review_id=? AND name NOT LIKE 'preview-%'", id), sql(env, "DELETE FROM admin_files WHERE review_id IN (SELECT id FROM admin_reviews WHERE state='pr-open' ORDER BY created DESC LIMIT -1 OFFSET 20)"), history(env, 'processor', 'publication-pr', row.submission_id, id)]); return json({ok: true});
+    await env.DB.batch([sql(env, "UPDATE admin_reviews SET pr=?,state='pr-open',error=?,version=version+1,updated=? WHERE id=? AND state='publishing'", data.pr, manual, seconds(), id), sql(env, "DELETE FROM admin_files WHERE review_id=? AND name NOT LIKE 'preview-%'", id), sql(env, "DELETE FROM admin_files WHERE review_id IN (SELECT id FROM admin_reviews WHERE state IN ('pr-open','published','withdrawn') ORDER BY created DESC LIMIT -1 OFFSET 20)"), history(env, 'processor', 'publication-pr', row.submission_id, id)]); return json({ok: true});
   }
   if (path.endsWith('/failed')) {
     check(['processing', 'publishing'].includes(row.state), 409);
@@ -174,20 +241,19 @@ export async function handle(request, env) {
       const state = url.searchParams.get('state') || '', q = (url.searchParams.get('q') || '').slice(0, 100), page = Number(url.searchParams.get('page') || 1), order = url.searchParams.get('sort') === 'oldest' ? 'ASC' : 'DESC';
       check(Number.isInteger(page) && page > 0 && page < 10000);
       const where = 'WHERE (?=\'\' OR state=?) AND (?=\'\' OR instr(lower(payload),lower(?))>0 OR instr(COALESCE(listing_id,\'\'),?)>0)';
+      if (url.searchParams.get('all')) return json({ids: (await sql(env, `SELECT id FROM submissions ${where} ORDER BY id LIMIT 500`, state, state, q, q, q).all()).results.map(row => row.id)});
       const rows = (await sql(env, `SELECT * FROM submissions ${where} ORDER BY created ${order},id ${order} LIMIT 25 OFFSET ?`, state, state, q, q, q, (page - 1) * 25).all()).results;
       const count = await sql(env, `SELECT count(*) n FROM submissions ${where}`, state, state, q, q, q).first();
-      const projects = await catalog(env);
-      const items = [];
-      for (const row of rows) {
-        const duplicates = (await sql(env, 'SELECT id FROM submissions WHERE id<>? AND url_key=? ORDER BY id LIMIT 20', row.id, row.url_key).all()).results.map(x => x.id);
-        items.push({...item(row), possible_duplicates: duplicates, existing: projects.filter(p => row.url_key && projectKeys(p).includes(row.url_key)).map(p => ({id: p.id, title: p.title}))});
-      }
-      return json({items, total: count.n, page});
+      const counts = Object.fromEntries((await sql(env, 'SELECT state,count(*) n FROM submissions GROUP BY state').all()).results.map(row => [row.state, row.n]));
+      const projects = await catalog(env), related = await twins(env, rows), ids = rows.map(row => row.id);
+      const latest = ids.length ? (await sql(env, `SELECT id,submission_id,state FROM admin_reviews WHERE submission_id IN (${marks(ids)}) ORDER BY created,id`, ...ids).all()).results : [];
+      const items = rows.map(row => ({...item(row), possible_duplicates: related(row), review: latest.findLast(r => r.submission_id === row.id) || null, existing: projects.filter(p => row.url_key && projectKeys(p).includes(row.url_key)).map(p => ({id: p.id, title: p.title}))}));
+      return json({items, total: count.n, page, counts});
     }
     if (path === '/api/detail' && request.method === 'GET') {
       const id = Number(url.searchParams.get('id')); check(Number.isInteger(id));
       const row = await sql(env, 'SELECT * FROM submissions WHERE id=?', id).first(); check(row, 404);
-      return json({submission: item(row), history: (await sql(env, 'SELECT * FROM admin_history WHERE submission_id=? ORDER BY id', id).all()).results, reviews: (await sql(env, 'SELECT * FROM admin_reviews WHERE submission_id=? ORDER BY created DESC', id).all()).results.map(review)});
+      return json({submission: {...item(row), possible_duplicates: (await twins(env, [row]))(row)}, history: (await sql(env, 'SELECT * FROM admin_history WHERE submission_id=? ORDER BY id', id).all()).results, reviews: (await sql(env, 'SELECT * FROM admin_reviews WHERE submission_id=? ORDER BY created DESC', id).all()).results.map(review)});
     }
     if (path === '/api/reviews' && request.method === 'GET') return json({items: (await sql(env, 'SELECT * FROM admin_reviews ORDER BY created DESC LIMIT 100').all()).results.map(review)});
     if (path === '/api/preview' && request.method === 'GET') {
@@ -211,8 +277,8 @@ export async function handle(request, env) {
       return json({ok: true});
     }
     if (path === '/api/prepare') {
-      await env.DB.batch([sql(env, 'DELETE FROM admin_files WHERE review_id IN (SELECT id FROM admin_reviews WHERE updated<?)', seconds() - 7 * 86400), sql(env, "UPDATE admin_reviews SET state='expired',package=NULL WHERE updated<? AND state NOT IN ('pr-open','expired')", seconds() - 7 * 86400)]);
-      await sql(env, "DELETE FROM admin_files WHERE review_id IN (SELECT id FROM admin_reviews WHERE state IN ('stale','failed','expired'))").run();
+      await env.DB.batch([sql(env, 'DELETE FROM admin_files WHERE review_id IN (SELECT id FROM admin_reviews WHERE updated<?)', seconds() - 7 * 86400), sql(env, "UPDATE admin_reviews SET state='expired',package=NULL WHERE updated<? AND state NOT IN ('pr-open','published','withdrawn','discarded','expired')", seconds() - 7 * 86400)]);
+      await sql(env, "DELETE FROM admin_files WHERE review_id IN (SELECT id FROM admin_reviews WHERE state IN ('stale','failed','expired','discarded'))").run();
       const stored = await sql(env, "SELECT count(DISTINCT review_id) n FROM admin_files WHERE name NOT LIKE 'preview-%'").first();
       check(stored.n < 6, 503, 'Private artwork storage is full; wait for its seven-day retention cleanup');
       check(['submission', 'edit', 'suspend', 'delist', 'restore', 'claim', 'feature', 'unfeature'].includes(data.operation));
@@ -241,8 +307,7 @@ export async function handle(request, env) {
       return json({id}, 201);
     }
     if (path === '/api/approve') {
-      const control = await sql(env, 'SELECT c.authority_epoch,c.owner_config_hash FROM publication_control c JOIN publication_authorities a ON a.epoch=c.authority_epoch AND a.config_hash=c.owner_config_hash WHERE c.id=1').first();
-      check(await isOwner(user, env, control), 403, 'Only the publication owner can approve');
+      await requireOwner(env, user, 'Only the publication owner can approve');
       const override = data.override === true, reason = note(data.reason, 500);
       check(!override || reason.length >= 5, 400, 'A reason is required to approve incomplete metadata');
       const row = await currentReview(env, data.id); await fresh(env, row);
@@ -254,14 +319,59 @@ export async function handle(request, env) {
       if (row.submission_id) changes.push(sql(env, "UPDATE submissions SET state='approved',project_id=?,public_note=?,private_note=?,updated=? WHERE id=? AND revision=? AND changes()=1", row.project_id, pub, priv, seconds(), row.submission_id, row.revision));
       changes.push(sql(env, "INSERT INTO admin_history(submission_id,review_id,actor,action,public_note,private_note,created) SELECT ?,?,?,?,?,?,? WHERE changes()=1", row.submission_id, row.id, user.email, (override ? 'exact-approval-override' : 'exact-approval') + (data.expedite === true ? '-expedited' : ''), pub, override ? (reason + ' ' + priv).slice(0, 1000) : priv, seconds()));
       const results = await env.DB.batch(changes); check(results[0].meta.changes, 409, 'Submission or review changed; reload before approving');
-      if (data.expedite === true) await dispatch(env, row.id, 'publish');
-      return json({ok: true, expedited: data.expedite === true});
+      if (data.expedite !== true) return json({ok: true, expedited: false});
+      try { await startPublication(env, row.id); } catch (error) { return json({ok: true, expedited: false, warning: error.message}); }
+      return json({ok: true, expedited: true});
     }
     if (path === '/api/publish') {
       const row = await currentReview(env, data.id); await fresh(env, row);
       check(row.state === 'approved' && row.digest === data.digest && row.approved_digest === row.digest, 409, 'Exact approval is required');
       await rate(env, 'publish:' + user.sub, 5);
-      await dispatch(env, row.id, 'publish'); return json({ok: true});
+      await startPublication(env, row.id); return json({ok: true});
+    }
+    if (path === '/api/redeploy') {
+      const status = await publication(env, await currentReview(env, data.id));
+      check(status.actions?.some(a => a.action === 'redeploy'), 409, 'There is nothing to try again');
+      await rate(env, 'publish:' + user.sub, 5);
+      await github(env, `/actions/runs/${status.run}/rerun-failed-jobs`, 'POST'); return json({ok: true});
+    }
+    if (path === '/api/discard') {
+      await requireOwner(env, user, 'Only the publication owner can discard a review');
+      const row = await currentReview(env, data.id);
+      const free = ['queued', 'processing', 'ready', 'failed', 'dispatch-failed'].includes(row.state) || (await publication(env, row)).actions?.some(a => a.action === 'discard');
+      check(free, 409, 'This review cannot be discarded while its publication is in progress');
+      const gone = "EXISTS (SELECT 1 FROM admin_reviews WHERE id=? AND state='discarded' AND version=?)";
+      const done = await env.DB.batch([
+        sql(env, "UPDATE admin_reviews SET state='discarded',package=NULL,version=version+1,updated=? WHERE id=? AND state=? AND version=?", seconds(), row.id, row.state, row.version),
+        sql(env, `DELETE FROM admin_files WHERE review_id=? AND ${gone}`, row.id, row.id, row.version + 1),
+        sql(env, `UPDATE submissions SET state='in-review',updated=? WHERE id=? AND state='approved' AND ${gone}`, seconds(), row.submission_id, row.id, row.version + 1),
+        sql(env, `INSERT INTO admin_history(submission_id,review_id,actor,action,created) SELECT ?,?,?,'discarded-review',? WHERE ${gone}`, row.submission_id, row.id, user.email, seconds(), row.id, row.version + 1)]);
+      check(done[0].meta.changes, 409, 'This review changed; reload it');
+      return json({ok: true});
+    }
+    if (path === '/api/delete') {
+      await requireOwner(env, user, 'Only the publication owner can delete submissions');
+      const ids = data.ids;
+      check(Array.isArray(ids) && ids.length > 0 && ids.length <= 10 && ids.every(Number.isInteger) && new Set(ids).size === ids.length, 400, 'Choose between 1 and 10 submissions');
+      const rows = (await sql(env, `SELECT id,payload,listing_id FROM submissions WHERE id IN (${marks(ids)})`, ...ids).all()).results;
+      const unfinished = () => sql(env, `SELECT * FROM admin_reviews WHERE submission_id IN (${marks(ids)}) AND state IN ('approved','publishing','pr-open')`, ...ids).all();
+      for (const pending of (await unfinished()).results.filter(r => r.state === 'pr-open')) await publication(env, pending).catch(() => {});
+      const busy = new Set((await unfinished()).results.map(r => r.submission_id)), items = [];
+      for (const id of ids) {
+        const row = rows.find(r => r.id === id), entry = {id, title: row ? JSON.parse(row.payload).title || row.listing_id || 'Untitled submission' : null};
+        if (!row) entry.gone = true;
+        else if (busy.has(id)) entry.blocked = BUSY_TEXT;
+        else if (data.preview !== true) try {
+          const done = await env.DB.batch([
+            sql(env, `UPDATE admin_reviews SET submission_id=NULL WHERE submission_id=?1 AND state IN ('published','withdrawn') AND ${BUSY}`, id),
+            sql(env, `DELETE FROM admin_history WHERE submission_id=?1 AND (review_id IS NULL OR review_id NOT IN (SELECT id FROM admin_reviews WHERE state IN ('published','withdrawn'))) AND EXISTS (SELECT 1 FROM submissions WHERE id=?1) AND ${BUSY}`, id),
+            sql(env, `DELETE FROM submissions WHERE id=?1 AND ${BUSY}`, id),
+            sql(env, "INSERT INTO admin_history(submission_id,actor,action,created) SELECT ?1,?2,'deleted-submission',?3 WHERE changes()=1", id, user.email, seconds())]);
+          if (done[2].meta.changes) entry.deleted = true; else entry.blocked = BUSY_TEXT;
+        } catch { entry.blocked = 'This submission could not be deleted. Try again.'; }
+        items.push(entry);
+      }
+      return json({items});
     }
     check(false, 404);
   } catch (error) {

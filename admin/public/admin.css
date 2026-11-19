@@ -114,6 +114,17 @@ figcaption{font-size:.78rem;color:var(--muted);overflow-wrap:anywhere}
 dialog{width:min(90vw,510px);max-width:none;border:1px solid #b5c1d2;padding:1.5rem;border-radius:13px;box-shadow:0 20px 70px #0e183c55}
 dialog::backdrop{background:#101b30aa}
 .dialog-actions{display:flex;justify-content:flex-end;gap:.6rem;margin-top:1rem}
+.bulk-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin:0 0 1rem}
+.bulk-bar p{margin:0;font-weight:700}
+.bulk-bar .button-danger{margin-left:auto}
+.button-danger:not(:disabled){background:#fff5f6}
+.danger-zone{background:#fff7f7;border-color:#e6bcc2;margin-top:2rem}
+.compare{list-style:none;margin:0;padding:0;display:grid;gap:.6rem}
+.compare li{border:1px solid var(--line);border-radius:8px;padding:.7rem;background:#fff;min-width:0}
+.compare .summary-row{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}
+.compare strong{overflow-wrap:anywhere}
+.item-card .inline-check{margin:.6rem 0 0}
+#confirmation-text{white-space:pre-line}
 [hidden]{display:none!important}
 @media(max-width:900px){.filter-bar{grid-template-columns:repeat(2,minmax(0,1fr))}.review-layout{grid-template-columns:1fr}.review-detail{border-left:0;border-top:1px solid var(--line);padding:1rem 0 0}.review-list{grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}}
 @media(max-width:600px){body{padding:0 .7rem 2rem}.masthead{margin:0 -.7rem .8rem;padding:1rem;align-items:flex-start;flex-direction:column}.account{text-align:left}.account p{margin-bottom:.4rem}.primary-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.4rem}.primary-nav button{padding:.5rem .35rem;font-size:.84rem}.workspace-panel{margin:1rem 0;padding:.9rem}.section-intro{display:block}.section-stat{display:inline-block;margin:.75rem 0 0}.filter-bar,.field-grid{grid-template-columns:1fr}.filter-bar{gap:.15rem}.filter-bar label{margin:.3rem 0}.pagination{flex-direction:column;align-items:flex-start}.pagination div{display:flex;gap:.5rem}.action-row button{flex:1 1 150px}.detail-navigation{align-items:flex-start}.review-list{grid-template-columns:1fr}}
