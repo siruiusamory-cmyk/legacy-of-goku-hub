@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "ext-n4ewtiwz3pr2",
+  "title": "Legacy of Goku 2 - World Map Demo",
+  "developer": "Golden PSP",
+  "description": "A homebrew Game Boy Advance demo that recreates the Mode 7 style world map of The Legacy of Goku II from scratch. It runs on real hardware.",
+  "game": "legacy-of-goku-2",
+  "category": "fan-project",
+  "status": "released",
+  "source": {
+    "type": "platform",
+    "url": "https://goldenpsp.itch.io/legacy-of-goku-2-world-map-demo"
+  },
+  "links": [
+    {
+      "label": "Development thread",
+      "url": "https://x.com/GoldenPortable/status/1417250602711752704"
+    }
+  ],
+  "screenshots": [],
+  "cover": "cover.png",
+  "approved_at": "2026-11-19T19:29:54Z"
+}
