@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "ext-m2kjqroxo4zh",
+  "title": "Buu's Fury Brazilian Portuguese Translation",
+  "developer": "Breno",
+  "description": "A full Brazilian Portuguese translation of Buu's Fury covering text, graphics and scenery. It also restores Mr. Satan's name by removing the 'Hercule' censorship from items and scenery. Version 1.1 fixes spelling, improves dialogue and graphics, and aligns terms with the same author's Legacy of Goku II translation.",
+  "game": "buus-fury",
+  "category": "translation",
+  "status": "released",
+  "source": {
+    "type": "platform",
+    "url": "https://www.romhacking.net/translations/6895/"
+  },
+  "distribution": {
+    "label": "Patch Page",
+    "url": "https://www.romhacking.net/translations/6895/",
+    "kind": "page"
+  },
+  "screenshots": [],
+  "approved_at": "2026-11-19T20:11:45Z"
+}
