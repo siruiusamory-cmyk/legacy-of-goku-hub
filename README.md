@@ -12,7 +12,7 @@ The [public catalogue](https://legacyofgokuhub.com/) brings community work toget
 
 - Browse by game, project type, or development status.
 - Search for specific projects and follow links to their repositories, websites, or approved download pages.
-- Discover featured projects and read about what each one does.
+- Discover featured projects, see what was recently updated, and read a short summary of what each one does.
 - Rate listed projects with the site's seven-Dragon-Ball rating system, without creating an account.
 
 Listings may cover released projects, works in progress, and useful tools or documentation. Not every project has a download or artwork.
@@ -60,6 +60,8 @@ For those contributing to or operating the Hub:
 
 - [Contributing to the Hub](CONTRIBUTING.md)
 - [Documentation index](docs/README.md)
+- [Changelog](CHANGELOG.md)
+- [Visual design notes and artist reference pack](docs/reviews/log-hub-019/review.md)
 - [Moderation and content policy](docs/moderation.md)
 - [Maintainer operations and recovery](docs/OPERATIONS.md)
 - [Administrator documentation](docs/launch/ADMIN.md)

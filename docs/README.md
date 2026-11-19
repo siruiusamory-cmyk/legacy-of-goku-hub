@@ -16,4 +16,6 @@ For maintainers, the source and operating references are:
 - [Cloudflare configuration](launch/CLOUDFLARE.md)
 - [Deployment and rollback](launch/DEPLOYMENT.md)
 
-Historical proposals, design screenshots and milestone reports are not maintained in the current source tree. They remain available through Git history. The live configuration and signed publication state, not old development notes, determine production status.
+The current visual design is described in [the design review](reviews/log-hub-019/review.md), with the measured reference pack for the artist beside it.
+
+Older proposals, design screenshots and milestone reports are not maintained in the current source tree. They remain available through Git history. The live configuration and signed publication state, not old development notes, determine production status.
