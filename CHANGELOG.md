@@ -4,6 +4,10 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ## Unreleased
 
+### Added
+
+- **Translation** is a project type of its own. Submitters and the owner can choose it, listings show it as a badge, and the directory offers it as a filter once a translation is published.
+
 ### Changed
 
 - The owner runbook now matches production: email notifications are described as on, the deploy procedure for the submission service and the dashboard is written out with its private settings file, verification and rollback, and the dashboard's "unavailable" messages have a next step. An operational handoff and the production acceptance report are added.
