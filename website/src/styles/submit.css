@@ -22,6 +22,10 @@
   gap: 20px;
   margin-bottom: 20px;
 }
+.submit-panel>div:not([class]):not([hidden]) {
+  display: grid;
+  gap: 20px;
+}
 .submit-panel fieldset {
   border: 0;
   margin: 0;
@@ -95,8 +99,8 @@
   margin-left: 10px;
   padding: 1px 8px;
   border: 1px solid var(--line);
-  border-radius: 999px;
-  font-size: .75rem;
+  border-radius: 0;
+  font-size: .8125rem;
   font-weight: 400;
   color: var(--ice);
 }

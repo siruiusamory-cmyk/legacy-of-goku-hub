@@ -1,6 +1,12 @@
 ---
 import {starLayouts, starPolygon} from '../lib/dragon-balls.js';
+const sprites = import.meta.glob('../assets/artist/ball-*.png', {eager: true, import: 'default'});
 const {number = 4, muted = false} = Astro.props;
 const polygon = starPolygon(number);
+const sprite = state => sprites[`../assets/artist/ball-${number}-${state}.png`].src;
+const art = 48;
+const size = 6400 / art;
+const left = -900 / art;
+const top = state => -(state === 'inactive' ? 16 : number < 3 ? 10 : 11) * 100 / art;
 ---
-<span class:list={['dragon-ball', {muted}]} data-ball={number} aria-hidden="true"><svg class="ball-stars" viewBox="0 0 100 100" aria-hidden="true">{starLayouts[number].map(([x,y]) => <polygon points={polygon} transform={`translate(${x} ${y})`}/>)}</svg></span>
+<span class:list={['dragon-ball', {muted}]} data-ball={number} aria-hidden="true"><svg class="ball-stars" viewBox="0 0 100 100" aria-hidden="true"><circle class="ball-base" cx="50" cy="50" r="46"/>{starLayouts[number].map(([x,y]) => <polygon points={polygon} transform={`translate(${x} ${y})`}/>)}<image class="ball-on" href={sprite('active')} x={left} y={top('active')} width={size} height={size}/><image class="ball-off" href={sprite('inactive')} x={left} y={top('inactive')} width={size} height={size}/></svg></span>
