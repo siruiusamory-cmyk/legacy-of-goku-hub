@@ -133,6 +133,25 @@
       ]
     },
     {
+      "project_id": "ext-pvjzivq7r6wq",
+      "decision": "approved",
+      "content_digests": [
+        "e959eab85c315f70763bc45902ac4cb54960697bd94f720e57e72a2b6e93c469"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "338605586a3757333d9d4af92de71142d25703578bd1c66841b7b980e2b56bb1",
+            "sha256": "8351b9e54ebcf86ffffe991f2f475114d97a246faa0aea8ac546f9fa1b4ebe87"
+          },
+          {
+            "source_sha256": "d0ab415af14f571a2966c621ed18e42e258c227f3e400261d13d8fc3b8766bee",
+            "sha256": "a3c298e63fe79e52c2e5cbee6b27a890274a352f18792efa4b3af39203919cba"
+          }
+        ]
+      ]
+    },
+    {
       "project_id": "gh-1131874995",
       "owner_id": 127344248,
       "decision": "approved",
