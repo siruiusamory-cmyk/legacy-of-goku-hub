@@ -22,7 +22,7 @@ test('administrator deliberately omits supplied artwork and approves the exact a
       await route.fulfill({status: response.status, headers: Object.fromEntries(response.headers), body: Buffer.from(await response.arrayBuffer())});
     });
     await page.goto(origin);
-    await page.getByRole('button', {name: 'Sign in', exact: true}).click();
+    await expect(page.getByRole('button', {name: 'Sign in', exact: true})).toBeHidden(); await expect(page.locator('#workspace')).toBeVisible();
     await page.getByRole('button', {name: 'Review submission 1', exact: true}).click();
     await page.locator('#more-metadata summary').click();
     await page.getByLabel('Omit all artwork', {exact: false}).check();
