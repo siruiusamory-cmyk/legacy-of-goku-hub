@@ -316,6 +316,17 @@
       ]
     },
     {
+      "project_id": "gh-1429329775",
+      "owner_id": 287528505,
+      "decision": "approved",
+      "content_digests": [
+        "51246d866a0d08e818886ee7926bf9fd9534adf298c3a5b2b90cc999809a1092"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
       "project_id": "gh-351776373",
       "owner_id": 12222927,
       "decision": "approved",
