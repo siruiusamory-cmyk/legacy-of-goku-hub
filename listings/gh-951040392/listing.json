@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "gh-951040392",
+  "title": "Sprite Swapper & Image Extractor",
+  "developer": "ghxstboyy",
+  "description": "Two Windows tools for Buu's Fury and The Legacy of Goku II. The Image Extractor pulls sprites out of your ROM as BMP files with a description file, and the Sprite Swapper reinserts edited BMPs into the ROM. Version 1.0.1 adds support for mirrored sprites. Published as a ready-built download only; the source code is not available.",
+  "game": "multiple",
+  "category": "tool",
+  "status": "released",
+  "source": {
+    "type": "github",
+    "url": "https://github.com/ghxstboyy/Sprite-Swapper-Image-Extractor-for-Buu-s-Fury-and-Legacy-Of-Goku"
+  },
+  "distribution": {
+    "label": "Patch Page",
+    "url": "https://github.com/ghxstboyy/Sprite-Swapper-Image-Extractor-for-Buu-s-Fury-and-Legacy-Of-Goku/releases",
+    "kind": "page"
+  },
+  "screenshots": [],
+  "approved_at": "2026-11-19T19:08:01Z"
+}
