@@ -8,6 +8,7 @@ For developers, the [manifest schema](../schema/manifest.schema.json) and [examp
 
 For maintainers, the source and operating references are:
 
+- [Owner runbook](OWNER-RUNBOOK.md): start here for day-to-day running of the Hub
 - [Content moderation](moderation.md)
 - [Publication, backups and recovery](OPERATIONS.md)
 - [Administration](launch/ADMIN.md)

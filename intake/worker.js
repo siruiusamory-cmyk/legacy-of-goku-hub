@@ -70,7 +70,9 @@ async function adminCheck(request, env) {
   const raw = request.headers.get('Authorization')?.match(/^Bearer ([A-Za-z0-9_-]{43})$/)?.[1];
   if (!raw || !env.ADMIN_HASH || (await digest(raw)) !== env.ADMIN_HASH) fail(401, 'Administrator credential required');
 }
-const view = row => ({status: row.state, kind: row.kind, message: MESSAGES[row.state], note: row.public_note || null, updated_at: new Date(row.updated * 1000).toISOString(), ...(row.challenge && OPEN.includes(row.state) ? {challenge: row.challenge} : {}), ...(row.project_id && row.state === 'published' ? {project_id: row.project_id} : {})});
+const ANSWERED = 'We have your reply. A person will read it. Check this page again for our answer.';
+const answered = row => ['received', 'in-review'].includes(row.state) && JSON.parse(row.payload).replies?.length > 0;
+const view = row => ({status: row.state, kind: row.kind, message: answered(row) ? ANSWERED : MESSAGES[row.state], ...(answered(row) ? {answered: true} : {}), note: row.public_note || null, updated_at: new Date(row.updated * 1000).toISOString(), ...(row.challenge && OPEN.includes(row.state) ? {challenge: row.challenge} : {}), ...(row.project_id && row.state === 'published' ? {project_id: row.project_id} : {})});
 
 async function create(request, env, ip) {
   const data = await body(request, 12288);
@@ -110,13 +112,26 @@ async function revise(request, env, ip) {
   const data = await body(request, 12288);
   const row = await lookup(env, data?.receipt);
   if (row.state !== 'needs-changes') fail(409, 'This submission is not waiting for changes.');
-  const merged = {...JSON.parse(row.payload), ...data.changes, kind: row.kind, listing_id: row.listing_id ?? undefined};
-  if (typeof data.changes?.url === 'string' && data.changes.url.trim()) delete merged.no_page;
+  const old = JSON.parse(row.payload);
+  const {replies: _replies, replies_dropped: _dropped, ...changes} = data.changes || {};
+  const merged = {...old, ...changes, kind: row.kind, listing_id: row.listing_id ?? undefined};
+  if (typeof changes.url === 'string' && changes.url.trim()) delete merged.no_page;
   const checked = validateSubmission(merged);
   if (!checked.ok) fail(422, 'Please fix the highlighted fields.', {errors: checked.errors});
   const time = now();
+  const value = checked.value;
+  const replies = [...(old.replies || [])];
+  replies.push({at: time, text: (changes.note !== undefined && value.note) || 'Changed details without a message.'});
+  if (changes.note !== undefined) {
+    if (old.note === undefined) delete value.note; else value.note = old.note;
+  }
+  value.replies = replies;
+  if (old.replies_dropped) value.replies_dropped = old.replies_dropped;
+  while (JSON.stringify(value).length > 8192 && value.replies?.length > 1) { value.replies.shift(); value.replies_dropped = (value.replies_dropped || 0) + 1; }
+  const payload = JSON.stringify(value);
+  if (payload.length > 8192) fail(413, 'That is too much text; shorten it and try again.');
   const revision = row.revision === undefined ? '' : ',revision=revision+1';
-  const changed = await sql(env, `UPDATE submissions SET payload=?,url_key=?,state='received',updated=?,expires=?${revision} WHERE id=? AND state='needs-changes' AND payload=?`, JSON.stringify(checked.value), submissionKey(checked.value), time, time + 90 * DAY, row.id, row.payload).run();
+  const changed = await sql(env, `UPDATE submissions SET payload=?,url_key=?,state='received',updated=?,expires=?${revision} WHERE id=? AND state='needs-changes' AND payload=?`, payload, submissionKey(value), time, time + 90 * DAY, row.id, row.payload).run();
   if (!changed.meta.changes) fail(409, 'This submission changed. Check its status again.');
   return json(env, {status: 'received', message: MESSAGES.received});
 }
@@ -174,4 +189,14 @@ export async function cleanup(env) {
   if (env.INTAKE_ENABLED !== 'true') return;
   await env.DB.batch([sql(env, 'DELETE FROM limits WHERE expires<=?', now()), sql(env, 'DELETE FROM submissions WHERE expires<=?', now())]);
 }
-export default {fetch: handle, scheduled: (_event, env, ctx) => ctx.waitUntil(cleanup(env))};
+export async function notify(env) {
+  if (env.INTAKE_ENABLED !== 'true' || typeof env.NOTIFY_EMAIL?.send !== 'function' || typeof env.NOTIFY_TO !== 'string' || !env.NOTIFY_TO || !/^https:\/\/[a-z0-9.-]+$/.test(env.ADMIN_ORIGIN)) return;
+  const {n} = await sql(env, `SELECT count(*) n FROM submissions WHERE state='received'`).first();
+  const last = (await sql(env, 'SELECT count FROM limits WHERE key=?', 'notify:received').first())?.count ?? 0;
+  if (n > last) {
+    const sentence = `${n} submission(s) waiting for review`;
+    try { await env.NOTIFY_EMAIL.send({to: env.NOTIFY_TO, from: 'notifications@' + new URL(env.SITE_ORIGIN).hostname, subject: sentence, text: sentence + '\n' + env.ADMIN_ORIGIN}); } catch { return; }
+  }
+  await sql(env, 'INSERT INTO limits(key,count,expires) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET count=excluded.count,expires=excluded.expires', 'notify:received', n, now() + 30 * DAY).run();
+}
+export default {fetch: handle, scheduled: (_event, env, ctx) => { ctx.waitUntil(cleanup(env)); ctx.waitUntil(notify(env).catch(() => {})); }};

@@ -12,6 +12,7 @@
     "INTAKE_ENABLED": "false",
     "SITE_ORIGIN": "https://legacyofgokuhub.com",
     "API_ORIGIN": "https://intake.legacyofgokuhub.com",
+    "ADMIN_ORIGIN": "https://admin.legacyofgokuhub.com",
     "MAX_PENDING": "300"
   },
   "d1_databases": [

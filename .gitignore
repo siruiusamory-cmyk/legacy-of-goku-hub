@@ -26,3 +26,4 @@ ratings/.dev.vars
 ratings/.wrangler/
 admin/.dev.vars
 admin/.wrangler/
+intake/wrangler.private.jsonc

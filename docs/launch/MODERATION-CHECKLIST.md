@@ -1,5 +1,7 @@
 # Maintainer moderation checklist
 
+**Superseded by the dashboard, see the [owner runbook](../OWNER-RUNBOOK.md).** This checklist stays as the developer reference for the GitHub manifest and Issue Form route.
+
 Use [the maintained policy contract](../moderation.md). LOG-HUB-007 exercised both intake routes locally at main `8157622a08e71364dda986277dd27336ed27f91a`: 26 passing checks, real private-review CLI/Sharp/catalog/static output and local signatures; GitHub permissions and human decisions were simulated. No real listing is approved by that test.
 
 1. Read the submission and metadata/hash-only `validation-report`. Check stable repository/owner IDs and actual team authority. First content always requires explicit review, even for trusted owners. Never open an untrusted project executable. Do not post images in public issue comments or upload review directories.

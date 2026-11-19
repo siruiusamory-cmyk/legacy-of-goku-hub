@@ -46,6 +46,8 @@ In separate terminals build the actual verified three-resource signed export wit
 
 ## Fraud exclusion and appeal
 
+The dashboard's Ratings tab handles the group case and its undo: it stops counting one score on one project from browsers that rated nothing else, for groups of 5 or more, and that also stops counting genuine one-time ratings of that score. Excluding one chosen browser remains the manual exceptional procedure below.
+
 A maintainer with restricted D1 access investigates private database rows and evidence; public content reports alone grant no exclusion authority. Record a concise reason without personal data. Do not expose hashes as public identities. In a reviewed incident, insert the exact credential_hash and reason into excluded_credentials with one parameterized statement. The v3 trigger atomically excludes all its existing votes in the same database operation. Future upserts consult the exclusion table atomically, so deleting/recreating the vote does not clear exclusion. For a successful appeal, delete the exact exclusion row; the v3 trigger atomically restores eligibility for its remaining votes. Recheck totals against `SELECT project_id, SUM(score), COUNT(*) FROM votes WHERE excluded=0 GROUP BY project_id`. Anonymous identity rotation remains possible; do not claim a human ban. Never create a public admin endpoint or accept a caller-selected hash as voting authority.
 
 ## Private export and recovery

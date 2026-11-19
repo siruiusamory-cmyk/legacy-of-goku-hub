@@ -37,7 +37,7 @@ function start(root) {
     root.querySelector('#status-message').textContent = data.message;
     const note = root.querySelector('#status-note');
     note.hidden = !data.note;
-    note.textContent = data.note ? 'Message from the moderators: ' + data.note : '';
+    note.textContent = data.note ? (data.answered ? 'You replied. Our earlier message: ' : 'Message from the moderators: ') + data.note : '';
     root.querySelector('#status-updated').textContent = 'Last updated ' + new Date(data.updated_at).toLocaleString();
     const link = root.querySelector('#status-link');
     link.hidden = data.status !== 'published' || !data.project_id;

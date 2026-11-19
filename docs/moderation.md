@@ -16,6 +16,8 @@ Gaps closed: trust previously allowed first publication; same URL previously reu
 
 ## Review privately on Windows
 
+**Superseded by the dashboard, see the [owner runbook](OWNER-RUNBOOK.md).** This procedure stays as the developer reference for the GitHub manifest and Issue Form route.
+
 1. Open the normal manifest or guided Issue Form. Automatic synchronization gives field errors and metadata/hash-only review notices in `validation-report`. It does not upload candidate artwork. Both methods use the same validation pipeline.
 2. On a trusted maintainer computer, with Node24 and existing dependencies installed:
 

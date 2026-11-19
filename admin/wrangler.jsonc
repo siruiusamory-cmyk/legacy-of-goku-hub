@@ -13,5 +13,5 @@
     "SITE_ORIGIN": "https://legacyofgokuhub.com",
     "SOURCE_REPO": "siruiusamory-cmyk/legacy-of-goku-hub"
   },
-  "d1_databases": [{"binding": "DB", "database_name": "loghub-intake", "database_id": "7f30d601-b245-4384-95de-792b0b5ed48f", "migrations_dir": "../intake/migrations"}]
+  "d1_databases": [{"binding": "DB", "database_name": "loghub-intake", "database_id": "7f30d601-b245-4384-95de-792b0b5ed48f", "migrations_dir": "../intake/migrations"}, {"binding": "RATINGS_DB", "database_name": "loghub-ratings", "database_id": "a90fe4fa-dc7f-4b9a-8d26-51c2e968f72c"}]
 }

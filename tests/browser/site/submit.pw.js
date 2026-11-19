@@ -197,6 +197,75 @@ test('mobile layout has no horizontal scroll and stays accessible', async ({page
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 });
 
+for (const width of [1280, 390]) {
+  test(`at ${width} px the review shows readable choices and the receipt explains where replies appear`, async ({page, context}) => {
+    await mock(context, {'/submissions': body => ({status: 201, body: {receipt: RECEIPT, status: 'received', message: 'We have your submission.', ...(body.kind === 'claim' ? {challenge: 'loghub-claim-' + 'a'.repeat(24)} : {})}})});
+    await page.setViewportSize({width, height: 900});
+    await page.goto('/submit/');
+    await expect(page.locator('label[for="f-artwork"]')).toHaveText('Links to images (optional)');
+    await expect(page.locator('#h-artwork')).toHaveText(/^We cannot accept uploads\. Paste direct links to PNG, JPG or WebP images, for example from the project page\./);
+    const summary = page.locator('#more > summary');
+    const marker = () => summary.evaluate(el => getComputedStyle(el, '::before').content);
+    const closed = await marker();
+    expect(closed).toContain('▸');
+    await summary.click();
+    const opened = await marker();
+    expect(opened).toContain('▾');
+    expect(opened).not.toEqual(closed);
+    await fillSuggestion(page);
+    await page.getByLabel('Base game').selectOption('legacy-of-goku-2');
+    await page.getByLabel('Status', {exact: true}).selectOption('in-development');
+    await page.getByRole('button', {name: /Review your submission/}).click();
+    const list = page.locator('#review-list');
+    await expect(list.locator('div', {has: page.locator('dt', {hasText: 'Type'})}).locator('dd')).toHaveText('ROM hack');
+    await expect(list.locator('div', {has: page.locator('dt', {hasText: 'Base game'})}).locator('dd')).toHaveText('Legacy of Goku II');
+    await expect(list.locator('div', {has: page.locator('dt', {hasText: 'Status'})}).locator('dd')).toHaveText('In development');
+    await expect(list).not.toContainText('rom-hack');
+    await expect(list).not.toContainText('legacy-of-goku-2');
+    await expect(list).not.toContainText('in-development');
+    expect((await axe(page)).violations).toEqual([]);
+    await page.getByRole('button', {name: 'Verify human'}).click();
+    await page.getByRole('button', {name: 'Send submission'}).click();
+    const hint = page.locator('#receipt > p.hint').first();
+    await expect(hint).toContainText('We keep no email');
+    await expect(hint).toContainText('appears on the status page');
+    await expect(hint).toContainText('this receipt is the only way to see it');
+    expect((await axe(page)).violations).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    await page.goto('/projects/ext-forumhack001/');
+    await page.getByRole('link', {name: 'This is my project'}).click();
+    await page.getByLabel('How are you connected', {exact: false}).fill('I created this hack and run its forum thread.');
+    await page.getByRole('button', {name: /Review your submission/}).click();
+    await page.getByRole('button', {name: 'Verify human'}).click();
+    await page.getByRole('button', {name: 'Send submission'}).click();
+    await expect(page.locator('#claim-steps p.hint')).toHaveText(/Their answer will appear on the status page\.$/);
+  });
+
+  test(`at ${width} px the status page says replies appear there and relabels an answered request`, async ({page, context}) => {
+    let answered = false;
+    await mock(context, {'/status': () => ({body: {status: answered ? 'received' : 'needs-changes', kind: 'suggest', message: answered ? 'We have your reply. A person will read it. Check this page again for our answer.' : 'We need a little more information before we can continue.', note: 'Please add the creator name.', updated_at: '2026-11-01T00:00:00.000Z', ...(answered ? {answered: true} : {})}}), '/revise': () => { answered = true; return {body: {status: 'received', message: 'ok'}}; }});
+    await page.setViewportSize({width, height: 900});
+    await page.goto('/submit/status/');
+    await expect(page.locator('.submit-heading p')).toContainText('Replies from the moderators appear on this page.');
+    await page.getByLabel('Receipt', {exact: false}).fill(RECEIPT);
+    await page.getByRole('button', {name: 'Check status'}).click();
+    await expect(page.locator('#status-note')).toHaveText('Message from the moderators: Please add the creator name.');
+    const summary = page.locator('#revise-form .more > summary');
+    const closed = await summary.evaluate(el => getComputedStyle(el, '::before').content);
+    expect(closed).toContain('▸');
+    await summary.click();
+    expect(await summary.evaluate(el => getComputedStyle(el, '::before').content)).toContain('▾');
+    expect((await axe(page)).violations).toEqual([]);
+    await page.getByLabel('Your reply').fill('The creator is Sir Hacker.');
+    await page.getByRole('button', {name: 'Send changes'}).click();
+    await expect(page.locator('#status-note')).toHaveText('You replied. Our earlier message: Please add the creator name.');
+    await expect(page.locator('#status-message')).toHaveText('We have your reply. A person will read it. Check this page again for our answer.');
+    await expect(page.locator('#revise-form')).toBeHidden();
+    expect((await axe(page)).violations).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  });
+}
+
 test('keyboard users can choose an action, fill the form and reach review', async ({page, context}) => {
   await mock(context);
   await page.goto('/submit/');

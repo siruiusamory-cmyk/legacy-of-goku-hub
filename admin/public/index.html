@@ -30,18 +30,27 @@
       <button id="catalog" type="button">Existing listings</button>
       <button id="reviews" type="button">Publication reviews</button>
       <button id="sessions" type="button">Sessions</button>
+      <button id="ratings" type="button">Ratings</button>
     </nav>
+    <div class="summary-strip" role="group" aria-label="Work waiting for you">
+      <button id="count-new" type="button"><span class="glyph" aria-hidden="true">+</span> <span class="label">New submissions</span> <span class="count">0</span></button>
+      <button id="count-waiting" type="button"><span class="glyph" aria-hidden="true">…</span> <span class="label">Waiting on the visitor</span> <span class="count">0</span></button>
+      <button id="count-ready" type="button"><span class="glyph" aria-hidden="true">✓</span> <span class="label">Ready for review</span> <span class="count">0</span></button>
+      <button id="count-publishing" type="button"><span class="glyph" aria-hidden="true">↑</span> <span class="label">Publishing</span> <span class="count">0</span></button>
+      <button id="count-attention" type="button"><span class="glyph" aria-hidden="true">!</span> <span class="label">Needs attention</span> <span class="count">0</span></button>
+    </div>
 
     <section id="queue" class="workspace-panel" aria-labelledby="queue-title">
       <div class="section-intro">
-        <div><span class="eyebrow">Step 1 · Triage</span><h2 id="queue-title">Submission inbox</h2>
+        <div><span class="eyebrow">Step 1 · Triage</span><h2 id="queue-title" tabindex="-1">Submission inbox</h2>
         <p>Open a submission, check the information, then prepare it for approval.</p></div>
         <p id="queue-count" class="section-stat" aria-live="polite"></p>
       </div>
       <form id="filters" class="filter-bar">
-        <label>Find a submission<input id="search" type="search" maxlength="100" placeholder="Name, project or receipt"></label>
+        <label>Find a submission<input id="search" type="search" maxlength="100" placeholder="Name or project"></label>
         <label>Status<select id="state">
-          <option value="">All statuses</option><option value="received">New submissions</option>
+          <option value="open" selected>Needs action</option><option value="new">New and under review</option>
+          <option value="">All statuses</option><option value="received">New only</option>
           <option value="in-review">Under review</option><option value="needs-changes">Awaiting corrections</option>
           <option value="approved">Approved</option><option value="published">Published</option>
           <option value="rejected">Rejected</option>
@@ -109,31 +118,32 @@
       <div id="submission-actions" class="action-panel">
         <h3>Submission decision</h3>
         <p>Record its review status or request corrections. This does not publish the project.</p>
+        <label>Message to the submitter (shown on their receipt)<textarea id="public-note" maxlength="500" rows="3"></textarea></label>
         <div class="action-row"><button id="start" type="button">Start review</button><button id="corrections" type="button">Request corrections</button><button id="reject" type="button" class="button-danger">Reject submission</button></div>
       </div>
 
       <details class="disclosure" id="moderation-notes">
-        <summary>Notes for the submitter and moderators</summary>
+        <summary>Private note for moderators</summary>
         <div class="disclosure-body">
-          <label>Public receipt note<textarea id="public-note" maxlength="500" rows="3"></textarea></label>
           <label>Private moderation note<textarea id="private-note" maxlength="1000" rows="3"></textarea></label>
-          <p class="muted">The public note appears on the submission receipt. The private note stays inside moderation.</p>
+          <p class="muted">The private note stays inside moderation.</p>
         </div>
       </details>
 
       <details class="disclosure" id="policy-evidence">
-        <summary>Ownership verification and policy reasons</summary>
+        <summary>Ownership verification and reasons</summary>
         <div class="disclosure-body">
-          <label>Public policy reason / private claim-verification evidence<textarea id="reason" maxlength="1000" rows="3"></textarea></label>
-          <p class="muted">Suspension and restoration reasons enter the public policy. Claim-verification evidence stays private. For a project-owned website, prefix the reason with “page-token:” to verify its receipt challenge automatically; shared pages require documented manual verification.</p>
+          <label>Public reason / private claim-verification evidence<textarea id="reason" maxlength="1000" rows="3"></textarea></label>
+          <p class="muted">Suspension and restoration reasons are published with the listing's status. Claim-verification evidence stays private. For a project-owned website, prefix the reason with “page-token:” to verify its receipt challenge automatically; shared pages require documented manual verification.</p>
           <label class="inline-check"><input id="transfer" type="checkbox"> I separately verified an ownership transfer</label>
         </div>
       </details>
 
-      <div class="action-panel prepare-panel">
+      <div id="prepare-panel" class="action-panel prepare-panel">
         <h3>Next: prepare a publication review</h3>
-        <p>This builds a private preview. Nothing is approved or published until you review the exact package.</p>
-        <div class="action-row"><button id="prepare" type="button" class="button-primary">Prepare private review</button>
+        <p>This builds a private preview. Nothing is approved or published until you review the preview.</p>
+        <div class="action-row"><button id="prepare" type="button" class="button-primary">Prepare preview</button>
+          <label id="feature-choice" class="inline-check" hidden><input id="also-feature" type="checkbox"> Also make this the Featured project</label>
           <span id="listing-actions" hidden><button id="feature" type="button" hidden>Feature</button> <button id="unfeature" type="button" hidden>Remove from Featured</button>
           <button id="suspend" type="button">Suspend listing</button> <button id="delist" type="button" class="button-danger">Delist listing</button> <button id="restore" type="button">Restore listing</button></span>
         </div>
@@ -157,6 +167,11 @@
       <div class="section-intro"><div><span class="eyebrow">Account security</span><h2 id="session-title">Active administrator sessions</h2>
         <p>Revoke a dashboard session when access should end. Permanent authorization changes are managed through both allowlists.</p></div></div>
       <div id="session-list" class="card-list"></div>
+    </section>
+
+    <section id="ratings-panel" class="workspace-panel" hidden aria-labelledby="ratings-title">
+      <h2 id="ratings-title" tabindex="-1">Ratings</h2>
+      <div id="ratings-body"></div>
     </section>
   </main>
 
