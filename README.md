@@ -61,6 +61,7 @@ The administrator Worker stays disabled in the committed default configuration; 
 For those contributing to or operating the Hub:
 
 - [Owner runbook](docs/OWNER-RUNBOOK.md): running the Hub day to day from the administrator dashboard
+- [Operational handoff](docs/HANDOFF.md) and [production acceptance report](docs/reviews/log-hub-027/REPORT.md)
 - [Contributing to the Hub](CONTRIBUTING.md)
 - [Documentation index](docs/README.md)
 - [Changelog](CHANGELOG.md)
