@@ -32,28 +32,24 @@ Each of these is rare and is written out in the last section of the runbook:
 
 ## Maintenance
 
-- **Deploying.** The public site deploys itself. The submission service and the dashboard are deployed by hand after a merged change touches them. The commands, the check that the deploy worked and the way back are in "Deploying an approved change" in the runbook.
+- **Deploying.** The public site deploys itself. The submission service, the dashboard and the ratings service are deployed by hand after a merged change touches them. The commands, the check that the deploy worked and the way back are in "Deploying an approved change" in the runbook.
 - **The one private file.** Your notification address is kept out of the public repository, in `%LOCALAPPDATA%\loghub-private\intake\wrangler.private.jsonc`. It does not live in any working folder, so deleting old working folders is safe. If it is lost, the runbook says how to write it again; your address is its only private part.
 - **Secrets.** The services' secrets are stored in Cloudflare and survive every deploy. Nothing needs to be re-entered.
-- **Protections that must stay as they are.** The `main` branch requires the `test` check, an up-to-date branch and linear history, for administrators too. Publication branches (`admin/**`) cannot be changed once created. Automatic merge is on through the Actions variable `ADMIN_AUTO_MERGE_ENABLED`.
+- **Protections that must stay as they are.** The `main` branch requires the `test` check, an up-to-date branch and linear history, for administrators too. Publication branches (`admin/**`) cannot be changed once created. Automatic merge is on through the Actions variable `ADMIN_AUTO_MERGE_ENABLED`. A publication merges as soon as `test` passes; the `browser` check also runs on it but is not required, and that is deliberate: it tests the site against sample listings, so it says nothing about a real one.
+- **Credentials that expire.** Two of them lapse on 2026-12-16 and publishing stops when they do. The dates and how to renew each are in "Credentials that expire" in the runbook.
 
 ## Outstanding verification
 
-Two things could not be seen because no genuine event had happened yet. Neither blocks daily use.
+One thing has still not been seen in production. It does not block daily use.
 
-### The first automatic publication
+### Automatic publication
 
-The next time you approve a real change, watch it once:
+Seen on 2026-11-19: nineteen listings were approved in the dashboard, and each was merged, published and confirmed live without a click (pull requests #72 to #90). After approval the panel moves through Approved, Publishing, Waiting for checks, Deploying and Published; expect about five minutes for each listing, one at a time.
 
-1. Approve the preview and leave the page open.
-2. The panel should move through Approved, Publishing, Waiting for checks, Deploying and Published without any click from you. Expect several minutes.
-3. Open the link shown at Published and confirm the change is on the site.
-4. The submission should read Published in the inbox.
-
-If it stops, the panel says why and offers a button; the matching row is in "When something fails" in the runbook. The one outcome that needs GitHub is "Automatic merge was not turned on": merge that pull request by hand once, and note it, because it means the publisher is not allowed to turn automatic merge on and an operator should look.
+If one stops, the panel says why and offers a button; the matching row is in "When something fails" in the runbook. The one outcome that needs GitHub is "Automatic merge was not turned on": merge that pull request by hand once, and note it, because it means the publisher is not allowed to turn automatic merge on and an operator should look.
 
 ### Renewal of an expired session
 
-A dashboard session lasts 30 minutes. When it runs out while the page is open, your next action should carry on without a sign-in screen. If a **Sign in** button appears, press it; that is the fallback working as intended.
+A dashboard session lasts 30 minutes. When it runs out while the page is open, your next action should carry on without a sign-in screen. If a **Sign in** button appears, press it; that is the fallback working as intended. The fallback was seen once, on 2026-11-19. Carrying on without a sign-in screen has not been seen yet.
 
 Details and evidence for everything above are in the [production acceptance report](reviews/log-hub-027/REPORT.md).
