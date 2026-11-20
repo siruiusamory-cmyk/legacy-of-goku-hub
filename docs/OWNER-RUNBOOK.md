@@ -268,8 +268,8 @@ When: before the earliest date below. Publishing from the dashboard stops when e
 
 | Credential | Used by | Expires (UTC) | To renew |
 | --- | --- | --- | --- |
-| GitHub token `GH_DISPATCH_TOKEN` | The dashboard, to start and follow publications | 2026-12-16 08:00 | GitHub, Settings, Developer settings, Fine-grained tokens: regenerate it, then `npx wrangler secret put GH_DISPATCH_TOKEN --config admin/wrangler.production.jsonc` |
-| Access service token `loghub-admin-private-processor` | The publication workflow, to reach the dashboard (`ADMIN_ACCESS_CLIENT_ID` and `ADMIN_ACCESS_CLIENT_SECRET` in the `admin-processing` environment) | 2026-12-16 16:50 | Cloudflare Zero Trust, Access, Service auth: **Refresh** extends it and keeps the same secret |
+| GitHub token `GH_DISPATCH_TOKEN` | The dashboard, to start and follow publications | 2026-12-16 08:00 | GitHub, Settings, Developer settings, Fine-grained tokens: regenerate it, or create a new one with the permissions listed in [the administrator service notes](launch/ADMIN.md); an expired token cannot be restored. Then `npx wrangler secret put GH_DISPATCH_TOKEN --config admin/wrangler.production.jsonc` |
+| Access service token `loghub-admin-private-processor` | The publication workflow, to reach the dashboard (`ADMIN_ACCESS_CLIENT_ID` and `ADMIN_ACCESS_CLIENT_SECRET` in the `admin-processing` environment) | 2026-12-16 16:50 | Cloudflare Zero Trust, service tokens: **Refresh** sets the expiry to 30 days from that moment and keeps the same ID and secret, so nothing has to be re-entered. To renew less often, edit the token and choose a longer duration |
 | Access service token `loghub-admin-isolated-private-processor` | Nothing since the isolated acceptance test on 2026-11-16 | 2026-12-16 17:03 | Let it lapse |
 | Cloudflare token `CLOUDFLARE_API_TOKEN` | The site deploy (`cloudflare-pages` environment), set 2026-11-16 | Not recorded | Read the date in Cloudflare under My Profile, API Tokens, and write it here |
 
