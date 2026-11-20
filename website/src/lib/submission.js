@@ -14,8 +14,14 @@ function address(value, errors, field, {required = false, image = false} = {}) {
   const text = clean(value).replace(/#.*$/, '');
   if (!text) { if (required) errors[field] = 'Add a web address that starts with https://'; return ''; }
   const url = parseHttps(text);
-  if (!url) { errors[field] = 'Use a public web address that starts with https:// and has no password or port.'; return ''; }
-  if (GAME_FILE.test(url.pathname)) { errors[field] = 'Link to a page about the project, not to a game file.'; return ''; }
+  if (!url) {
+    errors[field] = text.length > 500 ? 'This address is too long. Remove the part after the ? and try again.'
+      : /^http:\/\//i.test(text) ? 'Use the https:// version of this address.'
+      : !/^https:\/\//i.test(text) ? 'Enter a web address, such as https://example.org/my-hack'
+      : 'Use a public web address without a password or port, such as https://example.org/my-hack';
+    return '';
+  }
+  if (GAME_FILE.test(url.pathname) || GAME_FILE.test(url.hostname)) { errors[field] = 'Link to a page about the project, not to a game file.'; return ''; }
   if (image && !IMAGE_FILE.test(url.pathname)) { errors[field] = 'Use a direct link to a PNG, JPG or WebP image.'; return ''; }
   return text;
 }
@@ -71,6 +77,7 @@ export function validateSubmission(input) {
   const artwork = (Array.isArray(data.artwork) ? data.artwork : []).slice(0, 4);
   const art = [];
   artwork.forEach((item, i) => { const url = address(item, errors, `artwork.${i}`, {image: true}); if (url) art.push(url); });
+  if (Array.isArray(data.artwork) && data.artwork.length > 4) errors['artwork.4'] = 'Use up to four image links. Remove the extra lines.';
   if (art.length) value.artwork = art;
   const note = clean(data.note);
   if (note) { value.note = note; length(note, errors, 'note', 1, 500, 'The note'); }
@@ -78,6 +85,17 @@ export function validateSubmission(input) {
   if (kind === 'claim' && !note) errors.note = 'Tell us how you are connected to this project.';
   if (kind === 'suggest') value.relation = 'third-party';
   return {ok: !Object.keys(errors).length, errors, value};
+}
+
+export function tidyAddress(value) {
+  const text = String(value ?? '').trim();
+  if (/^http:\/\//i.test(text)) return 'https://' + text.slice(7);
+  if (text && !/^[a-z][a-z0-9+.-]*:/i.test(text) && /^[^\s/]+\.[^\s/.]+(\/|$)/.test(text)) return 'https://' + text;
+  return text;
+}
+export function tidyImage(value) {
+  const blob = tidyAddress(value).match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/(?:blob|raw)\/(.+)$/i);
+  return blob ? `https://raw.githubusercontent.com/${blob[1]}/${blob[2]}/${blob[3]}` : tidyAddress(value);
 }
 
 export function submissionKey(value) { return value.url ? urlKey(value.url) : null; }

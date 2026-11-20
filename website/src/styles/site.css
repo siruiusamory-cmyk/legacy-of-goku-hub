@@ -316,6 +316,10 @@ dt {flex-shrink: 0; color: var(--ice); font-size: 1.05rem; text-transform: upper
 dd {min-width: 0; margin: 0; text-align: right; font-size: .92rem; overflow-wrap: anywhere;}
 dd a {color: var(--gold); text-decoration: underline;}
 .detail-feedback {margin-top: 10px; font-size: .85rem;}
+.listing-actions {display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px;}
+.listing-actions .button {flex: 1 1 auto; font-size: 1.05rem; text-decoration: none;}
+.empty-directory .not-listed {margin: 18px auto 0;}
+.not-listed a {color: var(--gold); text-decoration: underline;}
 .approved-links ul {margin: 0; padding: 0; list-style: none;}
 .approved-links li+li {border-top: 2px dotted var(--line);}
 .approved-links a {display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; overflow-wrap: anywhere;}
@@ -353,7 +357,7 @@ dd a {color: var(--gold); text-decoration: underline;}
   .category-tabs a:nth-child(n+4) {grid-column: span 3;}
   .category-tabs a:nth-child(4) {border-left-width: 2px;}
   .mobile-nav {display: block; position: relative; margin-inline: calc(-1 * var(--gutter));}
-  .mobile-nav summary {display: flex; align-items: center; justify-content: center; min-height: 44px; list-style: none; background: var(--navy-panel); border-top: 2px solid var(--line); font-size: 1.25rem; text-transform: uppercase;}
+  .mobile-nav summary {display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; list-style: none; background: var(--navy-panel); border-top: 2px solid var(--line); font-size: 1.25rem; text-transform: uppercase;}
   .mobile-nav summary::-webkit-details-marker {display: none;}
   .mobile-nav[open] summary {background: var(--gold); color: var(--ink);}
   .mobile-nav summary:focus-visible {outline-offset: -5px;}

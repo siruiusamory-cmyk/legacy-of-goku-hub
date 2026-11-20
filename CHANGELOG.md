@@ -6,6 +6,13 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Added
 
+- The submission form shows three steps (Details, Check, Sent) and keeps what you typed if the page reloads or you come back in the same tab. **Start over** clears it.
+- Correcting a listing shows the listing as it is now, next to the fields. Fill in only what should change; anything left alone is not sent.
+- The receipt can be saved as a file, and the **Check status** link opens the status directly. The footer and the submission page link to **Check a submission**.
+- **Preview images** shows each picture link before you send, and says which ones could not load.
+- A project already in the directory is pointed out as soon as its address is typed, with buttons to correct or claim that listing instead.
+- When nothing matches a search or filter, the directory offers **Suggest it**.
+
 - An RSS feed at `/rss.xml` announces new listings. A feed reader shows each listing once; a later edit moves it up the feed without announcing it again. A sitemap at `/sitemap.xml` and a `robots.txt` that points to it help search engines find every project page.
 - The repository has a license: the code is released under the MIT License. The site's commissioned artwork and the artwork and descriptions of listed projects are not covered.
 - A guide at `/how-to-patch/` explains how to apply a ROM hack or translation patch to your own copy of the game. The footer links to it, and ROM hack and translation pages link to it under their buttons.
@@ -16,6 +23,21 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 - **Translation** is a project type of its own. Submitters and the owner can choose it, listings show it as a badge, and the directory offers it as a filter once a translation is published.
 
 ### Changed
+
+- The main menu is Projects, Submit and Discord. The Discord tab shows its name next to the logo. The GitHub tab, the footer's "Contribute on GitHub" link and the "GitHub route" notes on the submission pages are gone: the site no longer links to its own repository. Links to the repositories of listed projects are unchanged.
+- Every Submit, Correct and Claim link opens the site's own form. If submissions are switched off, the form says so and points to Discord for corrections and removals, instead of sending visitors to GitHub.
+- The Submit tab is the highlighted tab on the submission pages.
+- With JavaScript turned off, both submission pages say that it is needed, and the status page can no longer put a receipt in the address bar.
+- A file name such as `hack.gba` typed as an address is refused with a message to link a page instead.
+- The submission form starts on **Suggest a project** and asks for the address first, then the name, type, game, status, creator, description and images. Download and community links are the only folded section.
+- An address typed without `https://` is completed, an `http://` address is switched to `https://`, and a GitHub picture page link is turned into a direct picture link. A rejected address says what is wrong with it.
+- Errors are listed in the order of the form, name the numbered link or line they refer to, and clear as soon as the field is fixed. Required fields are announced as required by screen readers.
+- **Send submission** stays unavailable until the human check is done, and a second click cannot send twice. Messages for a busy service, a closed form, a missing listing and a project that is already listed say what to do next.
+- Answers typed under one action are not sent with another.
+- On phones the four actions fit on two rows, and the menu button reads "Menu".
+- Project pages show **Correct this listing** and **Claim this listing** as buttons.
+- The status page checks a receipt opened from its link straight away, removes a saved receipt that is no longer stored and says why, and puts the cursor on the field that needs fixing.
+- The owner runbook opens with a table of dates to act on: the ratings export to delete by 26 November 2026 and the two credentials that expire on 16 December 2026.
 
 - Choosing a game in the directory also shows projects listed for multiple games. The status filter offers only statuses that have a listing, and sorting by release date is offered only when at least two listings have a release.
 - On fan project, tool and resource pages the button to an outside download page reads "Download Page" instead of "Patch Page".

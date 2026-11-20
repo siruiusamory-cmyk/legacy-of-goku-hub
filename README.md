@@ -37,7 +37,9 @@ AI-assisted projects are welcome. Low-effort projects made mostly by AI are not 
 
 A moderator reviews submissions before anything is added or changed. Suggesting a project does not give you ownership or editing rights over its listing. Claims of project control require verification.
 
-Keep the receipt provided after submitting; it lets you [check your submission's status](https://legacyofgokuhub.com/submit/status/).
+Keep the receipt provided after submitting; it lets you [check your submission's status](https://legacyofgokuhub.com/submit/status/). You can save it as a file from the confirmation step.
+
+The form keeps what you typed if the page reloads, completes an address typed without `https://`, and shows a listing's current details when you correct it.
 
 Prefer GitHub? [Repository-based submission options](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/issues/new/choose) are also available.
 

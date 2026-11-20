@@ -10,10 +10,8 @@ export const href = relative => base + relative;
 export const names = {'legacy-of-goku': 'LoG 1', 'legacy-of-goku-2': 'LoG II', 'buus-fury': "Buu’s Fury", multiple: 'LoG series', 'rom-hack': 'ROM Hack', translation: 'Translation', 'fan-project': 'Fan Project', tool: 'Tools', resource: 'Resource', released: 'Released', 'in-development': 'In Development', 'on-hold': 'On Hold', discontinued: 'Discontinued'};
 export const fullGame = {'legacy-of-goku': 'Legacy of Goku', 'legacy-of-goku-2': 'Legacy of Goku II', 'buus-fury': "Buu’s Fury", multiple: 'Multiple games'};
 export const projectURL = project => href('projects/' + project.id + '/');
-export const submitURL = import.meta.env.PUBLIC_INTAKE_ENABLED === 'true' ? href('submit/') : 'https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/issues/new/choose';
+export const submitURL = href('submit/');
 export const statusURL = href('submit/status/');
-export const advancedSubmitURL = 'https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/issues/new/choose';
-export const sourceURL = 'https://github.com/siruiusamory-cmyk/legacy-of-goku-hub';
 export const rating = project => provenance.purpose === 'fixture' && project.id !== 'fixture-1' ? {average: [6, 5.6, 6.2, 5.8, 6.1, 5.3, 6.4][catalog.projects.indexOf(project)] ?? 6, count: 412} : {};
 export const formatDate = value => new Intl.DateTimeFormat('en-US', {month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC'}).format(new Date(value));
 export const formatSize = size => size < 1048576 ? `${(size / 1024).toFixed(1)} KB` : `${(size / 1048576).toFixed(1)} MB`;
@@ -30,7 +28,8 @@ export const intakeAPI = import.meta.env.PUBLIC_INTAKE_ENABLED === 'true' ? impo
 export const turnstileKey = intakeAPI ? import.meta.env.PUBLIC_TURNSTILE_SITE_KEY : '';
 if (import.meta.env.PUBLIC_INTAKE_ENABLED === 'true' && (!intakeAPI || !turnstileKey)) throw Error('Enabled submissions require an API origin and a human-check site key');
 if (intakeAPI && !/^https:\/\/[a-z0-9.-]+$/.test(intakeAPI) && !/^http:\/\/127\.0\.0\.1:[0-9]+$/.test(intakeAPI)) throw Error('Submissions require an explicit API origin');
-export const listingIndex = catalog.projects.map(p => ({id: p.id, title: p.title, keys: projectKeys(p), url: projectURL(p)})).sort((a, b) => a.title.localeCompare(b.title));
+// shortcut: every description rides in the submit page; fetch catalog.json on demand instead past about 150 listings.
+export const listingIndex = catalog.projects.map(p => ({id: p.id, title: p.title, keys: projectKeys(p), url: projectURL(p), now: {url: p.repository || p.source?.url || '', category: p.category, game: p.game, status: p.status, creator: p.developer, description: p.description}})).sort((a, b) => a.title.localeCompare(b.title));
 export const projectActions = project => {
   const list = [];
   const available = project.availability === 'available';
@@ -50,6 +49,5 @@ export const projectActions = project => {
 };
 export const hostingLabels = {github: 'GitHub', git: 'Git repository', website: 'Project website', forum: 'Community forum', platform: 'Hacking site', none: 'No public page'};
 export const claimLabel = project => project.repository && !project.source ? 'Repository listing; team representation not verified' : {'repository-controlled': 'Maintained through its repository; team representation not verified', 'verified-claim': 'Creator claim verified by a moderator', unclaimed: 'Community listing; not yet claimed by its creator'}[project.ownership?.claim] || 'Community listing';
-const advancedGuidedURL = 'https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/issues/new?template=submit.yml&title=';
-export const correctionURL = project => intakeAPI ? submitURL + '?action=correct&listing=' + encodeURIComponent(project.id) : advancedGuidedURL + encodeURIComponent('[Submission] Correction: ' + project.title);
-export const claimURL = project => intakeAPI ? submitURL + '?action=claim&listing=' + encodeURIComponent(project.id) : advancedGuidedURL + encodeURIComponent('[Claim] ' + project.title);
+export const correctionURL = project => submitURL + '?action=correct&listing=' + encodeURIComponent(project.id);
+export const claimURL = project => submitURL + '?action=claim&listing=' + encodeURIComponent(project.id);

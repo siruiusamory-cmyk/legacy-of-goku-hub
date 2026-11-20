@@ -10,7 +10,7 @@ Anyone can suggest, add, correct or claim a project at [the public submission fo
 - Listings with hub-assigned IDs `ext-` plus 12 characters for projects with no GitHub repository. Existing `gh-<repoId>` IDs and ratings are unchanged.
 - Source-aware labels: View Repository (Git hosts), Visit Project (everything else), Download Patch (only a moderator-approved HTTPS distribution). The hub never hosts ROMs.
 - Duplicate detection by normalized address across hosts, suggesters and host moves.
-- GitHub Issue Forms and `.loghub.json` manifests remain as advanced routes. Hosted manifests also work on gitlab.com and codeberg.org.
+- GitHub Issue Forms and `.loghub.json` manifests remain in the repository as advanced routes. The website does not link to them. Hosted manifests also work on gitlab.com and codeberg.org.
 
 ## Private intake service
 
@@ -21,7 +21,7 @@ Activation (owner decision, not done by this change):
 1. `wrangler d1 create loghub-intake`, put the id in `intake/wrangler.jsonc`, then `wrangler d1 migrations apply loghub-intake --remote`.
 2. Make a moderator token with `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"` and keep it private. Secrets: `TURNSTILE_SECRET`, `RATE_SALT`, and `ADMIN_HASH`, the base64url SHA-256 of that token: `node -e "console.log(require('crypto').createHash('sha256').update(process.argv[1]).digest('base64url'))" TOKEN`. Automatic claim proof works only for project-owned websites; forum, platform and Git claims are verified manually.
 3. Deploy the Worker, set `INTAKE_ENABLED` to `"true"`.
-4. For the protected production website build, set repository variables `INTAKE_API_ORIGIN=<worker origin>` and `TURNSTILE_SITE_KEY=<public site key>`. After the Worker has passed live checks, set `INTAKE_ENABLED=true` and dispatch `catalog.yml` on protected `main`. The workflow maps these to Astro's `PUBLIC_INTAKE_API`, `PUBLIC_TURNSTILE_SITE_KEY` and `PUBLIC_INTAKE_ENABLED` settings. Until then, leave `INTAKE_ENABLED` absent/false; the site's primary Submit link continues to use the working GitHub route.
+4. For the protected production website build, set repository variables `INTAKE_API_ORIGIN=<worker origin>` and `TURNSTILE_SITE_KEY=<public site key>`. After the Worker has passed live checks, set `INTAKE_ENABLED=true` and dispatch `catalog.yml` on protected `main`. The workflow maps these to Astro's `PUBLIC_INTAKE_API`, `PUBLIC_TURNSTILE_SITE_KEY` and `PUBLIC_INTAKE_ENABLED` settings. Until then, leave `INTAKE_ENABLED` absent/false; the Submit page stays up, says submissions are not open yet, and sends nothing.
 
 ## Moderator workflow
 
@@ -49,7 +49,7 @@ Approval is always a human, signed-pipeline step: an unapproved or changed conte
 
 - Worker `loghub-intake` at https://loghub-intake.siruiusamory.workers.dev, D1 `loghub-intake` (`7f30d601-b245-4384-95de-792b0b5ed48f`, WNAM), Turnstile widget `loghub-submissions` for `loghub.pages.dev`.
 - The committed `INTAKE_ENABLED` stays `"false"`. The live gate was turned on at deploy time: `wrangler deploy --config intake/wrangler.jsonc --var INTAKE_ENABLED:true`. Redeploy with the same flag or the gate closes.
-- Repository variables `INTAKE_ENABLED`, `INTAKE_API_ORIGIN` and `TURNSTILE_SITE_KEY` feed the protected website build. To roll back, set `INTAKE_ENABLED` to `false` and dispatch the catalog workflow; the site returns to the GitHub Issue Form route.
+- Repository variables `INTAKE_ENABLED`, `INTAKE_API_ORIGIN` and `TURNSTILE_SITE_KEY` feed the protected website build. To roll back, set `INTAKE_ENABLED` to `false` and dispatch the catalog workflow; the Submit page then says submissions are not open and sends nothing. The website no longer links to the GitHub Issue Forms.
 - Secrets live only in the Worker and a private local folder. Rotate by re-running `wrangler secret put`.
 - `ADMIN_ORIGIN` (`https://admin.legacyofgokuhub.com`) is a committed variable in `intake/wrangler.jsonc`. The owner notification email links to it.
 - Owner notification email uses the `send_email` binding `NOTIFY_EMAIL` (with `destination_address`) and the variable `NOTIFY_TO`, both holding the owner's verified Email Routing address. Neither is committed. The private configuration is kept outside every checkout at `%LOCALAPPDATA%\loghub-private\intake\wrangler.private.jsonc` and copied to `intake/wrangler.private.jsonc` (listed in `.gitignore`) at deploy time. It is the committed `intake/wrangler.jsonc` plus `"send_email": [{"name": "NOTIFY_EMAIL", "destination_address": "<owner address>"}]` and `"NOTIFY_TO": "<owner address>"` under `vars`. Deploy it with `npx wrangler deploy --config intake/wrangler.private.jsonc --var INTAKE_ENABLED:true`. Without the binding, `NOTIFY_TO` or a valid `ADMIN_ORIGIN`, no mail is sent and everything else works. Live since 2026-11-19 as version `86d9cc39`; the first scheduled email arrived at 13:17 UTC that day. The full procedure is "Deploying an approved change" in the [owner runbook](../OWNER-RUNBOOK.md#deploying-an-approved-change).

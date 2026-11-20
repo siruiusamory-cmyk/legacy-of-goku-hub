@@ -70,4 +70,4 @@ Isolated hosted integration fixtures also need explicit reviewed hashes in `poli
 
 Revoking the last approved image set may produce an empty snapshot. This is allowed only when current protected policy explicitly suspends/delists every previous registry identity (matching repository, owner and project IDs). Removing approvals alone, missing rules or mismatched identities still fails the empty-state safety guard. Historical recovery points are preserved.
 
-Use the Report project content Issue Form for inappropriate artwork or misleading information. Reports notify maintainers, carry no publication authority and do not automatically hide projects. Supply URLs and text only, not image attachments.
+On the website, report inappropriate artwork or misleading information with **Correct a listing** on the submission form; the website does not link to the GitHub forms. From the repository, use the Report project content Issue Form. Reports notify maintainers, carry no publication authority and do not automatically hide projects. Supply URLs and text only, not image attachments.

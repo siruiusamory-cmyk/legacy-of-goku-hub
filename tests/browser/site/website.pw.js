@@ -182,7 +182,7 @@ test('empty catalog is polished, honest, unrated and contains no synthetic proje
   await page.goto('http://127.0.0.1:4322/');
   expect(await (await page.request.get('http://127.0.0.1:4322/site-provenance.json')).json()).toMatchObject({purpose:'fixture'});
   await expect(page.getByRole('heading',{name:'No approved projects yet'})).toBeVisible();
-  await expect(page.getByRole('link',{name:'Submit your project'})).toHaveAttribute('href','https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/issues/new/choose');
+  await expect(page.getByRole('link',{name:'Submit your project'})).toHaveAttribute('href','/submit/');
   await expect(page.locator('.project-card')).toHaveCount(0);
   await expect(page.getByRole('heading',{level:1})).toContainText('Legacy of Goku Community Directory');
 });
@@ -194,7 +194,7 @@ for (const width of [320,390,430,760,941,1024,1448]) test(`responsive home and d
   await page.goto('http://127.0.0.1:4323/projects/fixture-6/');
   await expect(page.getByRole('heading',{level:1})).toHaveText('W'.repeat(100));
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-  if(width<=900){await page.goto('/');await page.getByLabel('Open navigation').click();await expect(page.getByRole('link',{name:'Submit a project',exact:true}).first()).toBeVisible();}
+  if(width<=900){await page.goto('/');await page.locator('.mobile-nav summary').click();await expect(page.getByRole('link',{name:'Submit a project',exact:true}).first()).toBeVisible();}
 });
 for (const [route,width] of [['/',1448],['/projects/fixture-0/',1448],['/',390],['/projects/fixture-0/',390],['http://127.0.0.1:4322/',390],['/how-to-patch/',1448],['/how-to-patch/',390]]) test(`WCAG automated checks ${route} ${width}`, async ({page}) => {
   await page.setViewportSize({width,height:1086});await page.goto(route);
