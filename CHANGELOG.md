@@ -6,6 +6,7 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Added
 
+- An RSS feed at `/rss.xml` lists the most recently changed listings, newest first. A sitemap at `/sitemap.xml` and a `robots.txt` that points to it help search engines find every project page.
 - A guide at `/how-to-patch/` explains how to apply a ROM hack or translation patch to your own copy of the game. The footer links to it, and ROM hack and translation pages link to it under their buttons.
 - Links shared on Discord and other apps show a title, a short description and a picture: the cover art on a project page, and a site card everywhere else. The site has an icon in browser tabs and on phone home screens.
 - The home page opens with one line saying what the Hub lists and that it offers patches and links only, never ROMs.
@@ -15,6 +16,10 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
+- Choosing a game in the directory also shows projects listed for multiple games. The status filter offers only statuses that have a listing, and sorting by release date is offered only when at least two listings have a release.
+- On fan project, tool and resource pages the button to an outside download page reads "Download Page" instead of "Patch Page". When that button and "Visit Project" would lead to the same address, only the first is shown.
+- Project page artwork loads faster: the large picture is about a fifth of its former size.
+- A project with one rating reads "1 rating" instead of "1 ratings".
 - The owner runbook lists the credentials that expire, with their dates and how to renew each (two of them last 30 days), and records the date of the last catalogue and ratings exports. The operational handoff records that automatic publication has been seen working and that publications merge on the `test` check alone.
 - Search looks in every category. While a search is typed no tab is selected and the result count says "in all categories"; choosing a tab clears the search.
 - On phones, directory cards show their status (Released, In Development, On Hold, Discontinued) again.

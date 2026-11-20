@@ -39,8 +39,10 @@ export const projectActions = project => {
     list.push({id: 'repository', label: 'View Repository', icon: 'code', url: project.repository, aria: 'View ' + project.title + ' repository', cardIcon: 'github'});
     return list;
   }
-  if (project.distribution && available) list.push({id: 'distribution', label: project.distribution.label, icon: 'download', url: project.distribution.url, aria: project.distribution.label + ' for ' + project.title});
-  if (project.source?.url) {
+  // The stored label says "Patch Page" for every page link, whatever the project is.
+  const label = project.distribution?.kind === 'page' && !['rom-hack', 'translation'].includes(project.category) ? 'Download Page' : project.distribution?.label;
+  if (project.distribution && available) list.push({id: 'distribution', label, icon: 'download', url: project.distribution.url, aria: label + ' for ' + project.title});
+  if (project.source?.url && !list.some(action => action.url.replace(/\/$/, '') === project.source.url.replace(/\/$/, ''))) {
     const repo = ['git', 'github'].includes(project.source.type);
     list.push({id: repo ? 'repository' : 'project', label: repo ? 'View Repository' : 'Visit Project', icon: repo ? 'code' : 'external', url: project.source.url, aria: (repo ? 'View ' + project.title + ' repository' : 'Visit ' + project.title + ' project page'), cardIcon: repo ? 'github' : 'external'});
   }

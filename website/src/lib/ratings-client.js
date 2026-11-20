@@ -20,9 +20,9 @@ async function start(api){
   if(!Number.isInteger(data.count)||data.count<0||(data.count===0?data.average!==null:!Number.isFinite(data.average)||data.average<1||data.average>7))throw Error('Ratings unavailable.');
   document.querySelectorAll('[data-ratings-project]').forEach(el=>{
    if(el.dataset.ratingsProject!==id)return;
-   const text=data.count?`${data.average.toFixed(1)} / 7 (${data.count} ratings)`:'Not rated yet';
+   const votes=`(${data.count} ${data.count===1?'rating':'ratings'})`,text=data.count?`${data.average.toFixed(1)} / 7 ${votes}`:'Not rated yet';
    const value=el.querySelector('.rating-value'),strong=document.createElement('strong');
-   if(data.count){strong.textContent=data.average.toFixed(1)+' ';const scale=document.createElement('span');scale.textContent='/ 7';strong.append(scale);const count=document.createElement('small');count.textContent=` (${data.count} ratings)`;value.replaceChildren(strong,count);}
+   if(data.count){strong.textContent=data.average.toFixed(1)+' ';const scale=document.createElement('span');scale.textContent='/ 7';strong.append(scale);const count=document.createElement('small');count.textContent=' '+votes;value.replaceChildren(strong,count);}
    else{strong.className='unrated';strong.textContent='Not rated yet';value.replaceChildren(strong);}
    el.setAttribute('aria-label','Community rating: '+text);el.title='Community rating: '+text;el.querySelectorAll('.dragon-ball').forEach((ball,i)=>ball.classList.toggle('muted',!data.count||i>=Math.round(data.average)));
   });

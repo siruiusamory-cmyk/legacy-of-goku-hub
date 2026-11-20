@@ -4,7 +4,7 @@ import sharp from 'sharp';
 const titles = ['Saiyan Legacy Reborn','Other World Trial','Kai Frontier','Z-Fighter Remix','Capsule Quest','Majin Eclipse','Namek Redux'];
 const externals = [
   {id:'ext-forumhack001',title:'Super Saiyan Frontier',developer:'Unknown creator',game:'legacy-of-goku-2',category:'rom-hack',status:'released',source:{type:'forum',url:'https://forum.example.org/threads/super-saiyan-frontier.4812/'},distribution:{label:'Download Patch',url:'https://files.example.org/frontier.bps',kind:'patch'},ownership:{claim:'unclaimed',representation_verified:false},colors:['#d03850','#f8d040']},
-  {id:'ext-sitehack0002',title:'Capsule Corp Toolkit',developer:'Bulma Labs',game:'multiple',category:'tool',status:'in-development',source:{type:'website',url:'https://toolkit.example.net/'},ownership:{claim:'verified-claim',representation_verified:false},colors:['#20a0a8','#f8f8f8']}
+  {id:'ext-sitehack0002',title:'Capsule Corp Toolkit',developer:'Bulma Labs',game:'multiple',category:'tool',status:'in-development',source:{type:'website',url:'https://toolkit.example.net/'},distribution:{label:'Patch Page',url:'https://toolkit.example.net',kind:'page'},ownership:{claim:'verified-claim',representation_verified:false},colors:['#20a0a8','#f8f8f8']}
 ];
 export async function fixtureInput(destination, empty = false, unfeatured = false, external = false, withoutArtwork = false) {
   if (empty) return {catalog:{schema_version:1,projects:[],filters:{games:[],categories:[],statuses:[]},sort:{name:[],release_date:[],update_date:[]}},provenance:{purpose:'fixture',warning:'Empty-state preview only'}};
