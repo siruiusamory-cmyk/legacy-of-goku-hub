@@ -11,7 +11,7 @@ test('multi-game listings pass a game filter, filters offer only what exists, an
   expect(await page.locator('.project-card:visible').evaluateAll(cards => cards.map(card => card.dataset.id))).toEqual(['ext-sitehack0002']);
   await page.getByLabel('Base game',{exact:true}).selectOption('multiple');
   expect(await page.locator('.project-card:visible').evaluateAll(cards => cards.map(card => card.dataset.id))).toEqual(['ext-sitehack0002']);
-  await expect(page.locator('#status option')).toHaveText(['All statuses','In Development','Released']);
+  await expect(page.locator('#status option')).toHaveText(['All statuses','Released','In Development']);
   await page.goto('http://127.0.0.1:4324/projects/ext-sitehack0002/');
   await expect(page.locator('.hero-actions a')).toHaveText(['Download Page']);
   await page.goto('http://127.0.0.1:4322/');

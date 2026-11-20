@@ -16,7 +16,7 @@ The [public catalogue](https://legacyofgokuhub.com/) brings community work toget
 - Rate listed projects with the site's seven-Dragon-Ball rating system, without creating an account.
 - Follow the [patch guide](https://legacyofgokuhub.com/how-to-patch/) to apply a ROM hack or translation to your own copy of the game.
 - Share a listing on Discord or elsewhere with a preview showing its title, summary and cover art.
-- Follow listing changes with the [RSS feed](https://legacyofgokuhub.com/rss.xml).
+- Follow new listings with the [RSS feed](https://legacyofgokuhub.com/rss.xml).
 
 Listings may cover released projects, works in progress, and useful tools or documentation. Not every project has a download or artwork.
 

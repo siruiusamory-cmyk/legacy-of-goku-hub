@@ -1,7 +1,8 @@
 import {catalog, href, names, projectURL} from '../lib/catalog.js';
 import {projectSummary} from '../lib/summary.js';
 
-const text = value => String(value).replace(/[<>&"']/g, c => `&#${c.charCodeAt(0)};`);
+// One character outside the XML 1.0 Char range, such as U+FFFE, makes the whole feed unreadable.
+const text = value => String(value).replace(/[^\t\n\r\x20-퟿-�\u{10000}-\u{10FFFF}]/gu, '').replace(/[<>&"']/g, c => `&#${c.charCodeAt(0)};`);
 // The catalogue has no "first listed" date, so an edited listing moves to the top; its guid never changes.
 const newest = [...catalog.projects].sort((a, b) => Date.parse(b.last_updated) - Date.parse(a.last_updated) || a.id.localeCompare(b.id)).slice(0, 50);
 
