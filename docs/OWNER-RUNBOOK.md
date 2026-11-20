@@ -252,11 +252,28 @@ When: the ratings database is damaged or lost, or "Totals need checking" stays.
 
 See [Private export and recovery](launch/RATINGS.md#private-export-and-recovery). Ratings are not part of the catalogue backups.
 
+Last export: 2026-11-19 (24 ratings), taken without pausing ratings. A ratings export is kept for seven days at most, so delete that one by 2026-11-26.
+
 ### Backups and restore of the catalogue
 
 When: a publication was lost or damaged, or GitHub is unavailable.
 
 See [Restore and off-platform export](OPERATIONS.md#restore-and-off-platform-export-windows) and [Compromised credentials](OPERATIONS.md#compromised-credentials).
+
+Last export: 2026-11-19, recovery point `44613623538`, all 27 listings, verified offline with `verify-export`. An export only protects against losing GitHub once its ZIP is copied to storage outside GitHub and Cloudflare. Take a new one after a batch of publications and write its date here.
+
+### Credentials that expire
+
+When: before the earliest date below. Publishing from the dashboard stops when either of the first two lapses; the public site, submissions and ratings keep working.
+
+| Credential | Used by | Expires (UTC) | To renew |
+| --- | --- | --- | --- |
+| GitHub token `GH_DISPATCH_TOKEN` | The dashboard, to start and follow publications | 2026-12-16 08:00 | GitHub, Settings, Developer settings, Fine-grained tokens: regenerate it, then `npx wrangler secret put GH_DISPATCH_TOKEN --config admin/wrangler.production.jsonc` |
+| Access service token `loghub-admin-private-processor` | The publication workflow, to reach the dashboard (`ADMIN_ACCESS_CLIENT_ID` and `ADMIN_ACCESS_CLIENT_SECRET` in the `admin-processing` environment) | 2026-12-16 16:50 | Cloudflare Zero Trust, Access, Service auth: **Refresh** extends it and keeps the same secret |
+| Access service token `loghub-admin-isolated-private-processor` | Nothing since the isolated acceptance test on 2026-11-16 | 2026-12-16 17:03 | Let it lapse |
+| Cloudflare token `CLOUDFLARE_API_TOKEN` | The site deploy (`cloudflare-pages` environment), set 2026-11-16 | Not recorded | Read the date in Cloudflare under My Profile, API Tokens, and write it here |
+
+These have no expiry: the two GitHub App keys, the signing keys, `RATE_SALT`, the human-check secret and `ADMIN_PROCESSOR_TOKEN`. After renewing, replace the date in this table.
 
 ### The dashboard stays unavailable
 

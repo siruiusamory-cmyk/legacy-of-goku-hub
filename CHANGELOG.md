@@ -15,6 +15,7 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
+- The owner runbook lists the credentials that expire, with their dates and how to renew each, and records the date of the last catalogue and ratings exports. The operational handoff records that automatic publication has been seen working and that publications merge on the `test` check alone.
 - Search looks in every category. While a search is typed no tab is selected and the result count says "in all categories"; choosing a tab clears the search.
 - On phones, directory cards show their status (Released, In Development, On Hold, Discontinued) again.
 - The date on cards, on project pages and in the home page list is labelled "Listing updated", and the list is called Latest Listing Updates, because it is the date the Hub last changed the listing, not the date of project activity.
