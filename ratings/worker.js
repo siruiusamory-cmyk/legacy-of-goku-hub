@@ -5,8 +5,8 @@ export const digest=async value=>base64(await crypto.subtle.digest('SHA-256',enc
 const now=()=>Math.floor(Date.now()/1000);
 const fail=(status,message)=>{throw Object.assign(new Error(message),{status});};
 const sql=(env,query,...args)=>env.DB.prepare(query).bind(...args);
-function headers(env){return {'Content-Type':'application/json','Cache-Control':'no-store','Access-Control-Allow-Origin':env.SITE_ORIGIN,'Vary':'Origin','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'};}
-const json=(env,data,status=200)=>Response.json(data,{status,headers:headers(env)});
+function headers(env,cache='no-store'){return {'Content-Type':'application/json','Cache-Control':cache,'Access-Control-Allow-Origin':env.SITE_ORIGIN,'Vary':'Origin','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'};}
+const json=(env,data,status=200,cache)=>Response.json(data,{status,headers:headers(env,cache)});
 async function body(request){
  if(request.headers.get('Content-Type')!=='application/json')fail(415,'JSON required');
  const reader=request.body?.getReader();if(!reader)fail(400,'Body required');let text='',length=0;
@@ -33,6 +33,7 @@ export async function handle(request,env){
   if(!['GET','PUT','DELETE'].includes(request.method))fail(405,'Method not allowed');
   if(request.method!=='GET'&&origin!==env.SITE_ORIGIN)fail(403,'Origin rejected');
   const ip=await digest(env.RATE_SALT+':'+(request.headers.get('CF-Connecting-IP')||'local'));await limit(env,'read:'+ip,120);
+  if(url.pathname==='/projects'){if(request.method!=='GET')fail(405,'Method not allowed');const live=new Set((await catalog(env)).filter(p=>p.availability==='available').map(p=>p.id)),{results}=await sql(env,'SELECT project_id,total,count FROM totals WHERE count>0').all();return json(env,{projects:Object.fromEntries(results.filter(r=>live.has(r.project_id)).map(r=>[r.project_id,{count:r.count,average:r.total/r.count}]))},200,'public, max-age=60');}
   if(url.pathname==='/identity'&&request.method==='DELETE'){
    const hash=await credential(request);await limit(env,'write:'+ip,30);
    await env.DB.batch([sql(env,'INSERT INTO erasures VALUES(?,?,?,?) ON CONFLICT(credential_hash,project_id) DO UPDATE SET erased_at=excluded.erased_at,expires=excluded.expires',hash,'*',now(),now()+604800),sql(env,'DELETE FROM votes WHERE credential_hash=?',hash)]);return json(env,{deleted:true});

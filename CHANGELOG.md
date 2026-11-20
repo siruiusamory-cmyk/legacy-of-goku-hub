@@ -6,11 +6,20 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Added
 
+- A guide at `/how-to-patch/` explains how to apply a ROM hack or translation patch to your own copy of the game. The footer links to it, and ROM hack and translation pages link to it under their buttons.
+- Links shared on Discord and other apps show a title, a short description and a picture: the cover art on a project page, and a site card everywhere else. The site has an icon in browser tabs and on phone home screens.
+- The home page opens with one line saying what the Hub lists and that it offers patches and links only, never ROMs.
+- The footer says the Hub is an unofficial fan site and links to the form for requesting a correction or removal.
+- The submission page, the contributing guide and the moderation policy state that AI-assisted projects are welcome and low-effort projects made mostly by AI are not listed.
 - **Translation** is a project type of its own. Submitters and the owner can choose it, listings show it as a badge, and the directory offers it as a filter once a translation is published.
 
 ### Changed
 
-- The project directory is browsed by category. Five tabs styled like the main menu (ROM Hacks, Translations, Fan Projects, Tools, Resources) sit above the listing, each with its number of published projects. One category shows at a time, starting with ROM Hacks; there is no combined view, and the category drop-down and the **All** button are gone. Search, game, status and sorting work inside the selected category. Each tab has its own address, such as `?category=tool`, so it can be shared and Back and Forward move between tabs.
+- Search looks in every category. While a search is typed no tab is selected and the result count says "in all categories"; choosing a tab clears the search.
+- On phones, directory cards show their status (Released, In Development, On Hold, Discontinued) again.
+- The date on cards, on project pages and in the home page list is labelled "Listing updated", and the list is called Latest Listing Updates, because it is the date the Hub last changed the listing, not the date of project activity.
+- The home page loads all community ratings with one request, so ratings no longer show as unavailable after a few quick visits.
+- The project directory is browsed by category. Five tabs styled like the main menu (ROM Hacks, Translations, Fan Projects, Tools, Resources) sit above the listing, each with its number of published projects. One category shows at a time, starting with ROM Hacks; there is no combined view, and the category drop-down and the **All** button are gone. Game, status and sorting work inside the selected category. Each tab has its own address, such as `?category=tool`, so it can be shared and Back and Forward move between tabs.
 - On phones, project artwork in the directory rows is shown whole instead of being cropped to the row.
 
 - The owner runbook now matches production: email notifications are described as on, the deploy procedure for the submission service and the dashboard is written out with its private settings file, verification and rollback, and the dashboard's "unavailable" messages have a next step. An operational handoff and the production acceptance report are added.

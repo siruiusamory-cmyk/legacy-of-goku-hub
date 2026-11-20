@@ -27,12 +27,13 @@ test('owner features, replaces and clears GitHub/community projects through priv
       const response = await handle(new Request(request.url(), {method: request.method(), headers: {...request.headers(), 'Cf-Access-Jwt-Assertion': x.token}, ...(body ? {body} : {})}), x.env);
       await route.fulfill({status: response.status, headers: Object.fromEntries(response.headers), body: Buffer.from(await response.arrayBuffer())});
     });
-    await context.route('https://ratings.example/**', route => route.fulfill({json: {average: 6, count: 2}, headers: {'Access-Control-Allow-Origin': '*'}}));
+    await context.route('https://ratings.example/**', route => route.fulfill({json: {projects: Object.fromEntries(publication.catalog.projects.map(p => [p.id, {average: 6, count: 2}]))}, headers: {'Access-Control-Allow-Origin': '*'}}));
     await context.route('https://site.example/**', async route => {
       const pathname = new URL(route.request().url()).pathname;
       const file = path.join(rendered, pathname === '/' ? 'index.html' : pathname.endsWith('/') ? pathname + 'index.html' : pathname);
       const type = {'.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.webp': 'image/webp', '.png': 'image/png'}[path.extname(file)] || 'application/octet-stream';
-      await route.fulfill({body: await fs.readFile(file), contentType: type});
+      // The icons are written by tools/site/build.js, which this render does not run.
+      await fs.readFile(file).then(body => route.fulfill({body, contentType: type}), () => route.fulfill({status: 404}));
     });
     async function renderHome() {
       const directory = path.join(x.root, 'render-' + build++), input = path.join(directory, 'input');

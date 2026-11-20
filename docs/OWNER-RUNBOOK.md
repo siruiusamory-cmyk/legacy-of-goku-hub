@@ -266,7 +266,7 @@ Check https://www.cloudflarestatus.com first. If Cloudflare reports no incident 
 
 ### Deploying an approved change
 
-When: a merged change touches the submission service (`intake/`) or the dashboard (`admin/`). The public site deploys itself after every merge; only these two services are deployed by hand. Work in a clean, up-to-date checkout of `main`.
+When: a merged change touches the submission service (`intake/`), the dashboard (`admin/`) or the ratings service (`ratings/`). The public site deploys itself after every merge; only these three services are deployed by hand. Work in a clean, up-to-date checkout of `main`.
 
 **The private notification settings.** Your notification address is never put in the public repository. It lives in one private file, kept outside every checkout:
 
@@ -284,7 +284,11 @@ Both parts matter. Without the private file no email is sent. Without `--var INT
 
 This command can end with "Could not find zone for admin.legacyofgokuhub.com" even though the new version is live. Do not repeat it. `npx wrangler deployments list --config admin/wrangler.production.jsonc` tells the truth: the newest entry at 100% is what is running. The dashboard's secrets and its address survive every deploy.
 
-**Going back.** `npx wrangler rollback <version id> --config <the same config>` restores an earlier version of either service.
+**Ratings service.** `npx wrangler deploy --config ratings/wrangler.jsonc --var RATINGS_ENABLED:true`
+
+Without `--var RATINGS_ENABLED:true` ratings turn off, because the committed setting keeps them off. When a site change needs a new ratings route, deploy the ratings service from that change's branch before you merge it; this is the one case where you do not deploy from `main`.
+
+**Going back.** `npx wrangler rollback <version id> --config <the same config>` restores an earlier version of any of these services.
 
 ### Changing the notification address
 

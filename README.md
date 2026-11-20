@@ -11,9 +11,11 @@ Discover and share ROM hacks, translations, fan projects, modding tools, disasse
 The [public catalogue](https://legacyofgokuhub.com/) brings community work together in one searchable place. You can:
 
 - Browse by project type with five tabs (ROM Hacks, Translations, Fan Projects, Tools, Resources), each showing how many projects it holds, then narrow by game or development status.
-- Search for specific projects and follow links to their repositories, websites, or approved download pages.
-- Discover featured projects, see what was recently updated, and read a short summary of what each one does.
+- Search every category at once for specific projects and follow links to their repositories, websites, or approved download pages.
+- Discover featured projects, see which listings changed most recently, and read a short summary of what each one does.
 - Rate listed projects with the site's seven-Dragon-Ball rating system, without creating an account.
+- Follow the [patch guide](https://legacyofgokuhub.com/how-to-patch/) to apply a ROM hack or translation to your own copy of the game.
+- Share a listing on Discord or elsewhere with a preview showing its title, summary and cover art.
 
 Listings may cover released projects, works in progress, and useful tools or documentation. Not every project has a download or artwork.
 
@@ -29,6 +31,8 @@ Listings may cover released projects, works in progress, and useful tools or doc
 | **Claim** | You created a listed project and want to verify your connection to it. |
 
 Provide the project's name, a short description, and a link if one exists. Additional details and images are helpful but artwork is **optional**.
+
+AI-assisted projects are welcome. Low-effort projects made mostly by AI are not listed.
 
 A moderator reviews submissions before anything is added or changed. Suggesting a project does not give you ownership or editing rights over its listing. Claims of project control require verification.
 
