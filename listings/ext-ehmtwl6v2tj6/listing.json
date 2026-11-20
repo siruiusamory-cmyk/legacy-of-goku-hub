@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "ext-ehmtwl6v2tj6",
+  "title": "Legacy of Goku II Enhanced",
+  "developer": "ThegreatBen",
+  "description": "A rebalance of The Legacy of Goku II, made for the European ROM. Levelling is much faster after level 30, every character starts with a large ki bonus so special moves and Super Saiyan are usable, and the characters are re-tuned: Gohan starts weak and ends strongest, Vegeta, Piccolo and Trunks each excel in one stat, and Goku is above average in all. A second patch includes an anti-piracy fix for flash carts.",
+  "game": "legacy-of-goku-2",
+  "category": "rom-hack",
+  "status": "released",
+  "source": {
+    "type": "website",
+    "url": "https://romhackplaza.org/romhacks/dragon-ball-z-the-legacy-of-goku-ii-enhanced-game-boy-advance"
+  },
+  "distribution": {
+    "label": "Patch Page",
+    "url": "https://romhackplaza.org/romhacks/dragon-ball-z-the-legacy-of-goku-ii-enhanced-game-boy-advance",
+    "kind": "page"
+  },
+  "screenshots": [],
+  "omit_artwork": true,
+  "approved_at": "2026-11-19T18:37:49Z"
+}

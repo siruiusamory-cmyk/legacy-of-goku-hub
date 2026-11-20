@@ -11,7 +11,7 @@
     "developer": {"type": "string", "minLength": 1, "maxLength": 100},
     "description": {"type": "string", "minLength": 20, "maxLength": 2000},
     "game": {"enum": ["legacy-of-goku", "legacy-of-goku-2", "buus-fury", "multiple"]},
-    "category": {"enum": ["rom-hack", "fan-project", "tool", "resource"]},
+    "category": {"enum": ["rom-hack", "translation", "fan-project", "tool", "resource"]},
     "status": {"enum": ["in-development", "released", "on-hold", "discontinued"]},
     "source": {
       "type": "object", "additionalProperties": false, "required": ["type"],

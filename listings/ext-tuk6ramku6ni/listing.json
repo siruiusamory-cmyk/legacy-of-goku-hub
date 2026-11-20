@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "ext-tuk6ramku6ni",
+  "title": "DBZ: The Legacy of Goku Remake",
+  "developer": "OmniStarGames",
+  "description": "A Windows fan game that retells the Saiyan and Namek sagas with the action RPG gameplay of the Legacy of Goku series. It adds Tien as a second playable character, new capsule items and a secret boss. The most recent build is from December 2017.",
+  "game": "legacy-of-goku",
+  "category": "fan-project",
+  "status": "in-development",
+  "source": {
+    "type": "website",
+    "url": "https://gamejolt.com/games/dbzlegacyofgokuremake/285032"
+  },
+  "screenshots": [],
+  "cover": "cover.webp",
+  "approved_at": "2026-11-19T19:43:55Z"
+}

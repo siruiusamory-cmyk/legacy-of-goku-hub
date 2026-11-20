@@ -7,7 +7,7 @@ export const artwork = JSON.parse(await fs.readFile(path.join(input, 'artwork.js
 export const provenance = JSON.parse(await fs.readFile(path.join(input, 'provenance.json'), 'utf8'));
 export const base = import.meta.env.BASE_URL;
 export const href = relative => base + relative;
-export const names = {'legacy-of-goku': 'LoG 1', 'legacy-of-goku-2': 'LoG II', 'buus-fury': "Buu’s Fury", multiple: 'LoG series', 'rom-hack': 'ROM Hack', 'fan-project': 'Fan Project', tool: 'Tools', resource: 'Resource', released: 'Released', 'in-development': 'In Development', 'on-hold': 'On Hold', discontinued: 'Discontinued'};
+export const names = {'legacy-of-goku': 'LoG 1', 'legacy-of-goku-2': 'LoG II', 'buus-fury': "Buu’s Fury", multiple: 'LoG series', 'rom-hack': 'ROM Hack', translation: 'Translation', 'fan-project': 'Fan Project', tool: 'Tools', resource: 'Resource', released: 'Released', 'in-development': 'In Development', 'on-hold': 'On Hold', discontinued: 'Discontinued'};
 export const fullGame = {'legacy-of-goku': 'Legacy of Goku', 'legacy-of-goku-2': 'Legacy of Goku II', 'buus-fury': "Buu’s Fury", multiple: 'Multiple games'};
 export const projectURL = project => href('projects/' + project.id + '/');
 export const submitURL = import.meta.env.PUBLIC_INTAKE_ENABLED === 'true' ? href('submit/') : 'https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/issues/new/choose';
@@ -39,8 +39,10 @@ export const projectActions = project => {
     list.push({id: 'repository', label: 'View Repository', icon: 'code', url: project.repository, aria: 'View ' + project.title + ' repository', cardIcon: 'github'});
     return list;
   }
-  if (project.distribution && available) list.push({id: 'distribution', label: project.distribution.label, icon: 'download', url: project.distribution.url, aria: project.distribution.label + ' for ' + project.title});
-  if (project.source?.url) {
+  // The stored label says "Patch Page" for every page link, whatever the project is.
+  const label = project.distribution?.kind === 'page' && !['rom-hack', 'translation'].includes(project.category) ? 'Download Page' : project.distribution?.label;
+  if (project.distribution && available) list.push({id: 'distribution', label, icon: 'download', url: project.distribution.url, aria: label + ' for ' + project.title});
+  if (project.source?.url && !list.some(action => action.url.replace(/\/$/, '') === project.source.url.replace(/\/$/, ''))) {
     const repo = ['git', 'github'].includes(project.source.type);
     list.push({id: repo ? 'repository' : 'project', label: repo ? 'View Repository' : 'Visit Project', icon: repo ? 'code' : 'external', url: project.source.url, aria: (repo ? 'View ' + project.title + ' repository' : 'Visit ' + project.title + ' project page'), cardIcon: repo ? 'github' : 'external'});
   }

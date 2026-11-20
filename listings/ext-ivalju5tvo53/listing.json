@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "ext-ivalju5tvo53",
+  "title": "Buu's Fury on Data Crystal",
+  "developer": "Data Crystal contributors",
+  "description": "Community ROM hacking notes for Buu's Fury: a ROM map with text pointers, map codes and sprite animation tables, a RAM map, and worked examples for swapping a character's sprite, recolouring a character, adding a halo and adding a waypoint.",
+  "game": "buus-fury",
+  "category": "resource",
+  "status": "released",
+  "source": {
+    "type": "website",
+    "url": "https://datacrystal.tcrf.net/wiki/Dragon_Ball_Z:_Buu%27s_Fury"
+  },
+  "links": [
+    {
+      "label": "ROM map",
+      "url": "https://datacrystal.tcrf.net/wiki/Dragon_Ball_Z:_Buu%27s_Fury/ROM_map"
+    }
+  ],
+  "screenshots": [],
+  "approved_at": "2026-11-19T19:51:06Z"
+}

@@ -17,6 +17,7 @@ const sha = value => createHash('sha256').update(value).digest('hex');
 const hash = value => createHash('sha256').update(value).digest('base64url');
 const text = value => JSON.stringify(value, null, 2) + '\n';
 const assert = (value, message) => { if (!value) throw Error(message); };
+const clearFeatured = policy => { for (const previous of [...policy.projects, ...(policy.external_projects || [])]) if (previous.featured) previous.featured = false; };
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const ALLOWED = /^(?:cover|screenshot-[1-6])\.(?:png|jpg|jpeg|webp)$/;
 const EDITABLE = ['title', 'developer', 'description', 'game', 'category', 'status', 'distribution', 'links'];
@@ -54,7 +55,7 @@ export async function preparePackage({row, root = ROOT, api = new GitHub(), fetc
         }
         featuredPreview = live;
       } else assert(rule.featured, 'Featured selection changed; reload the catalog');
-      for (const previous of [...policy.projects, ...(policy.external_projects || [])]) if (previous.featured) previous.featured = false;
+      clearFeatured(policy);
       rule.featured = row.operation === 'feature';
     } else if (['suspend', 'delist', 'restore', 'claim'].includes(row.operation)) {
       const old = existingRule || legacyRule; assert(old, 'No approved policy identity exists');
@@ -134,6 +135,17 @@ export async function preparePackage({row, root = ROOT, api = new GitHub(), fetc
         legacyRule.reason = 'Replaced by exact-approved managed listing with the same stable identity';
         warnings.push('Converts the prior GitHub intake record to a managed listing; stable ID and ratings are retained.');
       }
+      if (row.payload.feature === true) {
+        assert(row.operation === 'submission' && isNew, 'Featured can only be chosen when approving a new listing');
+        clearFeatured(policy); rule.featured = true;
+        warnings.push('Also makes this the Featured project on the home page, replacing the current one if there is one.');
+      }
+      if (oldListing) {
+        const undated = l => text({...l, approved_at: undefined});
+        const undigested = p => text({...p, external_projects: (p.external_projects || []).map(r => r.project_id === projectId ? {...r, content_digests: undefined} : r)});
+        const sameArtwork = async () => { for (const file of files) if (!file.bytes.equals(await fs.readFile(path.join(root, 'listings', projectId, file.name)))) return false; return true; };
+        assert(undated(listing) !== undated(oldListing) || undigested(policy) !== undigested(originalPolicy) || !(await sameArtwork()), 'Nothing has changed from the published listing.');
+      }
     }
     policyCheck(policy);
     const buffers = [...files, ...previews];
@@ -198,15 +210,21 @@ export async function enableAutoMerge({row, api, repo, pr: number, loadFile}) {
   assert(!result.errors && result.data?.enablePullRequestAutoMerge?.pullRequest.autoMergeRequest, 'GitHub refused automatic merge: ' + (result.errors?.[0]?.message || 'no reason given'));
 }
 
+export async function patiently(operation, attempts = 3, pause = 3000) {
+  for (let left = attempts; ; await new Promise(resolve => setTimeout(resolve, pause))) {
+    try { return await operation(); } catch (error) { if (error.final || !--left) throw error; }
+  }
+}
+
 async function main() {
   const id = process.env.REVIEW_ID, action = process.env.REVIEW_ACTION;
   assert(/^[A-Za-z0-9_-]{24}$/.test(id || '') && ['prepare', 'publish'].includes(action), 'Invalid job');
   const base = process.env.ADMIN_API;
   assert(/^https:\/\/[a-z0-9.-]+$/.test(base || ''), 'Invalid processor origin');
-  const call = async (suffix = '', data) => {
+  const call = (suffix = '', data) => patiently(async () => {
     const response = await fetch(`${base}/processor/${id}${suffix}`, {method: data ? 'POST' : 'GET', headers: {Authorization: 'Bearer ' + process.env.ADMIN_PROCESSOR_TOKEN, 'CF-Access-Client-Id': process.env.ACCESS_CLIENT_ID, 'CF-Access-Client-Secret': process.env.ACCESS_CLIENT_SECRET, ...(data ? {'Content-Type': 'application/json'} : {})}, body: data ? JSON.stringify(data) : undefined, redirect: 'error', signal: AbortSignal.timeout(20000)});
-    if (!response.ok) throw Error('Private processor API rejected operation'); return response.json();
-  };
+    if (!response.ok) throw Object.assign(Error('Private processor API rejected operation'), {final: response.status < 500}); return response.json();
+  });
   let claimed = false;
   try {
     await call('/claim', {action}); claimed = true;
@@ -226,7 +244,7 @@ async function main() {
       };
       const pr = await createPublicationPR({row, api, repo: process.env.GITHUB_REPOSITORY, loadFile});
       let auto_merge = 'off';
-      if (process.env.ADMIN_AUTO_MERGE === 'true') auto_merge = await enableAutoMerge({row, api, repo: process.env.GITHUB_REPOSITORY, pr, loadFile}).then(() => 'enabled', error => String(error.message).replace(/[<>\x00-\x1f]/g, ' ').slice(0, 300));
+      if (process.env.ADMIN_AUTO_MERGE === 'true') auto_merge = await patiently(() => enableAutoMerge({row, api, repo: process.env.GITHUB_REPOSITORY, pr, loadFile})).then(() => 'enabled', error => String(error.message).replace(/[<>\x00-\x1f]/g, ' ').slice(0, 300));
       await call('/published-pr', {pr, auto_merge});
     }
   } catch (error) {

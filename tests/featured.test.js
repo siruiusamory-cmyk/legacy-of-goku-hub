@@ -74,11 +74,11 @@ test('Featured management requires approved published projects and exact protect
     assert.deepEqual(publication.catalog.projects.filter(project => project.featured).map(project => project.id), [id]);
     await assertPublicationPolicy(publication.snapshot, publication.catalog, change.policy, await readSnapshot(publication.snapshot));
     x.state.pr = {head: {sha: featureBase}, merged: true, state: 'closed', merge_commit_sha: featureBase, html_url: 'https://github.com/fictional/hub/pull/42'};
-    assert.equal((await json(await x.call('/api/publication?id=' + change.reviewId))).status, 'awaiting-deployment');
-    x.state.manifest = {build_commit: featureBase}; x.state.runs = [{id: 7, head_sha: featureBase, event: 'push'}];
+    assert.equal((await json(await x.call('/api/publication?id=' + change.reviewId))).stage, 'deploying');
+    x.state.manifest = {build_commit: featureBase}; x.state.runs = [{id: 7, head_sha: featureBase, event: 'push', status: 'completed', conclusion: 'success'}];
     x.state.jobs = ['synchronize', 'backup', 'anchor', 'publish', 'website', 'deploy-website'].map(name => ({name, conclusion: 'success'}));
     const status = await json(await x.call('/api/publication?id=' + change.reviewId));
-    assert.equal(status.status, 'published'); assert.equal(status.live_url, 'https://site.example/');
+    assert.equal(status.stage, 'published'); assert.equal(status.live_url, 'https://site.example/');
     x.state.jobs = [];
     const key = generateKeyPairSync('ed25519');
     const config = {version: 1, enabled: true, source_repository: 'fictional/hub', source_repository_id: 42, backup_repository: 'fictional/vault', backup_repository_id: 84, default_branch: 'main', signing_key_id: 'test', public_keys: {test: key.publicKey.export({format: 'pem', type: 'spki'})}};

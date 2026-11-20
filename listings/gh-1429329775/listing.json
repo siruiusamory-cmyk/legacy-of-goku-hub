@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "gh-1429329775",
+  "title": "DragonByte Z / Webfoot SDK",
+  "developer": "siruiusamory-cmyk",
+  "description": "ROM editing tools and documented formats for Webfoot's Dragon Ball Z GBA trilogy. Pre-1.0 and in active development. The DragonByte Z creator application currently opens your own Buu's Fury ROM, edits the game's text, builds a playable ROM and plays it in mGBA. Visual editing of maps, scripts, graphics and audio is a stated goal, not a shipped feature. No ROM or game data is included. MPL-2.0 licensed.",
+  "game": "multiple",
+  "category": "tool",
+  "status": "in-development",
+  "source": {
+    "type": "github",
+    "url": "https://github.com/siruiusamory-cmyk/dragonbyte-z"
+  },
+  "links": [
+    {
+      "label": "Install guide",
+      "url": "https://github.com/siruiusamory-cmyk/dragonbyte-z/blob/master/INSTALL.md"
+    },
+    {
+      "label": "Documentation",
+      "url": "https://github.com/siruiusamory-cmyk/dragonbyte-z/blob/master/docs/README.md"
+    }
+  ],
+  "screenshots": [],
+  "approved_at": "2026-11-19T20:54:45Z"
+}

@@ -20,16 +20,16 @@ async function start(api){
   if(!Number.isInteger(data.count)||data.count<0||(data.count===0?data.average!==null:!Number.isFinite(data.average)||data.average<1||data.average>7))throw Error('Ratings unavailable.');
   document.querySelectorAll('[data-ratings-project]').forEach(el=>{
    if(el.dataset.ratingsProject!==id)return;
-   const text=data.count?`${data.average.toFixed(1)} / 7 (${data.count} ratings)`:'Not rated yet';
+   const votes=`(${data.count} ${data.count===1?'rating':'ratings'})`,text=data.count?`${data.average.toFixed(1)} / 7 ${votes}`:'Not rated yet';
    const value=el.querySelector('.rating-value'),strong=document.createElement('strong');
-   if(data.count){strong.textContent=data.average.toFixed(1)+' ';const scale=document.createElement('span');scale.textContent='/ 7';strong.append(scale);const count=document.createElement('small');count.textContent=` (${data.count} ratings)`;value.replaceChildren(strong,count);}
+   if(data.count){strong.textContent=data.average.toFixed(1)+' ';const scale=document.createElement('span');scale.textContent='/ 7';strong.append(scale);const count=document.createElement('small');count.textContent=' '+votes;value.replaceChildren(strong,count);}
    else{strong.className='unrated';strong.textContent='Not rated yet';value.replaceChildren(strong);}
    el.setAttribute('aria-label','Community rating: '+text);el.title='Community rating: '+text;el.querySelectorAll('.dragon-ball').forEach((ball,i)=>ball.classList.toggle('muted',!data.count||i>=Math.round(data.average)));
   });
  }
  function unavailable(id){document.querySelectorAll('[data-ratings-project]').forEach(el=>{if(el.dataset.ratingsProject===id){el.querySelector('.rating-value').textContent='Ratings unavailable';el.setAttribute('aria-label','Community ratings unavailable');el.title='Ratings unavailable';el.querySelectorAll('.dragon-ball').forEach(ball=>ball.classList.add('muted'));}});}
- async function refresh(id){try{display(id,await request('/projects/'+id));}catch{unavailable(id);}}
- const ids=[...new Set([...document.querySelectorAll('[data-ratings-project]')].map(el=>el.dataset.ratingsProject))];const aggregates=Promise.all(ids.map(refresh));if(!selector){await aggregates;return;}
+ const ids=[...new Set([...document.querySelectorAll('[data-ratings-project]')].map(el=>el.dataset.ratingsProject))];
+ const aggregates=ids.length&&request('/projects').catch(()=>null).then(data=>ids.forEach(id=>{try{if(!data?.projects||typeof data.projects!=='object'||Array.isArray(data.projects))throw Error('Ratings unavailable.');display(id,data.projects[id]??{count:0,average:null});}catch{unavailable(id);}}));if(!selector){await aggregates;return;}
  const id=selector.dataset.ratingSelector;let saved=null,busy=false,queued=null,readVersion=0;
  function selected(score){selector.querySelectorAll('input').forEach(el=>el.checked=Number(el.value)===score);}
  async function mine(){

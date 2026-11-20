@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "ext-24utakxngwg4",
+  "title": "Legacy of Goku II Brazilian Portuguese Translation",
+  "developer": "Breno",
+  "description": "A full Brazilian Portuguese translation of The Legacy of Goku II covering text, graphics and scenery. It removes the 'Hercule' censorship so Mr. Satan keeps his name, and adds Japanese character thumbnails as an extra.",
+  "game": "legacy-of-goku-2",
+  "category": "translation",
+  "status": "released",
+  "source": {
+    "type": "platform",
+    "url": "https://www.romhacking.net/translations/7682/"
+  },
+  "distribution": {
+    "label": "Patch Page",
+    "url": "https://www.romhacking.net/translations/7682/",
+    "kind": "page"
+  },
+  "screenshots": [],
+  "approved_at": "2026-11-19T20:18:51Z"
+}

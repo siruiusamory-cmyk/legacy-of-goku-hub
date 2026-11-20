@@ -1,0 +1,662 @@
+{
+ "desktop": {
+  "pageOverflow": 0,
+  "tabs": [
+   {
+    "text": "ROM HACKS 4 PROJECTS",
+    "box": [
+     140,
+     1045,
+     233.6,
+     45.8
+    ],
+    "clipped": false,
+    "font": "21.6px",
+    "borders": "2px 2px 0px 2px"
+   },
+   {
+    "text": "TRANSLATIONS 1 PROJECT",
+    "box": [
+     374,
+     1045,
+     233.6,
+     45.8
+    ],
+    "clipped": false,
+    "font": "21.6px",
+    "borders": "2px 2px 0px 0px"
+   },
+   {
+    "text": "FAN PROJECTS 1 PROJECT",
+    "box": [
+     607,
+     1045,
+     233.6,
+     45.8
+    ],
+    "clipped": false,
+    "font": "21.6px",
+    "borders": "2px 2px 0px 0px"
+   },
+   {
+    "text": "TOOLS 1 PROJECT",
+    "box": [
+     841,
+     1045,
+     233.6,
+     45.8
+    ],
+    "clipped": false,
+    "font": "21.6px",
+    "borders": "2px 2px 0px 0px"
+   },
+   {
+    "text": "RESOURCES 0 PROJECTS",
+    "box": [
+     1074,
+     1045,
+     233.6,
+     45.8
+    ],
+    "clipped": false,
+    "font": "21.6px",
+    "borders": "2px 2px 0px 0px"
+   }
+  ],
+  "nav": [
+   {
+    "text": "PROJECTS",
+    "box": [
+     464,
+     186,
+     130.1,
+     45.8
+    ],
+    "font": "21.6px"
+   },
+   {
+    "text": "SUBMIT",
+    "box": [
+     594,
+     186,
+     130.1,
+     45.8
+    ],
+    "font": "21.6px"
+   },
+   {
+    "text": "GITHUB",
+    "box": [
+     724,
+     186,
+     130.1,
+     45.8
+    ],
+    "font": "21.6px"
+   },
+   {
+    "text": "",
+    "box": [
+     854,
+     186,
+     130.1,
+     45.8
+    ],
+    "font": "21.6px"
+   }
+  ],
+  "tablist": [
+   140,
+   1045,
+   1168,
+   45.8
+  ],
+  "controls": [
+   140,
+   1090,
+   1168,
+   68
+  ],
+  "heading": [
+   140,
+   974,
+   1168,
+   54.5
+  ],
+  "grid": [
+   140,
+   1170,
+   1168,
+   887.8
+  ],
+  "visibleCards": 4
+ },
+ "laptop": {
+  "pageOverflow": 0,
+  "tabs": [
+   {
+    "text": "ROM HACKS 4 PROJECTS",
+    "box": [
+     36,
+     994,
+     190.4,
+     43.1
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 2px"
+   },
+   {
+    "text": "TRANSLATIONS 1 PROJECT",
+    "box": [
+     226,
+     994,
+     190.4,
+     43.1
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 0px"
+   },
+   {
+    "text": "FAN PROJECTS 1 PROJECT",
+    "box": [
+     417,
+     994,
+     190.4,
+     43.1
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 0px"
+   },
+   {
+    "text": "TOOLS 1 PROJECT",
+    "box": [
+     607,
+     994,
+     190.4,
+     43.1
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 0px"
+   },
+   {
+    "text": "RESOURCES 0 PROJECTS",
+    "box": [
+     798,
+     994,
+     190.4,
+     43.1
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 0px"
+   }
+  ],
+  "nav": [
+   {
+    "text": "PROJECTS",
+    "box": [
+     289,
+     185,
+     111.7,
+     44
+    ],
+    "font": "19.2px"
+   },
+   {
+    "text": "SUBMIT",
+    "box": [
+     400,
+     185,
+     111.7,
+     44
+    ],
+    "font": "19.2px"
+   },
+   {
+    "text": "GITHUB",
+    "box": [
+     512,
+     185,
+     111.7,
+     44
+    ],
+    "font": "19.2px"
+   },
+   {
+    "text": "",
+    "box": [
+     624,
+     185,
+     111.7,
+     44
+    ],
+    "font": "19.2px"
+   }
+  ],
+  "tablist": [
+   36,
+   994,
+   952,
+   43.1
+  ],
+  "controls": [
+   36,
+   1038,
+   952,
+   122
+  ],
+  "heading": [
+   36,
+   935,
+   952,
+   43.9
+  ],
+  "grid": [
+   36,
+   1172,
+   952,
+   988.7
+  ],
+  "visibleCards": 4
+ },
+ "tablet": {
+  "pageOverflow": 0,
+  "tabs": [
+   {
+    "text": "ROM HACKS 4 PROJECTS",
+    "box": [
+     24,
+     1266,
+     237.3,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 2px"
+   },
+   {
+    "text": "TRANSLATIONS 1 PROJECT",
+    "box": [
+     261,
+     1266,
+     237.3,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 0px"
+   },
+   {
+    "text": "FAN PROJECTS 1 PROJECT",
+    "box": [
+     499,
+     1266,
+     237.3,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 0px"
+   },
+   {
+    "text": "TOOLS 1 PROJECT",
+    "box": [
+     24,
+     1310,
+     356,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 2px"
+   },
+   {
+    "text": "RESOURCES 0 PROJECTS",
+    "box": [
+     380,
+     1310,
+     356,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 0px"
+   }
+  ],
+  "nav": [
+   {
+    "text": "Projects",
+    "box": [
+     0,
+     1289,
+     0,
+     0
+    ],
+    "font": "19.2px"
+   },
+   {
+    "text": "Submit",
+    "box": [
+     0,
+     1289,
+     0,
+     0
+    ],
+    "font": "19.2px"
+   },
+   {
+    "text": "GitHub",
+    "box": [
+     0,
+     1289,
+     0,
+     0
+    ],
+    "font": "19.2px"
+   },
+   {
+    "text": "",
+    "box": [
+     0,
+     1289,
+     0,
+     0
+    ],
+    "font": "19.2px"
+   }
+  ],
+  "tablist": [
+   24,
+   1266,
+   712,
+   88
+  ],
+  "controls": [
+   24,
+   1354,
+   712,
+   176
+  ],
+  "heading": [
+   24,
+   1200,
+   712,
+   50.1
+  ],
+  "grid": [
+   24,
+   1542,
+   712,
+   851.9
+  ],
+  "visibleCards": 4
+ },
+ "mobile": {
+  "pageOverflow": 0,
+  "tabs": [
+   {
+    "text": "ROM HACKS 4 PROJECTS",
+    "box": [
+     16,
+     1464,
+     179,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 2px"
+   },
+   {
+    "text": "TRANSLATIONS 1 PROJECT",
+    "box": [
+     195,
+     1464,
+     179,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 0px"
+   },
+   {
+    "text": "FAN PROJECTS 1 PROJECT",
+    "box": [
+     16,
+     1508,
+     179,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 2px"
+   },
+   {
+    "text": "TOOLS 1 PROJECT",
+    "box": [
+     195,
+     1508,
+     179,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 0px"
+   },
+   {
+    "text": "RESOURCES 0 PROJECTS",
+    "box": [
+     16,
+     1552,
+     358,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 2px"
+   }
+  ],
+  "nav": [
+   {
+    "text": "Projects",
+    "box": [
+     0,
+     1461,
+     0,
+     0
+    ],
+    "font": "19.2px"
+   },
+   {
+    "text": "Submit",
+    "box": [
+     0,
+     1461,
+     0,
+     0
+    ],
+    "font": "19.2px"
+   },
+   {
+    "text": "GitHub",
+    "box": [
+     0,
+     1461,
+     0,
+     0
+    ],
+    "font": "19.2px"
+   },
+   {
+    "text": "",
+    "box": [
+     0,
+     1461,
+     0,
+     0
+    ],
+    "font": "19.2px"
+   }
+  ],
+  "tablist": [
+   16,
+   1464,
+   358,
+   132
+  ],
+  "controls": [
+   16,
+   1596,
+   358,
+   176
+  ],
+  "heading": [
+   16,
+   1357,
+   358,
+   91
+  ],
+  "grid": [
+   16,
+   1784,
+   358,
+   640.6
+  ],
+  "visibleCards": 4
+ },
+ "small": {
+  "pageOverflow": 0,
+  "tabs": [
+   {
+    "text": "ROM HACKS 4 PROJECTS",
+    "box": [
+     16,
+     1493,
+     144,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 2px"
+   },
+   {
+    "text": "TRANSLATIONS 1 PROJECT",
+    "box": [
+     160,
+     1493,
+     144,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 0px"
+   },
+   {
+    "text": "FAN PROJECTS 1 PROJECT",
+    "box": [
+     16,
+     1537,
+     144,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 2px"
+   },
+   {
+    "text": "TOOLS 1 PROJECT",
+    "box": [
+     160,
+     1537,
+     144,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 0px"
+   },
+   {
+    "text": "RESOURCES 0 PROJECTS",
+    "box": [
+     16,
+     1581,
+     288,
+     44
+    ],
+    "clipped": false,
+    "font": "19.2px",
+    "borders": "2px 2px 0px 2px"
+   }
+  ],
+  "nav": [
+   {
+    "text": "Projects",
+    "box": [
+     0,
+     1633,
+     0,
+     0
+    ],
+    "font": "19.2px"
+   },
+   {
+    "text": "Submit",
+    "box": [
+     0,
+     1633,
+     0,
+     0
+    ],
+    "font": "19.2px"
+   },
+   {
+    "text": "GitHub",
+    "box": [
+     0,
+     1633,
+     0,
+     0
+    ],
+    "font": "19.2px"
+   },
+   {
+    "text": "",
+    "box": [
+     0,
+     1633,
+     0,
+     0
+    ],
+    "font": "19.2px"
+   }
+  ],
+  "tablist": [
+   16,
+   1493,
+   288,
+   132
+  ],
+  "controls": [
+   16,
+   1625,
+   288,
+   228
+  ],
+  "heading": [
+   16,
+   1386,
+   288,
+   91
+  ],
+  "grid": [
+   16,
+   1865,
+   288,
+   731.2
+  ],
+  "visibleCards": 4
+ }
+}

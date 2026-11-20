@@ -1,0 +1,17 @@
+{
+  "name": "loghub-admin",
+  "main": "worker.js",
+  "compatibility_date": "2026-07-02",
+  "workers_dev": false,
+  "routes": [{"pattern": "admin.legacyofgokuhub.com", "custom_domain": true}],
+  "preview_urls": false,
+  "observability": {"enabled": false},
+  "assets": {"directory": "./public", "binding": "ASSETS", "run_worker_first": true},
+  "vars": {
+    "ADMIN_ENABLED": "true",
+    "ADMIN_ORIGIN": "https://admin.legacyofgokuhub.com",
+    "SITE_ORIGIN": "https://legacyofgokuhub.com",
+    "SOURCE_REPO": "siruiusamory-cmyk/legacy-of-goku-hub"
+  },
+  "d1_databases": [{"binding": "DB", "database_name": "loghub-intake", "database_id": "7f30d601-b245-4384-95de-792b0b5ed48f", "migrations_dir": "../intake/migrations"}, {"binding": "RATINGS_DB", "database_name": "loghub-ratings", "database_id": "a90fe4fa-dc7f-4b9a-8d26-51c2e968f72c"}]
+}

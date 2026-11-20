@@ -69,6 +69,51 @@
   ],
   "external_projects": [
     {
+      "project_id": "ext-24utakxngwg4",
+      "decision": "approved",
+      "content_digests": [
+        "7e5b858011cee4f7ae65878ee45ee9be1ef3fd746bb1f0cc4bac12f5ec0c2313"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
+      "project_id": "ext-db2tm2uibxbu",
+      "decision": "approved",
+      "content_digests": [
+        "0ba176d887ee4b41cbfa5bc3572bb0155d360756e0371ec2258cc413a471cce5"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
+      "project_id": "ext-ehmtwl6v2tj6",
+      "decision": "approved",
+      "content_digests": [
+        "a9c5d69896407dbb0f4f2372bd6260e7cbb3910516cebffc6efdb9b1fc4488d9"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
+      "project_id": "ext-fz776bgnkfc6",
+      "decision": "approved",
+      "content_digests": [
+        "8f14808d516b9f13ccb23e7a3e7967176991491fcff9d2dc505c044568158403"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "9801d099eeb214bad322272466912ce9e8299b8a05f12be9313b776c3e4517e1",
+            "sha256": "c98d83eaf0ec2df17777a25390b46daf9e0ad38e4fce67d17ccc6bb29ef12a45"
+          }
+        ]
+      ]
+    },
+    {
       "project_id": "ext-gcshm2l3av3q",
       "decision": "approved",
       "content_digests": [
@@ -112,6 +157,26 @@
       "featured": true
     },
     {
+      "project_id": "ext-ivalju5tvo53",
+      "decision": "approved",
+      "content_digests": [
+        "9bf0514f8f6c38008c3e56b4d37d4c93d8fea4096647f6b859a6b02e84d4dda1"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
+      "project_id": "ext-m2kjqroxo4zh",
+      "decision": "approved",
+      "content_digests": [
+        "18ebd26b5e2211a51da0e86888ee893e10f9b175ad5e7a4bf621056cfc12fbe6"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
       "project_id": "ext-mkclhutzqjew",
       "decision": "approved",
       "content_digests": [
@@ -120,6 +185,80 @@
       ],
       "artwork_sets": [
         []
+      ]
+    },
+    {
+      "project_id": "ext-n4ewtiwz3pr2",
+      "decision": "approved",
+      "content_digests": [
+        "df1db31ada5cd6e253afb9821a704203dd4e60f772073314141bcbb39c2a03d6"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "1b4a58a8b549c5088b414bfbd01f37600be5b9739d912ff64f207e570b5b5b0a",
+            "sha256": "285a6e1654ae1691912440c1de77668b2a504da308836f77db70a02672cc75fa"
+          }
+        ]
+      ]
+    },
+    {
+      "project_id": "ext-oq7jsaap3ozw",
+      "decision": "approved",
+      "content_digests": [
+        "c380a762c3e2fea5899fa64de828eaa21d5d4f4fa3255d92fb2a5eac8176f082"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
+      "project_id": "ext-pvjzivq7r6wq",
+      "decision": "approved",
+      "content_digests": [
+        "e959eab85c315f70763bc45902ac4cb54960697bd94f720e57e72a2b6e93c469"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "338605586a3757333d9d4af92de71142d25703578bd1c66841b7b980e2b56bb1",
+            "sha256": "8351b9e54ebcf86ffffe991f2f475114d97a246faa0aea8ac546f9fa1b4ebe87"
+          },
+          {
+            "source_sha256": "d0ab415af14f571a2966c621ed18e42e258c227f3e400261d13d8fc3b8766bee",
+            "sha256": "a3c298e63fe79e52c2e5cbee6b27a890274a352f18792efa4b3af39203919cba"
+          }
+        ]
+      ]
+    },
+    {
+      "project_id": "ext-tuk6ramku6ni",
+      "decision": "approved",
+      "content_digests": [
+        "c4593af16dfc62105f7c64ae4ddada8df546d9f89ed694b251ed860e59dce153"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "aa36613689925139c7c8809ebe53c8fd9c82ffef9429b7a7c44b31361d250db6",
+            "sha256": "93e2a9be5dc25ca7515c979354c96b945669f680f7474092941839f04601a08b"
+          }
+        ]
+      ]
+    },
+    {
+      "project_id": "ext-yz2uy2jy3ewf",
+      "decision": "approved",
+      "content_digests": [
+        "8bae10a7a39c81e1c4afc572a8198aee14b0629f64048b967c89596acc4206db"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "0983a916071383deed61e20fcf7e1ea3b952ab16754f6039c9b4afca4a8e9302",
+            "sha256": "04de35893dbbcb35467b2b66ffa7e20ebf5bf5f2e0df48caa28e0cf3464e4ce1"
+          }
+        ]
       ]
     },
     {
@@ -133,6 +272,28 @@
         []
       ],
       "featured": false
+    },
+    {
+      "project_id": "gh-1300911360",
+      "owner_id": 50032825,
+      "decision": "approved",
+      "content_digests": [
+        "992ce91cd079e9ac325f8c18f80ae627e9a2990bc8ff5a9e5cc1dccb956a2bf3"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
+      "project_id": "gh-1313399170",
+      "owner_id": 120978532,
+      "decision": "approved",
+      "content_digests": [
+        "b6f733485349430b116c1d28656b665d748de8a05dc4548a195bf9b508fe77cc"
+      ],
+      "artwork_sets": [
+        []
+      ]
     },
     {
       "project_id": "gh-1418576969",
@@ -152,6 +313,85 @@
             "sha256": "d0a72b488d6665d07a890a1ccdb04a7a5f8273e1f57bf9e91ac94a407c11dedb"
           }
         ]
+      ]
+    },
+    {
+      "project_id": "gh-1429329775",
+      "owner_id": 287528505,
+      "decision": "approved",
+      "content_digests": [
+        "51246d866a0d08e818886ee7926bf9fd9534adf298c3a5b2b90cc999809a1092"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
+      "project_id": "gh-351776373",
+      "owner_id": 12222927,
+      "decision": "approved",
+      "content_digests": [
+        "1e7cbfd8fea12cc9eb783549cdc8ee8922a1d06cabf4822e00517c03ff787166"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
+      "project_id": "gh-469285176",
+      "owner_id": 8932978,
+      "decision": "approved",
+      "content_digests": [
+        "dfa2bb584ec8ebe7c945f9c424df44700433d21493f6b16072d5dfdebd6afedf"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
+      "project_id": "gh-776476544",
+      "owner_id": 164657944,
+      "decision": "approved",
+      "content_digests": [
+        "9812ccbe1b69e2b2d83451e0032db1f0d143e2af0e977007f9590afffe40cc38"
+      ],
+      "artwork_sets": [
+        []
+      ]
+    },
+    {
+      "project_id": "gh-803617920",
+      "owner_id": 83682740,
+      "decision": "approved",
+      "content_digests": [
+        "24f522fb2d1d1b9dfa0006f45e4e848843e00b600dbeb914c8d9df60d0ebbed9"
+      ],
+      "artwork_sets": [
+        [
+          {
+            "source_sha256": "f377aedc1e955fa0f038684b1138e063303c7c3e2a020dd56b6549cf0c1f33a9",
+            "sha256": "5d8c21cdedde769dc79922ad6c9148551f370fe91f3ead2db3917e78b0d5f062"
+          },
+          {
+            "source_sha256": "61a29d345f3b39f5d2c23ec1c888b8f5083c15bd85782c7553fe02e7f87ba0a6",
+            "sha256": "6ba1c336218c1908d074020da5a367ae7d46f82ff5eeaa23f819dc4d99a4dcc6"
+          },
+          {
+            "source_sha256": "ea511ce30b83247a8c26077c3690e261db010fbd32ef078ac0603b9d000dbef9",
+            "sha256": "3c25ca027ac8bea0b235ddd257dce72ff8a1f8b53825292293ba4e165968478d"
+          }
+        ]
+      ]
+    },
+    {
+      "project_id": "gh-951040392",
+      "owner_id": 160562170,
+      "decision": "approved",
+      "content_digests": [
+        "929ce327734b94c2d1f7125c7d34b61e26f02bd430000a62db3bfcc8325fa11d"
+      ],
+      "artwork_sets": [
+        []
       ]
     }
   ]

@@ -1,27 +1,152 @@
 import {test, expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import fs from 'node:fs/promises';
+import sharp from 'sharp';
 test.beforeEach(async ({context}) => {
-  await context.route('**/*',route => /^http:\/\/127\.0\.0\.1:(4321|4322|4323)\//.test(route.request().url()) ? route.continue() : route.abort());
+  await context.route('**/*',route => /^http:\/\/127\.0\.0\.1:(4321|4322|4323|4324)\//.test(route.request().url()) ? route.continue() : route.abort());
 });
-test('search, combined filters, reset and deterministic sorting work', async ({page}) => {
+test('multi-game listings pass a game filter, filters offer only what exists, and page links are named for the project', async ({page}) => {
+  await page.goto('http://127.0.0.1:4324/?category=tool');
+  await page.getByLabel('Base game',{exact:true}).selectOption('legacy-of-goku');
+  expect(await page.locator('.project-card:visible').evaluateAll(cards => cards.map(card => card.dataset.id))).toEqual(['ext-sitehack0002']);
+  await page.getByLabel('Base game',{exact:true}).selectOption('multiple');
+  expect(await page.locator('.project-card:visible').evaluateAll(cards => cards.map(card => card.dataset.id))).toEqual(['ext-sitehack0002']);
+  await expect(page.locator('#status option')).toHaveText(['All statuses','Released','In Development']);
+  await page.goto('http://127.0.0.1:4324/projects/ext-sitehack0002/');
+  await expect(page.locator('.hero-actions a')).toHaveText(['Download Page']);
+  await page.goto('http://127.0.0.1:4322/');
+  await expect(page.locator('#status option')).toHaveText(['All statuses']);
+  await expect(page.locator('#sort option')).toHaveText(['Sort by: Name','Sort by: Listing updated']);
+});
+test('sitemap, feed and robots file list the published pages', async ({page}) => {
+  const sitemap = await (await page.request.get('/sitemap.xml')).text();
+  for (const address of ['', 'how-to-patch/', 'submit/', 'ratings-privacy/', 'projects/fixture-0/', 'projects/fixture-6/']) expect(sitemap).toContain(`<loc>https://legacyofgokuhub.com/${address}</loc>`);
+  expect(sitemap.match(/<url>/g)).toHaveLength(11);
+  const feed = await (await page.request.get('/rss.xml')).text();
+  expect(feed.match(/<item>/g)).toHaveLength(7);
+  expect(feed).toContain('<guid>https://legacyofgokuhub.com/projects/fixture-6/</guid>');
+  expect(feed).not.toMatch(/<img|<script/);
+  expect(await (await page.request.get('/robots.txt')).text()).toContain('Sitemap: https://legacyofgokuhub.com/sitemap.xml');
+  expect((await (await page.request.get('http://127.0.0.1:4322/rss.xml')).text()).match(/<item>/g)).toBeNull();
+  await page.goto('/');
+  await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute('href','/rss.xml');
+});
+const shown = page => page.locator('.project-card:visible').evaluateAll(cards => cards.map(card => card.dataset.id));
+test('search, filters, clear and deterministic sorting work', async ({page}) => {
   await page.goto('/');
   await expect(page.locator('.project-card')).toHaveCount(7);
+  await expect(page.locator('.project-card:visible')).toHaveCount(4);
   await page.getByRole('searchbox').fill('CapsuleWorks');
-  await expect(page.locator('.project-card:visible')).toHaveCount(1);
-  await page.getByRole('button',{name:'Show all projects and reset filters'}).click();
-  await page.getByLabel('Base game',{exact:true}).selectOption('legacy-of-goku-2');
-  await page.getByLabel('Project category',{exact:true}).selectOption('tool');
-  await expect(page.locator('.project-card:visible')).toHaveCount(1);
+  expect(await shown(page)).toEqual(['fixture-4']);
   await page.getByLabel('Development status',{exact:true}).selectOption('in-development');
   await expect(page.getByText('No matching projects',{exact:true})).toBeVisible();
   await page.getByRole('button',{name:'Clear filters'}).click();
+  await expect(page.getByRole('searchbox')).toHaveValue('');
+  await expect(page.locator('.project-card:visible')).toHaveCount(4);
+  await page.locator('.category-tabs a[data-category="rom-hack"]').click();
+  await page.getByLabel('Base game',{exact:true}).selectOption('buus-fury');
+  expect(await shown(page)).toEqual(['fixture-5']);
+  await page.getByLabel('Base game',{exact:true}).selectOption('');
   await page.getByLabel('Sort projects',{exact:true}).selectOption('updated');
-  await expect(page.locator('.project-card').first()).toHaveAttribute('data-id','fixture-6');
+  expect(await shown(page)).toEqual(['fixture-6','fixture-5','fixture-1','fixture-0']);
   await page.getByLabel('Sort projects',{exact:true}).selectOption('release');
-  await expect(page.locator('.project-card').first()).toHaveAttribute('data-id','fixture-6');
+  expect(await shown(page)).toEqual(['fixture-6','fixture-5','fixture-0','fixture-1']);
   await page.getByLabel('Sort projects',{exact:true}).selectOption('name');
-  await expect(page.locator('.project-card').first()).toHaveAttribute('data-id','fixture-4');
+  expect(await shown(page)).toEqual(['fixture-5','fixture-6','fixture-1','fixture-0']);
+});
+test('search looks in every category and a tab click clears it', async ({page}) => {
+  await page.goto('/');
+  await page.getByRole('searchbox').fill('CapsuleWorks');
+  expect(await shown(page)).toEqual(['fixture-4']);
+  await expect(page.locator('.category-tabs [aria-current]')).toHaveCount(0);
+  await expect(page.locator('#result-count')).toHaveText(/in all categories$/);
+  await page.locator('.category-tabs a[data-category="translation"]').click();
+  await expect(page.getByRole('searchbox')).toHaveValue('');
+  expect(await shown(page)).toEqual(['fixture-2']);
+  await expect(page.locator('.category-tabs [aria-current]')).toHaveAttribute('data-category','translation');
+});
+test('phone cards show their status without horizontal overflow', async ({page}) => {
+  await page.setViewportSize({width:390,height:844});await page.goto('/');
+  for (const card of await page.locator('.project-card:visible').all()) await expect(card.locator('.badge.released, .badge.in-development, .badge.on-hold, .badge.discontinued')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth === innerWidth)).toBe(true);
+});
+test('link previews, icons, patch guide, inclusion policy and unofficial notice', async ({page}) => {
+  await page.goto('/');
+  for (const name of ['og:title','og:description']) await expect(page.locator(`head meta[property="${name}"]`)).toHaveAttribute('content',/./);
+  await expect(page.locator('head meta[name="twitter:card"]')).toHaveAttribute('content','summary_large_image');
+  await expect(page.locator('head meta[property="og:image"]')).toHaveAttribute('content',/^https:\/\//);
+  await expect(page.locator('.site-footer')).toContainText('Unofficial fan site, not affiliated with or endorsed by the owners of Dragon Ball Z or The Legacy of Goku games.');
+  for (const [file,width,height] of [['favicon.png',48,48],['apple-touch-icon.png',180,180],['og-card.png',1200,630]]) {
+    const response = await page.request.get('/' + file);expect(response.status()).toBe(200);
+    expect(await sharp(await response.body()).metadata()).toMatchObject({format:'png',width,height});
+  }
+  await page.goto('/projects/fixture-0/');await expect(page.getByRole('link',{name:'How to apply a patch',exact:true})).toBeVisible();
+  await page.goto('/projects/fixture-4/');await expect(page.getByRole('link',{name:'How to apply a patch',exact:true})).toHaveCount(0);
+  await page.goto('/how-to-patch/');await expect(page.getByRole('heading',{level:1})).toHaveText('How to play a ROM hack or translation');
+  await page.goto('/submit/');await expect(page.getByText('AI-assisted projects are welcome. Low-effort projects made mostly by AI are not listed.')).toBeVisible();
+});
+test('five category tabs replace the combined listing and match the catalogue', async ({page}) => {
+  await page.goto('/');
+  const tabs = page.locator('.category-tabs a');
+  await expect(tabs).toHaveText(['ROM Hacks 4 projects','Translations 1 project','Fan Projects 1 project','Tools 1 project','Resources 0 projects']);
+  await expect(page.locator('.category-tabs [aria-current]')).toHaveText(/^ROM Hacks/);
+  await expect(page.locator('#directory').getByText(/^(all|all projects|all categories|everything)$/i)).toHaveCount(0);
+  await expect(page.locator('#category')).toHaveCount(0);
+  const catalogue = await (await page.request.get('/catalog.json')).json();
+  await page.evaluate(() => {window.stayedOnPage = true;});
+  for (const category of ['translation','fan-project','tool','resource','rom-hack']) {
+    await page.locator(`.category-tabs a[data-category="${category}"]`).click();
+    await expect(page).toHaveURL(new RegExp('\\?category=' + category + '#directory$'));
+    const expected = catalogue.projects.filter(project => project.category === category).map(project => project.id).sort();
+    expect((await shown(page)).sort()).toEqual(expected);
+    await expect(page.locator('.category-tabs [aria-current]')).toHaveAttribute('data-category', category);
+    await expect(page.locator(`.category-tabs a[data-category="${category}"] .tab-count`)).toHaveText(new RegExp('^' + expected.length + ' '));
+  }
+  expect(await page.evaluate(() => window.stayedOnPage)).toBe(true);
+  await page.locator('.category-tabs a[data-category="resource"]').click();
+  await expect(page.getByText('Nothing in this category yet',{exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Clear filters'})).toBeHidden();
+});
+test('category links are shareable and follow Back, Forward and the keyboard', async ({page}) => {
+  await page.goto('/?category=tool#directory');
+  await expect(page.locator('.category-tabs [aria-current]')).toHaveAttribute('data-category','tool');
+  expect(await shown(page)).toEqual(['fixture-4']);
+  await page.locator('.category-tabs a[data-category="translation"]').focus();
+  await page.keyboard.press('Enter');
+  expect(await shown(page)).toEqual(['fixture-2']);
+  await page.keyboard.press('Tab');
+  await expect(page.locator('.category-tabs a[data-category="fan-project"]')).toBeFocused();
+  await page.goBack();
+  await expect(page.locator('.category-tabs [aria-current]')).toHaveAttribute('data-category','tool');
+  expect(await shown(page)).toEqual(['fixture-4']);
+  await page.goForward();
+  await expect(page.locator('.category-tabs [aria-current]')).toHaveAttribute('data-category','translation');
+  await page.goto('/?category=everything');
+  await expect(page.locator('.category-tabs [aria-current]')).toHaveAttribute('data-category','rom-hack');
+  await expect(page.locator('.project-card:visible')).toHaveCount(4);
+});
+test('category tabs carry the main navigation styling and fit a phone', async ({page}) => {
+  await page.goto('/');
+  const style = selector => page.locator(selector).first().evaluate(element => {
+    const computed = getComputedStyle(element);
+    return Object.fromEntries(['fontFamily','fontSize','fontWeight','fontStyle','textTransform','letterSpacing','lineHeight','color','backgroundColor','borderTopColor','borderTopWidth','borderRightWidth','borderBottomWidth','paddingTop','paddingBottom','paddingLeft','paddingRight','clipPath','height'].map(key => [key, computed[key]]));
+  });
+  expect(await style('.category-tabs a:not([aria-current])')).toEqual(await style('.desktop-nav a:not(.active)'));
+  expect(await style('.category-tabs [aria-current]')).toEqual(await style('.desktop-nav a.active'));
+  await page.locator('.category-tabs a:not([aria-current])').first().hover();
+  const hovered = await style('.category-tabs a:not([aria-current])');
+  await page.locator('.desktop-nav a:not(.active)').first().hover();
+  expect(hovered).toEqual(await style('.desktop-nav a:not(.active)'));
+  for (const width of [390, 320]) {
+    await page.setViewportSize({width, height: 844});
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(await page.locator('.card-art img').first().evaluate(image => getComputedStyle(image).objectFit)).toBe('contain');
+    for (const tab of await page.locator('.category-tabs a').all()) {
+      const box = await tab.boundingBox();
+      expect(box.height).toBeGreaterThanOrEqual(44);
+      expect(await tab.evaluate(element => element.scrollWidth <= element.clientWidth && element.scrollHeight <= element.clientHeight)).toBe(true);
+    }
+  }
 });
 test('stable detail navigation, actual metadata and safe external actions', async ({page}) => {
   await page.goto('/');await page.getByRole('link',{name:'View Project',exact:true}).click();
@@ -71,7 +196,7 @@ for (const width of [320,390,430,760,941,1024,1448]) test(`responsive home and d
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   if(width<=900){await page.goto('/');await page.getByLabel('Open navigation').click();await expect(page.getByRole('link',{name:'Submit a project',exact:true}).first()).toBeVisible();}
 });
-for (const [route,width] of [['/',1448],['/projects/fixture-0/',1448],['/',390],['/projects/fixture-0/',390],['http://127.0.0.1:4322/',390]]) test(`WCAG automated checks ${route} ${width}`, async ({page}) => {
+for (const [route,width] of [['/',1448],['/projects/fixture-0/',1448],['/',390],['/projects/fixture-0/',390],['http://127.0.0.1:4322/',390],['/how-to-patch/',1448],['/how-to-patch/',390]]) test(`WCAG automated checks ${route} ${width}`, async ({page}) => {
   await page.setViewportSize({width,height:1086});await page.goto(route);
   expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);
 });

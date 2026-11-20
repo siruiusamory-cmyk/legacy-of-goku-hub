@@ -38,7 +38,7 @@ h1,.brand-name,.empty-art-title {
   line-height: var(--leading-title);
   letter-spacing: 0;
 }
-h2,h3,.label,.panel-title,.featured-label,.desktop-nav a,.mobile-nav summary,.mobile-nav nav a,.button,.filter-chip,.badge,dt,.rating-label,.breadcrumbs,.result-count,.site-motto,.web-badges li,.artwork-unavailable,legend,.field label,.req,.kind-title {
+h2,h3,.label,.panel-title,.featured-label,.desktop-nav a,.category-tabs a,.mobile-nav summary,.mobile-nav nav a,.button,.filter-chip,.badge,dt,.rating-label,.breadcrumbs,.result-count,.site-motto,.web-badges li,.artwork-unavailable,legend,.field label,.req,.kind-title {
   font-family: var(--font-label);
   font-weight: 700;
   font-style: italic;

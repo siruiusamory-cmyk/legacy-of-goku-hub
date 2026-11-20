@@ -27,12 +27,13 @@ test('owner features, replaces and clears GitHub/community projects through priv
       const response = await handle(new Request(request.url(), {method: request.method(), headers: {...request.headers(), 'Cf-Access-Jwt-Assertion': x.token}, ...(body ? {body} : {})}), x.env);
       await route.fulfill({status: response.status, headers: Object.fromEntries(response.headers), body: Buffer.from(await response.arrayBuffer())});
     });
-    await context.route('https://ratings.example/**', route => route.fulfill({json: {average: 6, count: 2}, headers: {'Access-Control-Allow-Origin': '*'}}));
+    await context.route('https://ratings.example/**', route => route.fulfill({json: {projects: Object.fromEntries(publication.catalog.projects.map(p => [p.id, {average: 6, count: 2}]))}, headers: {'Access-Control-Allow-Origin': '*'}}));
     await context.route('https://site.example/**', async route => {
       const pathname = new URL(route.request().url()).pathname;
       const file = path.join(rendered, pathname === '/' ? 'index.html' : pathname.endsWith('/') ? pathname + 'index.html' : pathname);
       const type = {'.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.webp': 'image/webp', '.png': 'image/png'}[path.extname(file)] || 'application/octet-stream';
-      await route.fulfill({body: await fs.readFile(file), contentType: type});
+      // The icons are written by tools/site/build.js, which this render does not run.
+      await fs.readFile(file).then(body => route.fulfill({body, contentType: type}), () => route.fulfill({status: 404}));
     });
     async function renderHome() {
       const directory = path.join(x.root, 'render-' + build++), input = path.join(directory, 'input');
@@ -55,14 +56,14 @@ test('owner features, replaces and clears GitHub/community projects through priv
       await home.goto('https://site.example/');
     }
     await page.setViewportSize({width: 390, height: 900});
-    await page.goto(origin); await page.getByRole('button', {name: 'Sign in', exact: true}).click();
+    await page.goto(origin); await expect(page.getByRole('button', {name: 'Sign in', exact: true})).toBeHidden(); await expect(page.locator('#workspace')).toBeVisible();
     await page.getByRole('button', {name: 'Existing listings', exact: true}).click();
     await expect(page.getByText('Currently Featured: none', {exact: true})).toBeVisible();
     for (const [id, action] of [['gh-123', 'Feature'], ['ext-abcdefghijkl', 'Replace Featured'], ['ext-abcdefghijkl', 'Remove from Featured']]) {
       const project = x.state.projects.find(project => project.id === id);
-      if (action === 'Feature') await page.locator('.item-card').filter({has: page.getByRole('button', {name: 'Manage ' + id, exact: true})}).getByRole('button', {name: 'Make Featured', exact: true}).click();
+      if (action === 'Feature') await page.locator('.item-card').filter({has: page.getByRole('button', {name: 'Manage ' + project.title, exact: true})}).getByRole('button', {name: 'Make Featured', exact: true}).click();
       else {
-        await page.getByRole('button', {name: 'Manage ' + id, exact: true}).click();
+        await page.getByRole('button', {name: 'Manage ' + project.title, exact: true}).click();
         await page.getByRole('button', {name: action, exact: true}).click();
       }
       await expect(page.locator('#notice')).toContainText('Private preparation queued');
@@ -81,13 +82,13 @@ test('owner features, replaces and clears GitHub/community projects through priv
         await expect.poll(() => image.evaluate(img => img.complete && img.naturalWidth === 640)).toBe(true);
       }
       await page.getByLabel('I reviewed the exact content', {exact: false}).check();
-      if (prepared.package.files.length) await page.getByLabel('I inspected all normalized artwork', {exact: false}).check();
+      if (prepared.package.files.length) await page.getByLabel('I inspected all prepared images', {exact: false}).check();
       expect((await new AxeBuilder({page}).analyze()).violations).toEqual([]);
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.getByRole('button', {name: prepared.package.files.length ? 'Approve exact content and artwork' : 'Approve exact content', exact: true}).click(); await page.getByRole('button', {name: 'Confirm', exact: true}).click();
       await expect(page.locator('#notice')).toContainText('Exact approval recorded');
-      await page.getByRole('button', {name: 'Prepare protected publication PR'}).click(); await page.getByRole('button', {name: 'Confirm', exact: true}).click();
-      await expect(page.locator('#notice')).toContainText('PR preparation queued');
+      await page.getByRole('button', {name: 'Publish now', exact: true}).click();
+      await expect(page.locator('#notice')).toContainText('Publication started');
       expect(x.state.dispatched.at(-1).inputs.action).toBe('publish');
       await saveJSON(path.join(x.root, 'policy/publishing.json'), prepared.package.policy);
       publication = await x.refresh();

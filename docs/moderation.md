@@ -8,6 +8,8 @@ Every first listing needs a human content decision in `policy/publishing.json`, 
 
 Prohibited: explicit sexual imagery; abusive, hateful or threatening imagery/text; harassment; unlawful content; misleading impersonation; unrelated spam; copyrighted ROM uploads or misleading download claims. Require appropriate rights for submitted artwork. Attribution alone is not permission. GitHub-hosted downloads and automated checks do not establish malware safety.
 
+AI-assisted projects are welcome. Low-effort projects made mostly by AI are not listed.
+
 ## Existing controls and the gaps closed
 
 Preserved: static PNG/JPEG/WebP, 5 MiB, 20 megapixels, 8192px per side, corrupt/animated/unsupported rejection, proportional contain normalization to 640x360 covers and 480x320 screenshots. HTTPS same-repository, full-SHA raw URLs, no image redirects, bounded downloads, stable numeric repository/owner identities, representative policy, transfer review, duplicate identity rejection, release/asset checks and GitHub-only distribution remain intact. No submitted software executes.
@@ -15,6 +17,8 @@ Preserved: static PNG/JPEG/WebP, 5 MiB, 20 megapixels, 8192px per side, corrupt/
 Gaps closed: trust previously allowed first publication; same URL previously reused artwork without content verification; held candidates were written under a public Actions artifact; restored snapshots needed current artwork approval; the legacy staging workflow could put unapproved images in public PRs. It now grants no approvals and writes no files. Legacy `submission`/`stage` CLI commands fail with migration guidance.
 
 ## Review privately on Windows
+
+**Superseded by the dashboard, see the [owner runbook](OWNER-RUNBOOK.md).** This procedure stays as the developer reference for the GitHub manifest and Issue Form route.
 
 1. Open the normal manifest or guided Issue Form. Automatic synchronization gives field errors and metadata/hash-only review notices in `validation-report`. It does not upload candidate artwork. Both methods use the same validation pipeline.
 2. On a trusted maintainer computer, with Node24 and existing dependencies installed:

@@ -25,6 +25,8 @@ Activation (owner decision, not done by this change):
 
 ## Moderator workflow
 
+**Superseded by the dashboard, see the [owner runbook](../OWNER-RUNBOOK.md).** The command-line moderator below is kept for reference only.
+
 Set `INTAKE_API` and `INTAKE_ADMIN_TOKEN`, then `node tools/intake/moderate.js`:
 
 | Command | Purpose |
@@ -49,4 +51,7 @@ Approval is always a human, signed-pipeline step: an unapproved or changed conte
 - The committed `INTAKE_ENABLED` stays `"false"`. The live gate was turned on at deploy time: `wrangler deploy --config intake/wrangler.jsonc --var INTAKE_ENABLED:true`. Redeploy with the same flag or the gate closes.
 - Repository variables `INTAKE_ENABLED`, `INTAKE_API_ORIGIN` and `TURNSTILE_SITE_KEY` feed the protected website build. To roll back, set `INTAKE_ENABLED` to `false` and dispatch the catalog workflow; the site returns to the GitHub Issue Form route.
 - Secrets live only in the Worker and a private local folder. Rotate by re-running `wrangler secret put`.
+- `ADMIN_ORIGIN` (`https://admin.legacyofgokuhub.com`) is a committed variable in `intake/wrangler.jsonc`. The owner notification email links to it.
+- Owner notification email uses the `send_email` binding `NOTIFY_EMAIL` (with `destination_address`) and the variable `NOTIFY_TO`, both holding the owner's verified Email Routing address. Neither is committed. The private configuration is kept outside every checkout at `%LOCALAPPDATA%\loghub-private\intake\wrangler.private.jsonc` and copied to `intake/wrangler.private.jsonc` (listed in `.gitignore`) at deploy time. It is the committed `intake/wrangler.jsonc` plus `"send_email": [{"name": "NOTIFY_EMAIL", "destination_address": "<owner address>"}]` and `"NOTIFY_TO": "<owner address>"` under `vars`. Deploy it with `npx wrangler deploy --config intake/wrangler.private.jsonc --var INTAKE_ENABLED:true`. Without the binding, `NOTIFY_TO` or a valid `ADMIN_ORIGIN`, no mail is sent and everything else works. Live since 2026-11-19 as version `86d9cc39`; the first scheduled email arrived at 13:17 UTC that day. The full procedure is "Deploying an approved change" in the [owner runbook](../OWNER-RUNBOOK.md#deploying-an-approved-change).
+- The hourly cron sends one count-only email ("N submission(s) waiting for review" plus `ADMIN_ORIGIN`) when the number of `received` submissions rises. The last notified count is the `limits` row `notify:received`, written only after a successful send or when the count did not rise, so a failed send is retried the next hour. Cloudflare's Email Routing summary lists these sends as "dropped" even when they are delivered.
 - Automated browsers usually fail the Turnstile check, so live end-to-end tests need a person to tick the box.

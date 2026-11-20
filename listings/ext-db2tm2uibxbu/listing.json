@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "ext-db2tm2uibxbu",
+  "title": "Buu's Fury French Translation",
+  "developer": "Fralacticus",
+  "description": "A complete French translation of Buu's Fury, started in November 2020. Version 2.0 revises about a quarter of the dialogue blocks after proofreading, removes the splash screen added in 1.0 and puts the translation credits on the title screen. Distributed as an IPS patch.",
+  "game": "buus-fury",
+  "category": "translation",
+  "status": "released",
+  "source": {
+    "type": "website",
+    "url": "https://www.fralacticus.fr/dbz-buus-fury-francais/"
+  },
+  "distribution": {
+    "label": "Patch Page",
+    "url": "https://www.romhacking.net/translations/6075/",
+    "kind": "page"
+  },
+  "links": [
+    {
+      "label": "Version 2.0 notes",
+      "url": "https://www.fralacticus.fr/sortie-dbz-buus-fury-patch-fr-2-0/"
+    },
+    {
+      "label": "GitHub",
+      "url": "https://github.com/Fralacticus/dbz_buus_fury_translation"
+    }
+  ],
+  "screenshots": [],
+  "approved_at": "2026-11-19T20:04:48Z"
+}

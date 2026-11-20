@@ -15,6 +15,19 @@ const main = 'a'.repeat(40);
 async function setup(t) { const x = await fixture(); const original = globalThis.fetch; globalThis.fetch = x.fetcher; t.after(() => { globalThis.fetch = original; x.db.close(); }); return x; }
 const data = async res => { assert.equal(res.ok, true, await res.clone().text()); return res.json(); };
 
+test('Unexpected administrator exceptions log only the failing stage', async t => {
+  const x = await setup(t);
+  const logs = [], previous = console.error;
+  console.error = (...args) => logs.push(args.join(' '));
+  t.after(() => { console.error = previous; });
+  x.env.DB = {prepare() { throw Error('Private internal database detail'); }};
+  const res = await x.call('/');
+  assert.equal(res.status, 503);
+  assert.deepEqual(await res.json(), {error: 'Administration unavailable; retry later'});
+  assert.match(logs.join(' '), /Unexpected admin failure at stage: database-rate-limit/);
+  assert.doesNotMatch(logs.join(' '), /Private internal database detail/);
+});
+
 test('Workers-compatible fetch rejects certificate and GitHub redirects without following them', async t => {
   const x = await setup(t);
   globalThis.fetch = async (url, opts) => {
@@ -92,12 +105,12 @@ test('owner lifecycle: anonymous correction, exact artwork approval, protected P
   const manual = (await data(await x.call('/api/reviews'))).items.find(item => item.id === r.id);
   assert.equal(manual.state, 'pr-open'); assert.match(manual.error, /Automatic merge was not turned on \(GitHub refused automatic merge: .+\)\. Merge the pull request on GitHub\./);
   x.state.pr = {head: {sha: main}, merged: true, state: 'closed', merge_commit_sha: main, html_url: 'https://github.com/fictional/hub/pull/42'};
-  let status = await data(await x.call('/api/publication?id=' + r.id)); assert.equal(status.status, 'awaiting-deployment');
+  let status = await data(await x.call('/api/publication?id=' + r.id)); assert.equal(status.stage, 'deploying');
   assert.equal((await data(await publicCall('/status', {receipt: sub.receipt}))).status, 'approved');
-  x.state.manifest = {build_commit: main}; x.state.runs = [{id: 1, head_sha: main, event: 'push', html_url: 'https://github.com/fictional/hub/actions/runs/1'}];
+  x.state.manifest = {build_commit: main}; x.state.runs = [{id: 1, head_sha: main, event: 'push', status: 'completed', conclusion: 'success', html_url: 'https://github.com/fictional/hub/actions/runs/1'}];
   x.state.jobs = ['synchronize', 'backup', 'anchor', 'publish', 'website', 'deploy-website'].map(name => ({name, conclusion: 'success'}));
   x.state.projects = [{id: r.project_id}];
-  status = await data(await x.call('/api/publication?id=' + r.id)); assert.equal(status.status, 'published');
+  status = await data(await x.call('/api/publication?id=' + r.id)); assert.equal(status.stage, 'published');
   assert.equal((await data(await publicCall('/status', {receipt: sub.receipt}))).status, 'published');
   for (const file of tree) { const target = path.join(root, file.path); await fs.mkdir(path.dirname(target), {recursive: true}); await fs.writeFile(target, file.content || result.buffers[0].bytes); }
   const initial = await publish({root, output: path.join(root, 'initial'), api: {}, issues: [], fetcher}); assert.equal(initial.catalog.projects[0].id, r.project_id);
@@ -120,7 +133,7 @@ test('private routes reject bearer reuse, stale submissions, tampered package an
   assert.equal((await x.processCall(created.id, '/claim', {action: 'prepare'})).status, 409);
   assert.equal((await x.call('/api/decision', {id: sub.id, revision: 2, state: 'published'})).status, 400);
   assert.equal((await x.call('/api/logout', {}, {'Sec-Fetch-Site': 'cross-site'})).status, 403);
-  const withdrawn = await data(await x.call('/api/listing?id=ext-abcdefghijkl')); assert.equal(withdrawn.editable, false); assert.match(withdrawn.message, /Restore/);
+  const withdrawn = await data(await x.call('/api/listing?id=ext-abcdefghijkl')); assert.equal(withdrawn.editable, false); assert.match(withdrawn.message, /not on the site/);
   x.state.projects = [{id: 'ext-abcdefghijkl', title: 'Live training project'}];
   const live = await data(await x.call('/api/listing?id=ext-abcdefghijkl')); assert.equal(live.editable, true); assert.equal(live.record.title, 'Live training project');
   for (let n = 0; n < 125; n++) await x.call('/api/session');

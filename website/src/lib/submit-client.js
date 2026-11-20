@@ -158,7 +158,7 @@ function start(root) {
     if (value.listing_id) rows.push(['Listing', index.find(item => item.id === value.listing_id)?.title || value.listing_id]);
     if (value.url) rows.push(['Project address', value.url]); else if (value.no_page) rows.push(['Project address', 'No web page']);
     for (const [key, label] of [['title', 'Name'], ['category', 'Type'], ['description', 'Description'], ['creator', 'Creator'], ['game', 'Base game'], ['status', 'Status'], ['patch_url', 'Patch or download page'], ['note', 'Note for moderators']]) {
-      if (value[key]) rows.push([label, value[key]]);
+      if (value[key]) rows.push([label, ['category', 'game', 'status'].includes(key) ? [...control(key).options].find(option => option.value === value[key])?.textContent || value[key] : value[key]]);
     }
     if (value.links) rows.push(['Community links', value.links.map(link => `${link.label}: ${link.url}`).join(', ')]);
     if (value.artwork) rows.push(['Artwork', value.artwork.join(', ')]);

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "gh-1300911360",
+  "title": "gba-audio-tools",
+  "developer": "Mudassar Zahid",
+  "description": "Extracts and renders music from GBA ROMs. Alongside the standard MP2K driver it supports the Webfoot Technologies sound driver used by The Legacy of Goku II and Buu's Fury, which the project reverse-engineered and documented. It can render songs to WAV and export the game's instrument bank as a SoundFont.",
+  "game": "multiple",
+  "category": "tool",
+  "status": "released",
+  "source": {
+    "type": "github",
+    "url": "https://github.com/mudassarzahid/gba-audio-tools"
+  },
+  "links": [
+    {
+      "label": "Webfoot format notes",
+      "url": "https://github.com/mudassarzahid/gba-audio-tools/blob/main/docs/webfoot-format.md"
+    }
+  ],
+  "screenshots": [],
+  "approved_at": "2026-11-19T18:56:02Z"
+}
