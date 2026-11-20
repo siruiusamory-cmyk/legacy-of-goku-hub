@@ -16,7 +16,7 @@ function update() {
   for (const card of cards) {
     const inCategory = !category || card.dataset.category === category;
     if (inCategory) listed++;
-    card.hidden = !(inCategory && card.dataset.search.includes(query) && ['game','status'].every(key => !controls[key].value || card.dataset[key] === controls[key].value));
+    card.hidden = !(inCategory && card.dataset.search.includes(query) && ['game','status'].every(key => !controls[key].value || card.dataset[key] === controls[key].value || key === 'game' && card.dataset.game === 'multiple'));
     if (!card.hidden) visible++;
   }
   const key = controls.sort.value;

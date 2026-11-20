@@ -10,12 +10,13 @@ Discover and share ROM hacks, translations, fan projects, modding tools, disasse
 
 The [public catalogue](https://legacyofgokuhub.com/) brings community work together in one searchable place. You can:
 
-- Browse by project type with five tabs (ROM Hacks, Translations, Fan Projects, Tools, Resources), each showing how many projects it holds, then narrow by game or development status.
+- Browse by project type with five tabs (ROM Hacks, Translations, Fan Projects, Tools, Resources), each showing how many projects it holds, then narrow by game or development status. Projects that cover several games appear under each game.
 - Search every category at once for specific projects and follow links to their repositories, websites, or approved download pages.
 - Discover featured projects, see which listings changed most recently, and read a short summary of what each one does.
 - Rate listed projects with the site's seven-Dragon-Ball rating system, without creating an account.
 - Follow the [patch guide](https://legacyofgokuhub.com/how-to-patch/) to apply a ROM hack or translation to your own copy of the game.
 - Share a listing on Discord or elsewhere with a preview showing its title, summary and cover art.
+- Follow new listings with the [RSS feed](https://legacyofgokuhub.com/rss.xml).
 
 Listings may cover released projects, works in progress, and useful tools or documentation. Not every project has a download or artwork.
 
@@ -77,3 +78,5 @@ For those contributing to or operating the Hub:
 - [Deployment documentation](docs/launch/DEPLOYMENT.md)
 
 Legacy of Goku Hub is an **unofficial community project**. The games and associated trademarks belong to their respective owners.
+
+The code in this repository is released under the [MIT License](LICENSE). The license does not cover the site's commissioned artwork, or the artwork and descriptions of listed projects, which belong to their creators.

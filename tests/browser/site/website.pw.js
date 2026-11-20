@@ -3,7 +3,33 @@ import AxeBuilder from '@axe-core/playwright';
 import fs from 'node:fs/promises';
 import sharp from 'sharp';
 test.beforeEach(async ({context}) => {
-  await context.route('**/*',route => /^http:\/\/127\.0\.0\.1:(4321|4322|4323)\//.test(route.request().url()) ? route.continue() : route.abort());
+  await context.route('**/*',route => /^http:\/\/127\.0\.0\.1:(4321|4322|4323|4324)\//.test(route.request().url()) ? route.continue() : route.abort());
+});
+test('multi-game listings pass a game filter, filters offer only what exists, and page links are named for the project', async ({page}) => {
+  await page.goto('http://127.0.0.1:4324/?category=tool');
+  await page.getByLabel('Base game',{exact:true}).selectOption('legacy-of-goku');
+  expect(await page.locator('.project-card:visible').evaluateAll(cards => cards.map(card => card.dataset.id))).toEqual(['ext-sitehack0002']);
+  await page.getByLabel('Base game',{exact:true}).selectOption('multiple');
+  expect(await page.locator('.project-card:visible').evaluateAll(cards => cards.map(card => card.dataset.id))).toEqual(['ext-sitehack0002']);
+  await expect(page.locator('#status option')).toHaveText(['All statuses','Released','In Development']);
+  await page.goto('http://127.0.0.1:4324/projects/ext-sitehack0002/');
+  await expect(page.locator('.hero-actions a')).toHaveText(['Download Page']);
+  await page.goto('http://127.0.0.1:4322/');
+  await expect(page.locator('#status option')).toHaveText(['All statuses']);
+  await expect(page.locator('#sort option')).toHaveText(['Sort by: Name','Sort by: Listing updated']);
+});
+test('sitemap, feed and robots file list the published pages', async ({page}) => {
+  const sitemap = await (await page.request.get('/sitemap.xml')).text();
+  for (const address of ['', 'how-to-patch/', 'submit/', 'ratings-privacy/', 'projects/fixture-0/', 'projects/fixture-6/']) expect(sitemap).toContain(`<loc>https://legacyofgokuhub.com/${address}</loc>`);
+  expect(sitemap.match(/<url>/g)).toHaveLength(11);
+  const feed = await (await page.request.get('/rss.xml')).text();
+  expect(feed.match(/<item>/g)).toHaveLength(7);
+  expect(feed).toContain('<guid>https://legacyofgokuhub.com/projects/fixture-6/</guid>');
+  expect(feed).not.toMatch(/<img|<script/);
+  expect(await (await page.request.get('/robots.txt')).text()).toContain('Sitemap: https://legacyofgokuhub.com/sitemap.xml');
+  expect((await (await page.request.get('http://127.0.0.1:4322/rss.xml')).text()).match(/<item>/g)).toBeNull();
+  await page.goto('/');
+  await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute('href','/rss.xml');
 });
 const shown = page => page.locator('.project-card:visible').evaluateAll(cards => cards.map(card => card.dataset.id));
 test('search, filters, clear and deterministic sorting work', async ({page}) => {
