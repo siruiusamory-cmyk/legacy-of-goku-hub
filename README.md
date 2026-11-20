@@ -78,3 +78,5 @@ For those contributing to or operating the Hub:
 - [Deployment documentation](docs/launch/DEPLOYMENT.md)
 
 Legacy of Goku Hub is an **unofficial community project**. The games and associated trademarks belong to their respective owners.
+
+The code in this repository is released under the [MIT License](LICENSE). The license does not cover the site's commissioned artwork, or the artwork and descriptions of listed projects, which belong to their creators.

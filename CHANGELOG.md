@@ -7,6 +7,7 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 ### Added
 
 - An RSS feed at `/rss.xml` announces new listings. A feed reader shows each listing once; a later edit moves it up the feed without announcing it again. A sitemap at `/sitemap.xml` and a `robots.txt` that points to it help search engines find every project page.
+- The repository has a license: the code is released under the MIT License. The site's commissioned artwork and the artwork and descriptions of listed projects are not covered.
 - A guide at `/how-to-patch/` explains how to apply a ROM hack or translation patch to your own copy of the game. The footer links to it, and ROM hack and translation pages link to it under their buttons.
 - Links shared on Discord and other apps show a title, a short description and a picture: the cover art on a project page, and a site card everywhere else. The site has an icon in browser tabs and on phone home screens.
 - The home page opens with one line saying what the Hub lists and that it offers patches and links only, never ROMs.
