@@ -2,6 +2,15 @@
 
 This is the one guide for running the Hub day to day. Everything except the last section happens in the administrator dashboard at https://admin.legacyofgokuhub.com. Only the last section needs GitHub or Cloudflare.
 
+## Dates to act on
+
+| By | What | Where in this guide |
+| --- | --- | --- |
+| 2026-11-26 | Delete the ratings export in `C:\SafeExports\ratings-2026-11-19`. Keep the catalogue export `C:\SafeExports\loghub-2026-11-19` and its zip, and copy the zip off this computer. | [Ratings export, recovery and totals repair](#ratings-export-recovery-and-totals-repair), [Backups and restore of the catalogue](#backups-and-restore-of-the-catalogue) |
+| 2026-12-16 | Renew `GH_DISPATCH_TOKEN` and refresh the Access service token `loghub-admin-private-processor`. If either lapses, the dashboard can no longer start or follow publications. | [Credentials that expire](#credentials-that-expire) |
+
+Update this table whenever a date in those sections changes.
+
 ## Your daily routine
 
 1. Open the dashboard and enter the sign-in code that Cloudflare emails you. The dashboard starts its own session; a **Sign in** button appears only if that fails. A session lasts 30 minutes, and getting back in is one click.
@@ -224,7 +233,7 @@ Change the Cloudflare Access policy for the dashboard and the admin Worker's `AD
 
 When: a flood of spam or an incident on the public form.
 
-`npx wrangler deploy --config intake/wrangler.jsonc` closes the form, because the committed setting keeps submissions off. To also send the site's Submit link back to the GitHub route, set the repository variable `INTAKE_ENABLED` to `false` and run the catalog workflow.
+`npx wrangler deploy --config intake/wrangler.jsonc` closes the form, because the committed setting keeps submissions off. To also make the Submit page say submissions are not open, set the repository variable `INTAKE_ENABLED` to `false` and run the catalog workflow. The website no longer links to the GitHub Issue Forms.
 
 To open the form again with notifications, deploy the submission service as described in "Deploying an approved change" below.
 

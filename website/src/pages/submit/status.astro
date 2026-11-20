@@ -2,14 +2,15 @@
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
 import '../../styles/submit.css';
-import {href, intakeAPI, submitURL, advancedSubmitURL} from '../../lib/catalog.js';
+import {href, intakeAPI, submitURL} from '../../lib/catalog.js';
 ---
 <Layout title="Submission status | Legacy of Goku Hub" description="Check on a project submission with your receipt."><main id="main" class="container submit-main">
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href={submitURL}><Icon name="back"/>Submit</a><span aria-hidden="true">/</span><span aria-current="page">Status</span></nav>
-  <header class="submit-heading"><h1>Check a submission</h1><p>Paste the receipt you were given when you submitted. We keep no account or email, so the receipt is the only key. Replies from the moderators appear on this page.</p></header>
-  {!intakeAPI && <p class="availability-note" role="note"><strong>Submissions are not open yet.</strong> There is nothing to check. The <a href={advancedSubmitURL} rel="noopener noreferrer">GitHub route</a> is available in the meantime.</p>}
+  <header class="submit-heading"><h1>Check a submission</h1><p>Use the receipt you were given when you submitted. We keep no account or email, so the receipt is the only key. Replies from the moderators appear on this page.</p></header>
+  {!intakeAPI && <p class="availability-note" role="note"><strong>Submissions are not open yet.</strong> There is nothing to check.</p>}
+  <noscript><p class="availability-note" role="note">Checking a submission needs JavaScript. Turn it on in your browser, then reload this page.</p></noscript>
   <div data-status data-api={intakeAPI}>
-    <form id="status-form" class="panel submit-panel" novalidate autocomplete="off"><div class="field" data-field="receipt"><label for="f-receipt">Receipt<span class="req">Required</span></label><p class="hint" id="h-receipt">A code of 43 letters, numbers, dashes and underscores.</p><input id="f-receipt" name="receipt" type="text" spellcheck="false" autocapitalize="off" aria-describedby="h-receipt e-receipt"/><p class="error" id="e-receipt" hidden></p></div><div class="actions"><button class="button primary" type="submit">Check status<Icon name="arrow"/></button></div></form>
+    <form id="status-form" class="panel submit-panel" novalidate autocomplete="off"><div class="field" data-field="receipt"><label for="f-receipt">Receipt<span class="req" aria-hidden="true">Required</span></label><p class="hint" id="h-receipt">Paste the code you were given, or open the receipt file you saved.</p><input id="f-receipt" name="receipt" type="text" spellcheck="false" autocapitalize="off" aria-required="true" aria-describedby="h-receipt e-receipt"/><p class="error" id="e-receipt" hidden></p></div><div class="actions"><button class="button primary" type="submit" disabled>Check status<Icon name="arrow"/></button></div></form>
     <section id="saved" class="panel submit-panel" aria-labelledby="saved-title" hidden><h2 id="saved-title" class="panel-title">Submitted from this browser</h2><ul id="saved-list" class="saved-list"></ul></section>
     <section id="result" class="panel submit-panel" aria-labelledby="result-title" hidden><h2 id="result-title" class="panel-title" tabindex="-1">Status</h2><p class="status-line"><span class="status-glyph" id="status-glyph" aria-hidden="true"></span><strong id="status-name"></strong></p><p id="status-message"></p><p id="status-note" class="status-note" hidden></p><p id="status-updated" class="hint"></p><div id="status-link" hidden><a class="button primary" id="status-project" href={href('')}>View the listing<Icon name="arrow"/></a></div>
       <div id="claim-box" class="claim-steps" hidden><h3>Prove it is your project</h3><p>Add this exact text somewhere on your project page, then keep it there until a moderator confirms:</p><code id="claim-challenge"></code></div>

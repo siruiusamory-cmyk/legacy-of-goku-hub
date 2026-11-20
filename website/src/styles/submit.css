@@ -16,6 +16,154 @@
   max-width: 62ch;
   margin: 0;
 }
+.submit-heading .heading-link {
+  margin-top: 10px;
+}
+.heading-link a,
+.current-box a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  color: var(--gold);
+  text-decoration: underline;
+}
+.submit-main .breadcrumbs a {
+  min-height: 24px;
+}
+.script-note {
+  visibility: hidden;
+  animation: script-note 0s 4s forwards;
+}
+@keyframes script-note {
+  to { visibility: visible; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .script-note {
+    visibility: visible;
+  }
+}
+.steps {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  text-transform: uppercase;
+}
+.steps li {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  background: var(--surface-low);
+  color: var(--muted);
+}
+.steps li[aria-current] {
+  border: 3px solid var(--gold);
+  padding: 6px 8px;
+  background: var(--surface);
+  color: var(--paper);
+  font-weight: var(--weight-ui);
+}
+.step-number {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border: 2px solid currentColor;
+}
+.steps li[aria-current] .step-number {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+.draft-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 6px solid var(--gold);
+  background: var(--surface-low);
+}
+.link-button {
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: none;
+  color: var(--gold);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.current-box {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  background: var(--surface-low);
+}
+.current-title {
+  margin: 0;
+  font-size: 1rem;
+  text-transform: uppercase;
+  color: var(--ice);
+}
+.current-box dl {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+.current-box dl > div {
+  display: grid;
+  grid-template-columns: minmax(110px, 180px) minmax(0, 1fr);
+  gap: 12px;
+}
+.current-box dt {
+  color: var(--muted);
+}
+.current-box dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.art-preview {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+.art-preview li {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface-low);
+  font-size: var(--text-small);
+  overflow-wrap: anywhere;
+}
+.art-preview img {
+  width: 100%;
+  height: 110px;
+  object-fit: contain;
+}
+.submit-panel ::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+.button:disabled,
+.button[aria-disabled=true] {
+  opacity: .55;
+  cursor: not-allowed;
+}
+.receipt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
 .submit-panel {
   padding: 22px;
   display: grid;
@@ -68,6 +216,7 @@
 }
 .kind-option:has(input:checked) .kind-title:after {
   content: " \2713";
+  content: " \2713" / "";
 }
 .kind-option:has(input:focus-visible) {
   outline: 3px solid var(--gold);
@@ -75,6 +224,9 @@
 }
 .kind-title {
   font-weight: var(--weight-ui);
+}
+.kind-hint {
+  display: none;
 }
 .kind-text,
 .hint,
@@ -154,6 +306,8 @@
   padding-left: 22px;
 }
 .error-summary a {
+  display: block;
+  padding: 6px 0;
   text-decoration: underline;
 }
 .field-row {
@@ -180,9 +334,12 @@
 .more {
   border: 1px solid var(--line);
   border-radius: var(--radius-control);
-  padding: 4px 16px 16px;
+  padding: 4px 16px;
   display: grid;
   gap: 16px;
+}
+.more[open] {
+  padding-bottom: 16px;
 }
 .more > summary {
   cursor: pointer;
@@ -216,7 +373,6 @@
   text-decoration: underline;
 }
 .duplicate-note .button {
-  min-height: 40px;
   margin-top: 4px;
 }
 .prefill {
@@ -250,6 +406,7 @@
 #review-list dd {
   margin: 0;
   overflow-wrap: anywhere;
+  white-space: pre-line;
 }
 .human-check {
   min-height: 0;
@@ -326,6 +483,11 @@
   flex-wrap: wrap;
   gap: 10px;
 }
+.saved-list li,
+.saved-list .button {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
 .revise-form {
   display: grid;
   gap: 14px;
@@ -341,10 +503,49 @@
   .submit-panel {
     padding: 16px;
   }
-  .kind-options,
   .field-row,
-  .link-row {
+  .link-row,
+  .current-box dl > div {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .current-box dl > div {
+    gap: 2px;
+  }
+  .kind-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+  }
+  .kind-hint {
+    display: block;
+    margin-top: 10px;
+  }
+  .kind-option {
+    align-content: center;
+    padding-right: 8px;
+  }
+  .kind-option:has(input:checked) {
+    padding-right: 6px;
+  }
+  .submit-heading p {
+    font-size: var(--text-small);
+  }
+  .steps li {
+    padding: 6px;
+    font-size: var(--text-small);
+  }
+  .steps li[aria-current] {
+    padding: 4px;
+  }
+  .steps {
+    gap: 4px;
+  }
+  .steps li {
+    gap: 4px;
+    min-width: 0;
   }
   #review-list > div {
     grid-template-columns: minmax(0, 1fr);
