@@ -15,7 +15,7 @@ const statuses = [['', 'Not sure'], ['released', 'Released'], ['in-development',
 ---
 <Layout title="Submit a project | Legacy of Goku Hub" description="Add or suggest a Legacy of Goku ROM hack, fan project or tool. No account needed."><main id="main" class="container submit-main">
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href={href('')}><Icon name="back"/>All Projects</a><span aria-hidden="true">/</span><span aria-current="page">Submit</span></nav>
-  <header class="submit-heading"><h1>Submit a project</h1><p>Found a Legacy of Goku ROM hack, fan project or tool? Tell us where it lives. No account, email or password is needed, and the project does not need to be on GitHub. A person reviews every submission before anything is published.</p></header>
+  <header class="submit-heading"><h1>Submit a project</h1><p>Found a Legacy of Goku ROM hack, fan project or tool? Tell us where it lives. No account, email or password is needed, and the project does not need to be on GitHub. A person reviews every submission before anything is published. AI-assisted projects are welcome. Low-effort projects made mostly by AI are not listed.</p></header>
   {!intakeAPI && <p class="availability-note" role="note"><strong>Submissions are not open yet.</strong> You can fill in the form to see how it works. Sending will be enabled soon. Developers who prefer it can still use the <a href={advancedSubmitURL} rel="noopener noreferrer">GitHub route</a>.</p>}
   <noscript><p class="availability-note" role="note">This form needs JavaScript. You can also use the <a href={advancedSubmitURL} rel="noopener noreferrer">GitHub route</a>.</p></noscript>
   <div data-submit data-api={intakeAPI} data-site-key={turnstileKey} data-status-url={statusURL}>

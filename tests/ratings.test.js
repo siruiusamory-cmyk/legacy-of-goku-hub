@@ -5,7 +5,7 @@ import {DatabaseSync} from 'node:sqlite';
 import {handle,random,digest,cleanup} from '../ratings/worker.js';
 import {recoverySQL} from '../tools/ratings/recover.js';
 const origin='https://site.example',api='https://ratings.example',ids=['gh-1398951057','gh-1429374563','gh-1432341427'];
-function binding(db){return {prepare(query){return {bind(...args){const stmt=db.prepare(query);return {first:async()=>stmt.get(...args)||null,run:async()=>({meta:{changes:Number(stmt.run(...args).changes)}}),_all:()=>({results:stmt.all(...args)})};}};},async batch(statements){db.exec('BEGIN');try{const out=statements.map(s=>s._all());db.exec('COMMIT');return out;}catch(e){db.exec('ROLLBACK');throw e;}}};}
+function binding(db){return {prepare(query){return {bind(...args){const stmt=db.prepare(query);return {first:async()=>stmt.get(...args)||null,run:async()=>({meta:{changes:Number(stmt.run(...args).changes)}}),all:async()=>({results:stmt.all(...args)}),_all:()=>({results:stmt.all(...args)})};}};},async batch(statements){db.exec('BEGIN');try{const out=statements.map(s=>s._all());db.exec('COMMIT');return out;}catch(e){db.exec('ROLLBACK');throw e;}}};}
 async function setup(t){
  const db=new DatabaseSync(':memory:');for(const name of ['0001_ratings.sql','0002_erasures.sql','0003_exclusion_triggers.sql'])db.exec(await fs.readFile(new URL('../ratings/migrations/'+name,import.meta.url),'utf8'));
  const env={DB:binding(db),RATINGS_ENABLED:'true',SITE_ORIGIN:origin,API_ORIGIN:api,RATE_SALT:random()};
@@ -48,6 +48,15 @@ test('network mutation limits apply across fresh identities',async t=>{
 });
 test('oversized inputs and database quota failures do not create votes or zero aggregates',async t=>{
  const x=await setup(t),route='/projects/'+ids[0]+'/mine';assert.equal((await x.call(route,'PUT',{score:7,padding:'x'.repeat(2048)},random())).status,413);assert.equal(x.db.prepare('SELECT count(*) n FROM votes').get().n,0);const env={...x.env,DB:{prepare(){throw Error('D1 quota exhausted');}}};const response=await handle(new Request(api+'/projects/'+ids[0]),env);assert.equal(response.status,503);assert.deepEqual(await response.json(),{error:'Ratings unavailable'});
+});
+test('one cacheable read returns every voted available project and nothing else',async t=>{
+ const x=await setup(t);await x.call('/projects/'+ids[0]+'/mine','PUT',{score:7},random());await x.call('/projects/'+ids[0]+'/mine','PUT',{score:2},random());await x.call('/projects/'+ids[1]+'/mine','PUT',{score:5},random());
+ const response=await x.call('/projects');assert.equal(response.status,200);assert.equal(response.headers.get('Cache-Control'),'public, max-age=60');assert.deepEqual(await response.json(),{projects:{[ids[0]]:{count:2,average:4.5},[ids[1]]:{count:1,average:5}}});
+ assert.equal((await x.call('/projects/'+ids[0])).headers.get('Cache-Control'),'no-store');assert.equal((await x.call('/projects','PUT',{score:4},random())).status,405);
+ x.setCatalog([{id:ids[0],availability:'suspended'},{id:ids[1],availability:'available'},{id:ids[2],availability:'available'}]);assert.deepEqual(await (await x.call('/projects')).json(),{projects:{[ids[1]]:{count:1,average:5}}});
+});
+test('the read limiter applies to the all-projects read',async t=>{
+ const x=await setup(t);for(let i=0;i<120;i++)assert.equal((await x.call('/projects')).status,200);assert.equal((await x.call('/projects')).status,429);
 });
 test('recovery excludes erased and fraudulent identities and removed projects',async()=>{
  const hash=await digest(random()),time=2000000,snapshot={exported_at:time-100,votes:[{project_id:ids[0],credential_hash:hash,score:7,excluded:0}]};const ledger={exported_at:time,erasures:[{credential_hash:hash,project_id:'*',erased_at:time-50}],excluded_credentials:[]};const output=await recoverySQL(snapshot,ledger,{projects:ids.map(id=>({id,availability:'available'}))},time);assert.doesNotMatch(output,/INSERT INTO votes/);await assert.rejects(recoverySQL({...snapshot,exported_at:0},ledger,{projects:[]},time));await assert.rejects(recoverySQL(snapshot,{...ledger,exported_at:time-301},{projects:[]},time));

@@ -8,6 +8,8 @@ Every first listing needs a human content decision in `policy/publishing.json`, 
 
 Prohibited: explicit sexual imagery; abusive, hateful or threatening imagery/text; harassment; unlawful content; misleading impersonation; unrelated spam; copyrighted ROM uploads or misleading download claims. Require appropriate rights for submitted artwork. Attribution alone is not permission. GitHub-hosted downloads and automated checks do not establish malware safety.
 
+AI-assisted projects are welcome. Low-effort projects made mostly by AI are not listed.
+
 ## Existing controls and the gaps closed
 
 Preserved: static PNG/JPEG/WebP, 5 MiB, 20 megapixels, 8192px per side, corrupt/animated/unsupported rejection, proportional contain normalization to 640x360 covers and 480x320 screenshots. HTTPS same-repository, full-SHA raw URLs, no image redirects, bounded downloads, stable numeric repository/owner identities, representative policy, transfer review, duplicate identity rejection, release/asset checks and GitHub-only distribution remain intact. No submitted software executes.

@@ -28,8 +28,8 @@ async function start(api){
   });
  }
  function unavailable(id){document.querySelectorAll('[data-ratings-project]').forEach(el=>{if(el.dataset.ratingsProject===id){el.querySelector('.rating-value').textContent='Ratings unavailable';el.setAttribute('aria-label','Community ratings unavailable');el.title='Ratings unavailable';el.querySelectorAll('.dragon-ball').forEach(ball=>ball.classList.add('muted'));}});}
- async function refresh(id){try{display(id,await request('/projects/'+id));}catch{unavailable(id);}}
- const ids=[...new Set([...document.querySelectorAll('[data-ratings-project]')].map(el=>el.dataset.ratingsProject))];const aggregates=Promise.all(ids.map(refresh));if(!selector){await aggregates;return;}
+ const ids=[...new Set([...document.querySelectorAll('[data-ratings-project]')].map(el=>el.dataset.ratingsProject))];
+ const aggregates=ids.length&&request('/projects').catch(()=>null).then(data=>ids.forEach(id=>{try{if(!data?.projects||typeof data.projects!=='object'||Array.isArray(data.projects))throw Error('Ratings unavailable.');display(id,data.projects[id]??{count:0,average:null});}catch{unavailable(id);}}));if(!selector){await aggregates;return;}
  const id=selector.dataset.ratingSelector;let saved=null,busy=false,queued=null,readVersion=0;
  function selected(score){selector.querySelectorAll('input').forEach(el=>el.checked=Number(el.value)===score);}
  async function mine(){

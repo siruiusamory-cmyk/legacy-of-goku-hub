@@ -13,6 +13,8 @@ Use the **[public submission form](https://legacyofgokuhub.com/submit/)**. No Gi
 
 A submission receipt lets you [check its status](https://legacyofgokuhub.com/submit/status/). Images, a GitHub repository, and downloadable releases are not required for a listing. All proposed listings and changes receive moderation before publication.
 
+AI-assisted projects are welcome. Low-effort projects made mostly by AI are not listed.
+
 If you prefer a repository-based route, use the [GitHub submission forms](https://github.com/siruiusamory-cmyk/legacy-of-goku-hub/issues/new/choose). Repository authors can also provide a [`.loghub.json` manifest](schema/manifest.schema.json); see the [example](examples/.loghub.json).
 
 A suggestion does not give you control of another creator's listing. Ownership claims are checked separately.
