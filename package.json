@@ -17,6 +17,7 @@
     "backup:health": "node src/backup-cli.js health",
     "site:fixture": "node tools/site/build.js --fixture",
     "site:build": "node tools/site/build.js",
+    "site:preview": "node tools/site/build.js --live && wrangler pages deploy .site/live-preview --project-name=loghub --branch=preview --commit-dirty=true",
     "site:serve": "node tools/site/serve.js",
     "test:browser": "playwright test",
     "test:site": "node --test tests/site/*.test.js"

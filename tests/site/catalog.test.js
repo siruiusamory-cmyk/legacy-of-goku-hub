@@ -35,12 +35,17 @@ test('artwork-free and screenshot-only site listings retain explicit absence and
 });
 test('frontend deployment is default-branch gated, production-only and separated from write credentials', async () => {
   const workflow=YAML.parse(await fs.readFile('.github/workflows/catalog.yml','utf8'));
-  assert.equal(workflow.jobs.website.needs,'publish');
+  assert.deepEqual(workflow.jobs.website.needs,['scope','publish']);
+  assert.match(workflow.jobs.scope.steps[0].run,/grep -qvE '\^\(website\/\|docs\/\|tests\/\|README\\\.md\$\|CHANGELOG\\\.md\$\)'/);
+  assert.deepEqual(workflow.jobs.scope.permissions,{contents:'read'});
+  assert.match(workflow.jobs.synchronize.if,/^needs\.scope\.outputs\.site_only != 'true' &&/);
+  for (const job of ['website','deploy-website']) assert.ok(workflow.jobs[job].if.includes("(needs.publish.result == 'success' || (needs.scope.outputs.site_only == 'true' &&"));
+  assert.ok(workflow.jobs['deploy-website'].if.endsWith("&& needs.website.result == 'success'"));
   assert.deepEqual(workflow.jobs.website.permissions,{contents:'read',actions:'read'});
   assert.match(workflow.jobs['deploy-website'].if,/SITE_DEPLOYMENT_ENABLED/);
   assert.match(workflow.jobs['deploy-website'].if,/default_branch/);
   assert.match(workflow.jobs['deploy-website'].if,/ref_protected/);
-  assert.deepEqual(workflow.jobs['deploy-website'].needs,['publish','website']);
+  assert.deepEqual(workflow.jobs['deploy-website'].needs,['scope','publish','website']);
   assert.equal(workflow.jobs['deploy-website'].environment.name,'cloudflare-pages');
   assert.equal(workflow.jobs['deploy-website'].environment.url,'https://legacyofgokuhub.com/');
   assert.deepEqual(workflow.jobs['deploy-website'].permissions,{contents:'read',actions:'read'});
