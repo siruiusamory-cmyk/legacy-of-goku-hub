@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "ext-75z3v3dguuvf",
+  "title": "Legacy of Goku Speedrun Leaderboard",
+  "developer": "speedrun.com community",
+  "description": "The speedrun.com leaderboard for Dragon Ball Z: The Legacy of Goku. It holds the community's verified runs and the rules for the Any% and All Quests categories.",
+  "game": "legacy-of-goku",
+  "category": "resource",
+  "status": "released",
+  "source": {
+    "type": "website",
+    "url": "https://www.speedrun.com/dbzlog"
+  },
+  "screenshots": [],
+  "approved_at": "2026-11-21T07:41:27Z"
+}
