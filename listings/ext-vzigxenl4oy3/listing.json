@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "ext-vzigxenl4oy3",
+  "title": "Legacy of Goku TAS Game Resources",
+  "developer": "TASVideos contributors",
+  "description": "Technique notes for tool-assisted runs of The Legacy of Goku on TASVideos: faster movement, the invincibility, dialogue and negative damage glitches, the Ginyu Force skip, a faster Underworld route and memory addresses.",
+  "game": "legacy-of-goku",
+  "category": "resource",
+  "status": "released",
+  "source": {
+    "type": "website",
+    "url": "https://tasvideos.org/GameResources/GBA/DragonBallZTheLegacyOfGoku"
+  },
+  "screenshots": [],
+  "approved_at": "2026-11-21T07:22:46Z"
+}
