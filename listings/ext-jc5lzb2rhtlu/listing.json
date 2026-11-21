@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "ext-jc5lzb2rhtlu",
+  "title": "Legacy of Goku II Speedrun Leaderboard",
+  "developer": "speedrun.com community",
+  "description": "The speedrun.com leaderboard for Dragon Ball Z: The Legacy of Goku II. It holds the community's verified runs and the rules for the Any%, 100% and All Bosses categories.",
+  "game": "legacy-of-goku-2",
+  "category": "resource",
+  "status": "released",
+  "source": {
+    "type": "website",
+    "url": "https://www.speedrun.com/dbzlog2"
+  },
+  "screenshots": [],
+  "approved_at": "2026-11-21T07:38:25Z"
+}
