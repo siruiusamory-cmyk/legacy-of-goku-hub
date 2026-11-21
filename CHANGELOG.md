@@ -26,7 +26,9 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
-- The community rating panel on a project page is framed like the Dragon Radar: a white rounded casing with a dark screen lip and the button on top. The green grid inside is unchanged.
+- The top of every page is the orange of Goku's gi in the games (`#de8400`, with `#b55200` as its shade, both measured from the first game's Goku sprite) in place of dark navy.
+- The game's dialogue-box frame now surrounds the whole featured panel on the home page; the featured artwork inside has a plain border.
+- The community rating panel on a project page is framed like the Dragon Radar: a shaded white casing with a knurled button on top, drawn from reference pictures of the radar and coloured only with colours found in the games. The "Community Rating" tag sits above the casing and the green grid inside is unchanged.
 - Project pages no longer carry the boxed notice about links leading to sites run by other people. The footer still says no ROMs are hosted.
 - A listing without artwork now shows a glowing Dragon Ball on a scanline plate, in place of the grey checkerboard and "Project artwork not provided". Legacy of Goku has one star, Legacy of Goku II two, Buu's Fury three and multi-game projects seven.
 - The home page says each thing once. The line under the navigation, the sentence beside "Project Directory", the "Browse the directory" link and the footer's "A community home" line and second Submit link are gone. "No ROMs hosted" now appears once, in the footer. Project cards no longer print "Not rated yet" beside their grey balls or repeat the listing date; screen readers still hear the unrated state, and the date stays on the project page and in the ticker.
