@@ -24,6 +24,7 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
+- The page background is a faint wallpaper of all seven Dragon Balls in a shuffled pattern, in place of the starfield. On wide screens it stays still while the page scrolls.
 - The main menu is Projects, Submit and Discord. The Discord tab shows its name next to the logo. The GitHub tab, the footer's "Contribute on GitHub" link and the "GitHub route" notes on the submission pages are gone: the site no longer links to its own repository. Links to the repositories of listed projects are unchanged.
 - Every Submit, Correct and Claim link opens the site's own form. If submissions are switched off, the form says so and points to Discord for corrections and removals, instead of sending visitors to GitHub.
 - The Submit tab is the highlighted tab on the submission pages.

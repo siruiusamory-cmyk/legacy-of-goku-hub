@@ -72,7 +72,7 @@ For those contributing to or operating the Hub:
 - [Contributing to the Hub](CONTRIBUTING.md)
 - [Documentation index](docs/README.md)
 - [Changelog](CHANGELOG.md)
-- [Visual design notes and artist reference pack](docs/reviews/log-hub-019/review.md)
+- [Visual design notes and artist reference pack](docs/reviews/log-hub-019/review.md). The page wallpaper is built from the seven Dragon Ball sprites with `node tools/site/wallpaper.js`; run it again if a sprite changes
 - [Moderation and content policy](docs/moderation.md)
 - [Maintainer operations and recovery](docs/OPERATIONS.md)
 - [Administrator documentation](docs/launch/ADMIN.md), including automatic publication tracking (a change replaced by a later one counts as published), failure recovery, submission deletion and automatic merging of owner-approved publications (on in production since 2026-11-18; turned off by removing `ADMIN_AUTO_MERGE_ENABLED`)
@@ -81,4 +81,4 @@ For those contributing to or operating the Hub:
 
 Legacy of Goku Hub is an **unofficial community project**. The games and associated trademarks belong to their respective owners.
 
-The code in this repository is released under the [MIT License](LICENSE). The license does not cover the site's commissioned artwork, or the artwork and descriptions of listed projects, which belong to their creators.
+The code in this repository is released under the [MIT License](LICENSE). The license does not cover the site's commissioned artwork (the masthead, the Dragon Ball sprites and the page wallpaper made from them), or the artwork and descriptions of listed projects, which belong to their creators.

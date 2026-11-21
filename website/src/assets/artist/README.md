@@ -22,6 +22,8 @@ Source: `legacy-of-goku-hub-complete-agent-visual-package.zip`, `04-interactive-
 | `ball-7-inactive.png` | 64x64 | `527667ef749d6de841a4446728ea3a8befb008bae32090a87f9a79b4b6b02ea6` |
 | `energy-banner-960x160.png` | 960x160 | `e155576d739c994a821da698f94e5be09f26f10b054b43018510e3193bfa5914` |
 
+The seven inactive balls are also the page wallpaper. `node tools/site/wallpaper.js` shuffles them into `../wallpaper-balls.png`, which is tiled behind every page under a 90% navy wash. Run it again if a ball sprite changes.
+
 `energy-banner-960x160.png` is the supplied Kamehameha-style energy strip. It is the site masthead, shown at its native 960x160 on screens 1032px and wider and scaled down to fit below that. The site name is live text placed in its white core until the artist's lettering is supplied.
 
 The ball sprites are 64x64 files with a 48x48 ball that does not sit in the centre of the canvas. `Ball.astro` shows only the 48x48 ball so lit and grey balls line up. The files themselves are unchanged.

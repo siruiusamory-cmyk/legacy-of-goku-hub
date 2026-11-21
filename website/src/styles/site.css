@@ -3,7 +3,13 @@ body {
   position: relative;
   isolation: isolate;
   margin: 0;
-  background: var(--stars) var(--navy);
+  background:
+    linear-gradient(rgb(12 21 51 / .9), rgb(12 21 51 / .9)),
+    url('../assets/wallpaper-balls.png') 0 0 / 672px 672px,
+    var(--navy);
+}
+@media (min-width: 901px) {
+  body {background-attachment: fixed;}
 }
 a {color: inherit; text-decoration: none;}
 button,input,select,textarea {font: inherit;}
