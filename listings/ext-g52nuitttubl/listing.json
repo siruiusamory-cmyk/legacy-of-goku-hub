@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "ext-g52nuitttubl",
+  "title": "Buu's Fury Speedrun Leaderboard",
+  "developer": "speedrun.com community",
+  "description": "The speedrun.com leaderboard for Dragon Ball Z: Buu's Fury. It holds the community's verified runs and the rules for the Any%, 100% and Level 200 categories.",
+  "game": "buus-fury",
+  "category": "resource",
+  "status": "released",
+  "source": {
+    "type": "website",
+    "url": "https://www.speedrun.com/dbzbf"
+  },
+  "screenshots": [],
+  "approved_at": "2026-11-21T07:31:17Z"
+}
