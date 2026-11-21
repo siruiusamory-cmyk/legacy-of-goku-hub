@@ -26,6 +26,7 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
+- Icons are redrawn as pixel icons on a 12 by 12 grid. Small labels (badges, tab counts, field names, the "Featured" and "Updated" tags, footer buttons) use the Pixelify Sans pixel font. Tabs have stepped pixel corners. The rating panel has the orange pixel frame of the other panels, and its score is cream for contrast. Footer buttons use flat bands of in-game colours.
 - The patch guide, the ratings privacy page and the not-found page sit in the same framed panel as the rest of the site. The "Project Directory" heading is an orange tag like the panel headings in place of a maroon ribbon, and the phone menu bar has the gloss of the tabs.
 - The submission form matches the rest of the site: sunken fields, the site's own dropdown arrow, and raised step markers in the label lettering. The small download and repository buttons on cards have a raised edge. The "Projects" tab is highlighted only on project pages, no longer on the patch guide or privacy page.
 - Tabs in the main navigation and the directory are redrawn as glossy folder tabs with rounded top corners and a small gap between them. The "Community Rating" tag sits on the top left corner of its frame like the tags of the other panels.

@@ -26,6 +26,15 @@
       "source_sha256": "7b5a0e6d88696e43e95f6320613908e53d36ad854b4a18e4a1b8d1c19fdbf1fe",
       "sha256": "06eb151ffba973d5f47ad9c831c5159aa8646e7ca8f4f86c6645307c71a659d3",
       "bytes": 1392
+    },
+    {
+      "file": "pixelify-sans-bold-latin.woff2",
+      "family": "Pixelify Sans",
+      "style": "normal",
+      "weight": 700,
+      "source": "https://cdn.jsdelivr.net/fontsource/fonts/pixelify-sans@latest/latin-700-normal.woff2",
+      "sha256": "c836cfa5c0e9d62ea9b890e0418d52a6004149090a521cd198a8c09f5d5ab893",
+      "bytes": 7904
     }
   ],
   "subset_tool": "fontTools 4.63.0"

@@ -11,6 +11,12 @@
   src: url("../fonts/days-one-wordmark.woff2") format("woff2");
 }
 @font-face {
+  font-family: "Pixelify Sans";
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/pixelify-sans-bold-latin.woff2") format("woff2");
+}
+@font-face {
   font-family: "Barlow Condensed";
   font-style: italic;
   font-weight: 700;
@@ -38,3 +44,5 @@ h2,h3,.label,.panel-title,.featured-label,.desktop-nav a,.category-tabs a,.mobil
 }
 h1 {font-size: var(--text-title);}
 strong,b {font-weight: var(--weight-ui);}
+.badge,.tab-count,dt,.featured-label,.ticker strong,.button88 {font-family: var(--font-pixel); font-style: normal; font-weight: 700; font-size: .9rem; letter-spacing: 0;}
+.button88 {font-size: .75rem;}
