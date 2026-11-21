@@ -108,6 +108,8 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Fixed
 
+- On iPhone and other Safari browsers the featured panel no longer lets its artwork and text run over the right edge of its frame, and the page no longer scrolls sideways. On wide screens both rows of Dragon Balls in the rating panel sit on the same centre line.
+
 - A publication that a later one replaced before the dashboard had confirmed it, such as a Featured choice changed again the same day, is now shown as Published. It used to stay at Deploying and keep the Publishing count at one.
 - Game, category, status and repository are shown once on a project page instead of being repeated in the side column.
 - The release panel appears only for projects that have a release.

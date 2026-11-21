@@ -156,7 +156,7 @@ main.prose>h1 {margin-top: 10px;}
 
 .spotlight {padding: 28px var(--gutter) 4px;}
 .spotlight-inner {max-width: calc(var(--content-width) - 2 * var(--gutter)); margin: auto; padding: 14px; display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,1fr); gap: 28px; align-items: stretch;}
-.spotlight-art {display: block; aspect-ratio: 16/9;}
+.spotlight-art {display: block; width: 100%; min-width: 0; aspect-ratio: 16/9;}
 .spotlight-copy {min-width: 0;}
 .spotlight h1,.detail-intro h1,.not-found h1,.submit-heading h1 {text-shadow: 3px 3px 0 var(--ink);}
 .spotlight h1 {margin-bottom: 12px;}
@@ -304,6 +304,10 @@ main.prose>h1 {margin-top: 10px;}
 .detail-rating .community-rating>.panel-title {position: absolute; left: -15px; top: -15px; z-index: 1; margin: 0; white-space: nowrap;}
 .detail-rating>* {position: relative;}
 .detail-rating .rating-selector {border: 0;}
+@media(min-width:1101px) {
+  .detail-rating {padding-block: 24px;}
+  .detail-rating .rating-selector .panel-title {position: absolute; left: 22px; bottom: 100%; margin: 0;}
+}
 .community-rating .rating-display {min-height: 60px;}
 .community-rating {min-width: 0;}
 .community-rating .rating-label {display: none;}
@@ -393,7 +397,7 @@ dd a {color: var(--gold); text-decoration: underline;}
   .mobile-nav nav a:hover {color: var(--gold);}
   .world-scenery {display: none;}
   .spotlight {padding-top: 20px;}
-  .spotlight-inner {grid-template-columns: 1fr; gap: 16px; padding: 10px;}
+  .spotlight-inner {grid-template-columns: minmax(0,1fr); gap: 16px; padding: 10px;}
   .project-grid {gap: 14px;}
   .card-content h3,.developer {padding-right: 100px;}
   .search-field,.filter-controls,.sort-label {flex: 1 1 100%; margin-left: 0;}
