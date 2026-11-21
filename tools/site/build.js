@@ -80,7 +80,7 @@ await sharp(ball(48,0,'',1.5)).png().toFile(path.join(root,'.site/input/public/f
 await fs.writeFile(path.join(root,'.site/input/public/robots.txt'),'User-agent: *\nAllow: /\nSitemap: https://legacyofgokuhub.com/sitemap.xml\n');
 await sharp(ball(180,18,'#10103c')).png().toFile(path.join(root,'.site/input/public/apple-touch-icon.png'));
 // shortcut: site card has no lettering, replace when the artist banner lettering lands
-await sharp({create:{width:1200,height:630,channels:3,background:'#10103c'}}).composite([{input:await sharp('website/src/assets/artist/energy-banner-960x160.png').resize(1200,null,{kernel:'nearest'}).toBuffer()}]).png().toFile(path.join(root,'.site/input/public/og-card.png'));
+await fs.copyFile('website/src/assets/og-card.png',path.join(root,'.site/input/public/og-card.png'));
 await fs.writeFile(path.join(root,'.site/input/artwork.json'),JSON.stringify(artwork));
 await fs.writeFile(path.join(root,'.site/input/catalog.json'),JSON.stringify(catalog));
 await fs.writeFile(path.join(root,'.site/input/provenance.json'),JSON.stringify(provenance));
