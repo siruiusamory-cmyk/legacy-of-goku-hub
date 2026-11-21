@@ -6,6 +6,11 @@
   src: url("../fonts/kanit-extrabold-italic-latin.woff2") format("woff2");
 }
 @font-face {
+  font-family: "Bangers";
+  font-display: swap;
+  src: url("../fonts/bangers-wordmark.woff2") format("woff2");
+}
+@font-face {
   font-family: "Barlow Condensed";
   font-style: italic;
   font-weight: 700;

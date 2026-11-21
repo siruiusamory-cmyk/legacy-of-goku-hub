@@ -50,12 +50,13 @@ main.container>p,main.container>ol {max-width: 70ch; margin-bottom: 14px;}
   mask-composite: intersect;
 }
 
-.site-header {background: var(--gi) url('../assets/buus-fury-snake-way-clouds.png') 50% 0; border-bottom: 3px solid var(--ink); box-shadow: inset 0 -8px 0 var(--gi-shade);}
+.site-header {background: var(--gi) url('../assets/buus-fury-snake-way-clouds.png') 50% 0; border-bottom: 3px solid var(--gold); box-shadow: 0 3px 0 var(--ink);}
 .header-inner {max-width: var(--content-width); margin: auto; padding: 14px var(--gutter) 0; display: flex; flex-direction: column; align-items: center; gap: 12px;}
 .brand {position: relative; display: block; flex: none; width: min(100%,960px); container-type: inline-size;}
 .brand-beam {width: 100%; height: auto; image-rendering: pixelated;}
-.brand-name {position: absolute; left: 22.5%; width: 70%; top: 51%; transform: translateY(-50%); text-align: center; font-size: 6.6cqw; white-space: nowrap; color: var(--ink);}
-.brand-name em {font-style: inherit; color: var(--red);}
+.brand .brand-name {position: absolute; left: 22.5%; width: 70%; top: 51%; transform: translateY(-50%); text-align: center; font: 8.4cqw/1.2 "Bangers",var(--font-display); letter-spacing: .04em; white-space: nowrap; color: #213084; background: linear-gradient(#5888c8 30%,#2060c8 55%,#002858 80%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(.045em .045em 0 var(--navy));}
+.brand-name em {font-style: inherit;}
+@media (forced-colors: active) {.brand-name {-webkit-text-fill-color: currentColor; background: none;}}
 .desktop-nav {display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;}
 .desktop-nav a+a,.category-tabs a+a {border-left-width: 0;}
 .category-tabs {display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; justify-content: start;}
@@ -74,7 +75,7 @@ main.container>p,main.container>ol {max-width: 70ch; margin-bottom: 14px;}
   border-bottom: 0;
   clip-path: polygon(8px 0,100% 0,100% 100%,0 100%,0 8px);
 }
-.desktop-nav a:hover,.category-tabs a:hover {background: var(--navy-raised); color: var(--gold);}
+.desktop-nav a:hover,.category-tabs a:hover {background: var(--paper); color: var(--ink);}
 .desktop-nav a.active,.category-tabs a[aria-current] {background: var(--gold); border-color: var(--gold); color: var(--ink);}
 .desktop-nav a:focus-visible,.category-tabs a:focus-visible,.featured-label:focus-visible {outline-offset: -5px;}
 .desktop-nav a.active:focus-visible,.category-tabs a[aria-current]:focus-visible {outline-color: var(--ink);}

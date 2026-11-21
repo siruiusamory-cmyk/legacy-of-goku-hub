@@ -131,8 +131,11 @@ test('category tabs carry the main navigation styling and fit a phone', async ({
     const computed = getComputedStyle(element);
     return Object.fromEntries(['fontFamily','fontSize','fontWeight','fontStyle','textTransform','letterSpacing','lineHeight','color','backgroundColor','borderTopColor','borderTopWidth','borderRightWidth','borderBottomWidth','paddingTop','paddingBottom','paddingLeft','paddingRight','clipPath','height'].map(key => [key, computed[key]]));
   });
+  await page.goto('/submit/');
+  const activeNav = await style('.desktop-nav a.active');
+  await page.goto('/');
   expect(await style('.category-tabs a:not([aria-current])')).toEqual(await style('.desktop-nav a:not(.active)'));
-  expect(await style('.category-tabs [aria-current]')).toEqual(await style('.desktop-nav a.active'));
+  expect(await style('.category-tabs [aria-current]')).toEqual(activeNav);
   await page.locator('.category-tabs a:not([aria-current])').first().hover();
   const hovered = await style('.category-tabs a:not([aria-current])');
   await page.locator('.desktop-nav a:not(.active)').first().hover();

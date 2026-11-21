@@ -538,6 +538,8 @@ test('the Submit tab is the highlighted tab on the submission pages', async ({pa
     await expect(page.locator('.desktop-nav a.active')).toHaveText('Submit');
   }
   await page.goto('/');
+  await expect(page.locator('.desktop-nav a.active')).toHaveCount(0);
+  await page.goto(await page.locator('a[href*="/projects/"]').first().getAttribute('href'));
   await expect(page.locator('.desktop-nav a.active')).toHaveText('Projects');
 });
 

@@ -31,6 +31,15 @@
       "source_sha256": "5cb7103e4e605989afebc03d989c79201e54b21b5183db33981f70db9178a301",
       "sha256": "fda176c175066e593d4557cdae68b621fd3a4e6d296414160f59f1d755b62488",
       "bytes": 20376
+    },
+    {
+      "file": "bangers-wordmark.woff2",
+      "family": "Bangers",
+      "subset": "only the letters of the site title",
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/bangers/Bangers-Regular.ttf",
+      "source_sha256": "4160a7311de9342674cce9160cde9fcbb30f48190397d86ff1b70b455af65824",
+      "sha256": "89243c565eb41025fd48f726791832292f67c2f0f467669a7e01d528ccbbc4e7",
+      "bytes": 4260
     }
   ],
   "subset_tool": "fontTools 4.63.0"
