@@ -26,6 +26,7 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
+- Body text uses Verdana and Tahoma from the visitor's own device in place of the downloaded Inter font, which is removed. Badges are square with a raised edge, the search box is sunken and the filter dropdowns are raised, to match the site's turn-of-the-century look.
 - The site title in the masthead is lettered after the games' own title logos: wide slanted capitals in Days One, filled yellow to orange with a black outline and a red drop shadow, in place of black with a red last word. The font file holds only the title's letters.
 - No tab in the main navigation is highlighted on the home page. A tab turns cream when pointed at, and stays cream on the page it leads to.
 - Every colour in the site's stylesheets is now one that appears in the three games: each was replaced by its nearest match among 2,197 colours counted from the games' sprites and backgrounds. Yellow and gold are replaced throughout by the gi orange. Selected tabs are cream so the one in the main navigation stands apart from the orange masthead.

@@ -19,20 +19,6 @@
       "bytes": 20840
     },
     {
-      "file": "inter-regular-latin.woff2",
-      "source": "https://rsms.me/inter/font-files/Inter-Regular.woff2?v=4.1",
-      "source_sha256": "e06f6b1bc553aaea4e4668023ed0ab0a147129c3107f511bc7d03d361b0ae085",
-      "sha256": "506ed1538d517c6c9ca9910ed8e3bf7eb655ce1d60f5fd0bd4d45b64affdcd75",
-      "bytes": 20096
-    },
-    {
-      "file": "inter-semibold-latin.woff2",
-      "source": "https://rsms.me/inter/font-files/Inter-SemiBold.woff2?v=4.1",
-      "source_sha256": "5cb7103e4e605989afebc03d989c79201e54b21b5183db33981f70db9178a301",
-      "sha256": "fda176c175066e593d4557cdae68b621fd3a4e6d296414160f59f1d755b62488",
-      "bytes": 20376
-    },
-    {
       "file": "days-one-wordmark.woff2",
       "family": "Days One",
       "subset": "only the capital letters of the site title",
