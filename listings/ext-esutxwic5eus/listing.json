@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "ext-esutxwic5eus",
+  "title": "Legacy of Goku II TAS Game Resources",
+  "developer": "TASVideos contributors",
+  "description": "Technique notes for tool-assisted runs of The Legacy of Goku II on TASVideos: text speed, the charging glitch, save point memory corruption, the RNG formula, an experience chart and memory addresses.",
+  "game": "legacy-of-goku-2",
+  "category": "resource",
+  "status": "released",
+  "source": {
+    "type": "website",
+    "url": "https://tasvideos.org/GameResources/GBA/DragonBallZTheLegacyOfGoku2"
+  },
+  "screenshots": [],
+  "approved_at": "2026-11-21T07:12:39Z"
+}
