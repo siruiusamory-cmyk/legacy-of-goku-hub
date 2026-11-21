@@ -308,7 +308,7 @@ test('external listings use accurate labels and never claim to be repositories',
   await expect(page.getByRole('link', {name: 'View Repository'})).toHaveCount(0);
   await expect(page.locator('.project-information')).toContainText('Community forum');
   await expect(page.locator('.project-information')).toContainText('not yet claimed');
-  await expect(page.locator('.external-note')).toContainText('No game ROMs');
+  await expect(page.locator('.external-note')).toHaveCount(0);
   await page.goto('/projects/ext-sitehack0002/');
   await expect(page.locator('.project-information')).toContainText('Creator claim verified');
   await expect(page.getByRole('link', {name: 'Claim this listing'})).toHaveCount(0);
@@ -538,6 +538,8 @@ test('the Submit tab is the highlighted tab on the submission pages', async ({pa
     await expect(page.locator('.desktop-nav a.active')).toHaveText('Submit');
   }
   await page.goto('/');
+  await expect(page.locator('.desktop-nav a.active')).toHaveCount(0);
+  await page.goto(await page.locator('a[href*="/projects/"]').first().getAttribute('href'));
   await expect(page.locator('.desktop-nav a.active')).toHaveText('Projects');
 });
 

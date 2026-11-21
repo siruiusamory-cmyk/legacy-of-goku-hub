@@ -18,7 +18,7 @@ The [public catalogue](https://legacyofgokuhub.com/) brings community work toget
 - Share a listing on Discord or elsewhere with a preview showing its title, summary and cover art.
 - Follow new listings with the [RSS feed](https://legacyofgokuhub.com/rss.xml).
 
-Listings may cover released projects, works in progress, and useful tools or documentation. Not every project has a download or artwork. The newest listing updates scroll past in a ticker above the directory, and the footer links the RSS feed. Each card shows the name, creator, summary, status and community rating; the listing date is on the project page.
+Listings may cover released projects, works in progress, and useful tools or documentation. Not every project has a download or artwork; a listing without artwork shows a Dragon Ball plate whose star count marks its base game. The newest listing updates scroll past in a ticker above the directory, and the footer links the RSS feed. Each card shows the name, creator, summary, status and community rating; the listing date is on the project page.
 
 ## Submit, suggest, or update a project
 
@@ -81,4 +81,4 @@ For those contributing to or operating the Hub:
 
 Legacy of Goku Hub is an **unofficial community project**. The games and associated trademarks belong to their respective owners.
 
-The code in this repository is released under the [MIT License](LICENSE). The license does not cover the site's commissioned artwork (the masthead, the Dragon Ball sprites and the page wallpaper made from them), or the artwork and descriptions of listed projects, which belong to their creators.
+The code in this repository is released under the [MIT License](LICENSE). The license does not cover the site's commissioned artwork (the masthead, the Dragon Ball sprites and the page wallpaper made from them; the masthead sits on the yellow clouds of Snake Way from Buu's Fury, and the title is set in black in the open-licence Days One font and small labels at body-text size in the open-licence Pixelify Sans pixel font; icons are drawn as pixel art; body text uses fonts already on the visitor's device, and form fields, tabs, badges and text pages share one framed, bevelled style), or the artwork and descriptions of listed projects, which belong to their creators. The site's stylesheets use only colours that appear in the three games.

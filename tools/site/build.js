@@ -74,13 +74,13 @@ for(const project of catalog.projects){
   await fs.writeFile(path.join(root,'.site/input/public',src),image.data);
   artwork[project.id]={src,width:image.width,height:image.height};
 }
-const ball = (size,pad=0,fill='',star=1) => Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="${-pad} ${-pad} ${100+2*pad} ${100+2*pad}">${fill&&`<rect x="${-pad}" y="${-pad}" width="100%" height="100%" fill="${fill}"/>`}<circle cx="50" cy="50" r="46" fill="#f47a1a"/>${starLayouts[4].map(([x,y])=>`<polygon points="${starPolygon(4)}" transform="translate(${x} ${y}) scale(${star})" fill="#c8102e"/>`).join('')}</svg>`);
+const ball = (size,pad=0,fill='',star=1) => Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="${-pad} ${-pad} ${100+2*pad} ${100+2*pad}">${fill&&`<rect x="${-pad}" y="${-pad}" width="100%" height="100%" fill="${fill}"/>`}<circle cx="50" cy="50" r="46" fill="#f88818"/>${starLayouts[4].map(([x,y])=>`<polygon points="${starPolygon(4)}" transform="translate(${x} ${y}) scale(${star})" fill="#d01028"/>`).join('')}</svg>`);
 // Larger stars on the small icon, or they vanish at 16 px.
 await sharp(ball(48,0,'',1.5)).png().toFile(path.join(root,'.site/input/public/favicon.png'));
 await fs.writeFile(path.join(root,'.site/input/public/robots.txt'),'User-agent: *\nAllow: /\nSitemap: https://legacyofgokuhub.com/sitemap.xml\n');
-await sharp(ball(180,18,'#0c1533')).png().toFile(path.join(root,'.site/input/public/apple-touch-icon.png'));
+await sharp(ball(180,18,'#10103c')).png().toFile(path.join(root,'.site/input/public/apple-touch-icon.png'));
 // shortcut: site card has no lettering, replace when the artist banner lettering lands
-await sharp({create:{width:1200,height:630,channels:3,background:'#0c1533'}}).composite([{input:await sharp('website/src/assets/artist/energy-banner-960x160.png').resize(1200,null,{kernel:'nearest'}).toBuffer()}]).png().toFile(path.join(root,'.site/input/public/og-card.png'));
+await sharp({create:{width:1200,height:630,channels:3,background:'#10103c'}}).composite([{input:await sharp('website/src/assets/artist/energy-banner-960x160.png').resize(1200,null,{kernel:'nearest'}).toBuffer()}]).png().toFile(path.join(root,'.site/input/public/og-card.png'));
 await fs.writeFile(path.join(root,'.site/input/artwork.json'),JSON.stringify(artwork));
 await fs.writeFile(path.join(root,'.site/input/catalog.json'),JSON.stringify(catalog));
 await fs.writeFile(path.join(root,'.site/input/provenance.json'),JSON.stringify(provenance));

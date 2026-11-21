@@ -1,5 +1,7 @@
 # Decorative game artwork and provenance
 
+`buus-fury-snake-way-clouds.png` is one 96x96 repeat of the cloud floor cut from `buus-fury-snake-way.png` (left 0, top 262) by `node tools/site/wallpaper.js`. It carries the same credit and terms as that image and tiles behind the masthead.
+
 `log2-canyon.png` is the Canyon background from **Dragon Ball Z: The Legacy of Goku II**, credited to contributor **Son Gohan** by [Sprite Database](https://spritedatabase.net/file/2915). The original game graphics belong to their original creators and rights holders; this asset is not original Hub artwork and is not covered by the Hub code license.
 
 The owner explicitly authorized authentic trilogy game assets for this noncommercial fan site during LOG-HUB-004C. During the final refinement the owner explicitly instructed that the Canyon asset remain in the build after the redistribution issue was raised. This is ambient interface scenery, never a submitted project's cover or screenshot. No ROM file is included. The source PNG is unchanged. CSS uses native 256px scaling on mobile and 512px integer scaling on desktop, preserving square pixels and aspect ratio.

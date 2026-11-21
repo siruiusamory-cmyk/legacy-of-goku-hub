@@ -19,18 +19,22 @@
       "bytes": 20840
     },
     {
-      "file": "inter-regular-latin.woff2",
-      "source": "https://rsms.me/inter/font-files/Inter-Regular.woff2?v=4.1",
-      "source_sha256": "e06f6b1bc553aaea4e4668023ed0ab0a147129c3107f511bc7d03d361b0ae085",
-      "sha256": "506ed1538d517c6c9ca9910ed8e3bf7eb655ce1d60f5fd0bd4d45b64affdcd75",
-      "bytes": 20096
+      "file": "days-one-wordmark.woff2",
+      "family": "Days One",
+      "subset": "only the capital letters of the site title",
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/daysone/DaysOne-Regular.ttf",
+      "source_sha256": "7b5a0e6d88696e43e95f6320613908e53d36ad854b4a18e4a1b8d1c19fdbf1fe",
+      "sha256": "06eb151ffba973d5f47ad9c831c5159aa8646e7ca8f4f86c6645307c71a659d3",
+      "bytes": 1392
     },
     {
-      "file": "inter-semibold-latin.woff2",
-      "source": "https://rsms.me/inter/font-files/Inter-SemiBold.woff2?v=4.1",
-      "source_sha256": "5cb7103e4e605989afebc03d989c79201e54b21b5183db33981f70db9178a301",
-      "sha256": "fda176c175066e593d4557cdae68b621fd3a4e6d296414160f59f1d755b62488",
-      "bytes": 20376
+      "file": "pixelify-sans-bold-latin.woff2",
+      "family": "Pixelify Sans",
+      "style": "normal",
+      "weight": 700,
+      "source": "https://cdn.jsdelivr.net/fontsource/fonts/pixelify-sans@latest/latin-700-normal.woff2",
+      "sha256": "c836cfa5c0e9d62ea9b890e0418d52a6004149090a521cd198a8c09f5d5ab893",
+      "bytes": 7904
     }
   ],
   "subset_tool": "fontTools 4.63.0"
