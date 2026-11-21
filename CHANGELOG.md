@@ -26,6 +26,7 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
+- The patch guide, the ratings privacy page and the not-found page sit in the same framed panel as the rest of the site. The "Project Directory" heading is an orange tag like the panel headings in place of a maroon ribbon, and the phone menu bar has the gloss of the tabs.
 - The submission form matches the rest of the site: sunken fields, the site's own dropdown arrow, and raised step markers in the label lettering. The small download and repository buttons on cards have a raised edge. The "Projects" tab is highlighted only on project pages, no longer on the patch guide or privacy page.
 - Tabs in the main navigation and the directory are redrawn as glossy folder tabs with rounded top corners and a small gap between them. The "Community Rating" tag sits on the top left corner of its frame like the tags of the other panels.
 - Body text uses Verdana and Tahoma from the visitor's own device in place of the downloaded Inter font, which is removed. Badges are square with a raised edge, the search box is sunken and the filter dropdowns are raised, to match the site's turn-of-the-century look.
