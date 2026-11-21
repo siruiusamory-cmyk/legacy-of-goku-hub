@@ -27,7 +27,7 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 ### Changed
 
 - Every colour in the site's stylesheets is now one that appears in the three games: each was replaced by its nearest match among 2,197 colours counted from the games' sprites and backgrounds. Yellow and gold are replaced throughout by the gi orange. Selected tabs are cream so the one in the main navigation stands apart from the orange masthead.
-- The top of every page is the orange of Goku's gi in the games (`#de8400`, with `#b55200` as its shade, both measured from the first game's Goku sprite) with a pattern of pixel clouds, in place of dark navy.
+- The top of every page is the orange of Goku's gi in the games (`#de8400`, with `#b55200` as its shade, both measured from the first game's Goku sprite) over the yellow clouds of Snake Way from Buu's Fury, in place of dark navy.
 - The game's dialogue-box frame now surrounds the whole featured panel on the home page and the top panel of every project page; the artwork inside has a plain border.
 - The community rating panel on a project page has a plain white line border in the colour of the Dragon Radar casing, with the "Community Rating" tag above it. The green grid inside is unchanged.
 - Project pages no longer carry the boxed notice about links leading to sites run by other people. The footer still says no ROMs are hosted.

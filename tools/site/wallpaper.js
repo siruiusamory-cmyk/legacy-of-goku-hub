@@ -32,3 +32,8 @@ for (const parity of [1, 0]) for (let row = parity; row < ROWS; row += 2) for (l
 const file = path.join(assets, 'wallpaper-balls.png');
 await sharp(tile, {raw: {width: WIDTH, height: HEIGHT, channels: 4}}).png({palette: true, compressionLevel: 9}).toFile(file);
 console.log(`${file}: ${WIDTH}x${HEIGHT}`);
+
+const snake = sharp(path.join(assets, 'buus-fury-snake-way.png')).removeAlpha();
+const strip = top => snake.clone().extract({left: 0, top, width: 96, height: 96}).raw().toBuffer();
+assert.deepEqual(await strip(262), await strip(304).then(() => snake.clone().extract({left: 96, top: 262, width: 96, height: 96}).raw().toBuffer()));
+await snake.clone().extract({left: 0, top: 262, width: 96, height: 96}).png({palette: true, compressionLevel: 9}).toFile(path.join(assets, 'buus-fury-snake-way-clouds.png'));
