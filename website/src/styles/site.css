@@ -5,8 +5,7 @@ body {
   margin: 0;
   background:
     linear-gradient(rgb(12 21 51 / .9), rgb(12 21 51 / .9)),
-    url('../assets/artist/ball-4-inactive.png') 0 0 / 96px 96px,
-    url('../assets/artist/ball-4-inactive.png') 48px 48px / 96px 96px,
+    url('../assets/wallpaper-balls.png') 0 0 / 672px 672px,
     var(--navy);
 }
 @media (min-width: 901px) {
