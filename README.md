@@ -77,7 +77,7 @@ For those contributing to or operating the Hub:
 - [Maintainer operations and recovery](docs/OPERATIONS.md)
 - [Administrator documentation](docs/launch/ADMIN.md), including automatic publication tracking (a change replaced by a later one counts as published), failure recovery, submission deletion and automatic merging of owner-approved publications (on in production since 2026-11-18; turned off by removing `ADMIN_AUTO_MERGE_ENABLED`)
 - [Auto-merge integration evidence and owner decision report](docs/reviews/log-hub-023/REPORT.md)
-- [Deployment documentation](docs/launch/DEPLOYMENT.md)
+- [Deployment documentation](docs/launch/DEPLOYMENT.md), including the one-command preview address (`npm run site:preview`) and the short path for website-only merges
 
 Legacy of Goku Hub is an **unofficial community project**. The games and associated trademarks belong to their respective owners.
 

@@ -21,6 +21,14 @@ Current target (LOG-HUB-014): https://legacyofgokuhub.com/ with `admin`, `intake
 5. Record Actions run, artifact ID/manifest digest, signed point/current policy, Cloudflare deployment ID and production hostname. Verify HTTPS/certificate at **https://loghub.pages.dev/**; direct detail reloads, root assets/fonts/images, 404, desktop/mobile cards/filters/navigation, repository/documentation links and submit/report chooser. Confirm exactly three resources, accurate release/download absence, unrated display and “Preview only · not saved”, no fixtures/DragonByte. Public HTTP/CDN checks await the authorized first upload.
 6. Inspect the deploy job and GitHub failure notifications after each upload; the existing catalog notification job covers publication, not deploy failure. Check live availability manually after changes/outage reports. Record the next scheduled catalog/deployment result; no analytics/paid monitoring service is introduced.
 
+## Looking at a change before it ships
+
+`npm run site:preview` builds the site from the catalogue the live site is showing and uploads it to https://preview.loghub.pages.dev. It takes under a minute, needs `wrangler login` once on the machine, and never touches production: the build is marked `purpose=preview`, which `check-deployment.js` refuses to seal, and it is uploaded to the `preview` branch of the Pages project. Ratings and submissions are switched off in the preview. Cloudflare serves it with `X-Robots-Tag: noindex`.
+
+## Website-only merges
+
+The `scope` job in `catalog.yml` lists the files a push to `main` changed. When every one of them is under `website/`, `docs/` or `tests/`, or is `README.md` or `CHANGELOG.md`, the synchronize, backup, anchor and publish jobs are skipped and the run goes straight to `website` and `deploy-website`, which build from the last signed catalogue snapshot. Sealing, artifact verification, the Cloudflare project check, the stale-revision check and the protected `cloudflare-pages` environment all still run. Any other file, an unreadable comparison, or 300 or more changed files takes the full path. Scheduled, issue and manual runs always take the full path.
+
 ## Safe local verification (no Cloudflare contact)
 
 With current source/dependencies and a verified extracted signed export:

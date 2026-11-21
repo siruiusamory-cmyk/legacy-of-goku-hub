@@ -6,6 +6,8 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Added
 
+- Design changes can be looked at before they ship: `npm run site:preview` builds the site from the published catalogue and uploads it to https://preview.loghub.pages.dev in under a minute. Production is not touched and the preview is hidden from search engines.
+- A merge that changes only the website, its tests or documentation now skips the catalogue synchronisation, backup and publication jobs and goes straight to the verified build and upload. It reaches the live site in about a minute and a half, down from nearly five.
 - The submission form shows three steps (Details, Check, Sent) and keeps what you typed if the page reloads or you come back in the same tab. **Start over** clears it.
 - Correcting a listing shows the listing as it is now, next to the fields. Fill in only what should change; anything left alone is not sent.
 - The receipt can be saved as a file, and the **Check status** link opens the status directly. The footer and the submission page link to **Check a submission**.
