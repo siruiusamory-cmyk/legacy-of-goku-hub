@@ -26,7 +26,7 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
-- The home page says each thing once. The line under the navigation, the sentence beside "Project Directory", the "Browse the directory" link and the footer's "A community home" line and second Submit link are gone. "No ROMs hosted" now appears once, in the footer.
+- The home page says each thing once. The line under the navigation, the sentence beside "Project Directory", the "Browse the directory" link and the footer's "A community home" line and second Submit link are gone. "No ROMs hosted" now appears once, in the footer. Project cards no longer print "Not rated yet" beside their grey balls or repeat the listing date; screen readers still hear the unrated state, and the date stays on the project page and in the ticker.
 - Latest listing updates are a scrolling ticker above the directory in place of three boxes. It pauses under the pointer or keyboard focus and stays still for visitors who ask for reduced motion.
 - Gold buttons and the selected tabs have a glossy shine, and the footer carries 88x31 buttons for the RSS feed, "Fan made" and "No ROMs hosted".
 - The page background is a faint wallpaper of all seven Dragon Balls in a shuffled pattern, in place of the starfield. On wide screens it stays still while the page scrolls.

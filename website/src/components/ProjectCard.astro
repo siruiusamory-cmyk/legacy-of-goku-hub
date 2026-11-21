@@ -1,5 +1,5 @@
 ---
-import {href, projectURL, rating, projectActions, formatDate} from '../lib/catalog.js';
+import {href, projectURL, rating, projectActions} from '../lib/catalog.js';
 import {projectSummary} from '../lib/summary.js';
 import Badges from './Badges.astro';
 import Rating from './Rating.astro';
@@ -14,6 +14,6 @@ const summary = projectSummary(project.description || '');
   <div class="card-content"><h3><a href={projectURL(project)}>{project.title}</a></h3><p class="developer">by {project.developer}</p>
     {summary && <p class="card-summary">{summary}</p>}
     <div class="card-meta"><Badges project={project}/><div class="card-actions">{actions.map(a => <a class="icon-button" href={a.url} aria-label={a.aria} rel="noopener noreferrer"><Icon name={a.id === 'download' || a.id === 'distribution' ? 'download' : a.cardIcon}/></a>)}</div></div>
-    <div class="card-bottom">{project.last_updated && <p class="card-updated">Listing updated <time datetime={project.last_updated}>{formatDate(project.last_updated)}</time></p>}<Rating {...rating(project)} projectId={project.id} compact/></div>
+    <div class="card-bottom"><Rating {...rating(project)} projectId={project.id} compact/></div>
   </div>
 </article>
