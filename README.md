@@ -81,4 +81,4 @@ For those contributing to or operating the Hub:
 
 Legacy of Goku Hub is an **unofficial community project**. The games and associated trademarks belong to their respective owners.
 
-The code in this repository is released under the [MIT License](LICENSE). The license does not cover the site's commissioned artwork (the masthead, the Dragon Ball sprites and the page wallpaper made from them; the masthead sits on the orange of Goku's gi from the games), or the artwork and descriptions of listed projects, which belong to their creators.
+The code in this repository is released under the [MIT License](LICENSE). The license does not cover the site's commissioned artwork (the masthead, the Dragon Ball sprites and the page wallpaper made from them; the masthead sits on the orange of Goku's gi from the games). The site's stylesheets use only colours that appear in the three games, or the artwork and descriptions of listed projects, which belong to their creators.
