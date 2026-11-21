@@ -18,7 +18,7 @@ The [public catalogue](https://legacyofgokuhub.com/) brings community work toget
 - Share a listing on Discord or elsewhere with a preview showing its title, summary and cover art.
 - Follow new listings with the [RSS feed](https://legacyofgokuhub.com/rss.xml).
 
-Listings may cover released projects, works in progress, and useful tools or documentation. Not every project has a download or artwork. The newest listing updates scroll past in a ticker above the directory, and the footer links the RSS feed. Each card shows the name, creator, summary, status and community rating; the listing date is on the project page.
+Listings may cover released projects, works in progress, and useful tools or documentation. Not every project has a download or artwork; a listing without artwork shows a Dragon Ball plate whose star count marks its base game. The newest listing updates scroll past in a ticker above the directory, and the footer links the RSS feed. Each card shows the name, creator, summary, status and community rating; the listing date is on the project page.
 
 ## Submit, suggest, or update a project
 
