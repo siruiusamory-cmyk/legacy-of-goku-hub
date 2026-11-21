@@ -106,7 +106,12 @@
       ],
       "artwork_sets": [
         []
-      ]
+      ],
+      "claim": {
+        "method": "manual",
+        "proof_digest": "3fb01b4238913530cffec8b89a0196ee2737fba95bda73207717a3c075f225ab",
+        "verified_at": "2026-11-21T17:37:20Z"
+      }
     },
     {
       "project_id": "ext-esutxwic5eus",
