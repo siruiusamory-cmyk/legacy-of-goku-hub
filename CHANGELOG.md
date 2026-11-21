@@ -26,6 +26,9 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
+- The home page says each thing once. The line under the navigation, the sentence beside "Project Directory", the "Browse the directory" link and the footer's "A community home" line and second Submit link are gone. "No ROMs hosted" now appears once, in the footer.
+- Latest listing updates are a scrolling ticker above the directory in place of three boxes. It pauses under the pointer or keyboard focus and stays still for visitors who ask for reduced motion.
+- Gold buttons and the selected tabs have a glossy shine, and the footer carries 88x31 buttons for the RSS feed, "Fan made" and "No ROMs hosted".
 - The page background is a faint wallpaper of all seven Dragon Balls in a shuffled pattern, in place of the starfield. On wide screens it stays still while the page scrolls.
 - The main menu is Projects, Submit and Discord. The Discord tab shows its name next to the logo. The GitHub tab, the footer's "Contribute on GitHub" link and the "GitHub route" notes on the submission pages are gone: the site no longer links to its own repository. Links to the repositories of listed projects are unchanged.
 - Every Submit, Correct and Claim link opens the site's own form. If submissions are switched off, the form says so and points to Discord for corrections and removals, instead of sending visitors to GitHub.

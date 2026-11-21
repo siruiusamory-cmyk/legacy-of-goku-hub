@@ -322,7 +322,6 @@ test('primary navigation points at the native submit page', async ({page, contex
   await mock(context);
   await page.goto('/');
   await expect(page.getByRole('navigation', {name: 'Main navigation'}).getByRole('link', {name: 'Submit'})).toHaveAttribute('href', '/submit/');
-  await expect(page.locator('footer').getByRole('link', {name: 'Submit a project'})).toHaveAttribute('href', '/submit/');
 });
 
 const received = () => ({status: 201, body: {receipt: RECEIPT, status: 'received', message: 'We have your submission.'}});

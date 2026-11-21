@@ -18,7 +18,7 @@ The [public catalogue](https://legacyofgokuhub.com/) brings community work toget
 - Share a listing on Discord or elsewhere with a preview showing its title, summary and cover art.
 - Follow new listings with the [RSS feed](https://legacyofgokuhub.com/rss.xml).
 
-Listings may cover released projects, works in progress, and useful tools or documentation. Not every project has a download or artwork.
+Listings may cover released projects, works in progress, and useful tools or documentation. Not every project has a download or artwork. The newest listing updates scroll past in a ticker above the directory, and the footer links the RSS feed.
 
 ## Submit, suggest, or update a project
 
