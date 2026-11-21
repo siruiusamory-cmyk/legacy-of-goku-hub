@@ -60,6 +60,8 @@
   border: 1px solid var(--line);
   background: var(--surface-low);
   color: var(--muted);
+  font: italic 700 1.15rem var(--font-label);
+  box-shadow: inset 1px 1px 0 rgb(255 255 255 / .4),inset -1px -1px 0 rgb(0 0 0 / .5);
 }
 .steps li[aria-current] {
   border: 3px solid var(--gold);
@@ -200,6 +202,7 @@
   border-radius: var(--radius-control);
   background: linear-gradient(var(--surface), var(--surface-low));
   cursor: pointer;
+  box-shadow: inset 1px 1px 0 rgb(255 255 255 / .4),inset -1px -1px 0 rgb(0 0 0 / .5);
 }
 .kind-option input {
   position: absolute;
@@ -264,10 +267,18 @@
   width: 100%;
   min-height: 44px;
   padding: 10px 12px;
-  border: 1px solid var(--border);
+  border: 2px solid var(--steel);
   border-radius: var(--radius-control);
-  background: var(--surface-low);
+  background: var(--navy-deep);
   color: var(--paper);
+  box-shadow: inset 2px 2px 0 rgb(0 0 0 / .55),inset -1px -1px 0 rgb(255 255 255 / .18);
+}
+.field select {
+  appearance: none;
+  padding-right: 34px;
+  background-image: var(--chevron);
+  background-repeat: no-repeat;
+  background-position: right 12px center;
 }
 .field textarea {
   resize: vertical;
