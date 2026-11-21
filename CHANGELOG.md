@@ -26,7 +26,7 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
-- The site title in the masthead is set in Bangers, a comic lettering face, in the blues of the energy beam instead of black with a red last word. The font file holds only the title's letters (4 KB).
+- The site title in the masthead is lettered after the games' own title logos: wide slanted capitals in Days One, filled yellow to orange with a black outline and a red drop shadow, in place of black with a red last word. The font file holds only the title's letters.
 - No tab in the main navigation is highlighted on the home page. A tab turns cream when pointed at, and stays cream on the page it leads to.
 - Every colour in the site's stylesheets is now one that appears in the three games: each was replaced by its nearest match among 2,197 colours counted from the games' sprites and backgrounds. Yellow and gold are replaced throughout by the gi orange. Selected tabs are cream so the one in the main navigation stands apart from the orange masthead.
 - The top of every page is the orange of Goku's gi in the games (`#de8400`, with `#b55200` as its shade, both measured from the first game's Goku sprite) over the yellow clouds of Snake Way from Buu's Fury, in place of dark navy.

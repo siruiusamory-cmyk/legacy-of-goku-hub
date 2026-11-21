@@ -33,13 +33,13 @@
       "bytes": 20376
     },
     {
-      "file": "bangers-wordmark.woff2",
-      "family": "Bangers",
-      "subset": "only the letters of the site title",
-      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/bangers/Bangers-Regular.ttf",
-      "source_sha256": "4160a7311de9342674cce9160cde9fcbb30f48190397d86ff1b70b455af65824",
-      "sha256": "89243c565eb41025fd48f726791832292f67c2f0f467669a7e01d528ccbbc4e7",
-      "bytes": 4260
+      "file": "days-one-wordmark.woff2",
+      "family": "Days One",
+      "subset": "only the capital letters of the site title",
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/daysone/DaysOne-Regular.ttf",
+      "source_sha256": "7b5a0e6d88696e43e95f6320613908e53d36ad854b4a18e4a1b8d1c19fdbf1fe",
+      "sha256": "06eb151ffba973d5f47ad9c831c5159aa8646e7ca8f4f86c6645307c71a659d3",
+      "bytes": 1392
     }
   ],
   "subset_tool": "fontTools 4.63.0"
