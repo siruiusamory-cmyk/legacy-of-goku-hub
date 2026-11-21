@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "ext-ehmtwl6v2tj6",
   "title": "Legacy of Goku II Enhanced",
-  "developer": "ThegreatBen",
+  "developer": "Tedi1997",
   "description": "A rebalance of The Legacy of Goku II, made for the European ROM. Levelling is much faster after level 30, every character starts with a large ki bonus so special moves and Super Saiyan are usable, and the characters are re-tuned: Gohan starts weak and ends strongest, Vegeta, Piccolo and Trunks each excel in one stat, and Goku is above average in all. A second patch includes an anti-piracy fix for flash carts.",
   "game": "legacy-of-goku-2",
   "category": "rom-hack",
@@ -18,5 +18,6 @@
   },
   "screenshots": [],
   "omit_artwork": true,
-  "approved_at": "2026-11-19T18:37:49Z"
+  "approved_at": "2026-11-19T18:37:49Z",
+  "links": []
 }
