@@ -26,8 +26,9 @@ Changes that visitors or contributors can see. Catalogue publications are not li
 
 ### Changed
 
+- Tabs in the main navigation and the directory are redrawn as glossy folder tabs with rounded top corners and a small gap between them. The "Community Rating" tag sits on the top left corner of its frame like the tags of the other panels.
 - Body text uses Verdana and Tahoma from the visitor's own device in place of the downloaded Inter font, which is removed. Badges are square with a raised edge, the search box is sunken and the filter dropdowns are raised, to match the site's turn-of-the-century look.
-- The site title in the masthead is lettered after the games' own title logos: wide slanted capitals in Days One, filled yellow to orange with a black outline and a red drop shadow, in place of black with a red last word. The font file holds only the title's letters.
+- The site title in the masthead is lettered after the games' own title logos: wide slanted capitals in Days One, black with a yellow to orange outline and a red drop shadow, in place of black with a red last word. The font file holds only the title's letters.
 - No tab in the main navigation is highlighted on the home page. A tab turns cream when pointed at, and stays cream on the page it leads to.
 - Every colour in the site's stylesheets is now one that appears in the three games: each was replaced by its nearest match among 2,197 colours counted from the games' sprites and backgrounds. Yellow and gold are replaced throughout by the gi orange. Selected tabs are cream so the one in the main navigation stands apart from the orange masthead.
 - The top of every page is the orange of Goku's gi in the games (`#de8400`, with `#b55200` as its shade, both measured from the first game's Goku sprite) over the yellow clouds of Snake Way from Buu's Fury, in place of dark navy.
