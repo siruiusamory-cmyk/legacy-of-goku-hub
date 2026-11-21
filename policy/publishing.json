@@ -363,7 +363,12 @@
             "sha256": "d0a72b488d6665d07a890a1ccdb04a7a5f8273e1f57bf9e91ac94a407c11dedb"
           }
         ]
-      ]
+      ],
+      "claim": {
+        "method": "manual",
+        "proof_digest": "5e1f037124ea59bf4eac5f5c14136443b5f77a6922bc25b2291d0e275f064d45",
+        "verified_at": "2026-11-21T07:45:19Z"
+      }
     },
     {
       "project_id": "gh-1429329775",
