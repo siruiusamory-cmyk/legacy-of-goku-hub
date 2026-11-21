@@ -44,5 +44,5 @@ h2,h3,.label,.panel-title,.featured-label,.desktop-nav a,.category-tabs a,.mobil
 }
 h1 {font-size: var(--text-title);}
 strong,b {font-weight: var(--weight-ui);}
-.badge,.tab-count,dt,.featured-label,.ticker strong,.button88 {font-family: var(--font-pixel); font-style: normal; font-weight: 700; font-size: .9rem; letter-spacing: 0;}
-.button88 {font-size: .75rem;}
+.badge,.tab-count,dt,.featured-label,.ticker strong,.button88 {font-family: var(--font-pixel); font-style: normal; font-weight: 700; font-size: 1rem; letter-spacing: 0;}
+.button88 {width: auto; min-width: 88px; padding: 0 8px; font-size: 1rem; white-space: nowrap;}
